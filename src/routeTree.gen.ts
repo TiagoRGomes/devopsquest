@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as SkillsRouteImport } from './routes/skills'
+import { Route as AulasLessonIdRouteImport } from './routes/aulas.$lessonId'
 import { Route as ModulosIndexRouteImport } from './routes/modulos.index'
 import { Route as ModulosSlugRouteImport } from './routes/modulos.$slug'
 
@@ -30,6 +31,11 @@ const SkillsRoute = SkillsRouteImport.update({
   path: '/skills',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AulasLessonIdRoute = AulasLessonIdRouteImport.update({
+  id: '/aulas/$lessonId',
+  path: '/aulas/$lessonId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ModulosIndexRoute = ModulosIndexRouteImport.update({
   id: '/modulos/',
   path: '/modulos/',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/mapa': typeof MapaRoute
   '/skills': typeof SkillsRoute
+  '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/modulos/$slug': typeof ModulosSlugRoute
   '/modulos/': typeof ModulosIndexRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/mapa': typeof MapaRoute
   '/skills': typeof SkillsRoute
+  '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/modulos/$slug': typeof ModulosSlugRoute
   '/modulos': typeof ModulosIndexRoute
 }
@@ -60,21 +68,42 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/mapa': typeof MapaRoute
   '/skills': typeof SkillsRoute
+  '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/modulos/$slug': typeof ModulosSlugRoute
   '/modulos/': typeof ModulosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/mapa' | '/skills' | '/modulos/$slug' | '/modulos/'
+  fullPaths:
+    | '/'
+    | '/mapa'
+    | '/skills'
+    | '/aulas/$lessonId'
+    | '/modulos/$slug'
+    | '/modulos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/mapa' | '/skills' | '/modulos/$slug' | '/modulos'
-  id: '__root__' | '/' | '/mapa' | '/skills' | '/modulos/$slug' | '/modulos/'
+  to:
+    | '/'
+    | '/mapa'
+    | '/skills'
+    | '/aulas/$lessonId'
+    | '/modulos/$slug'
+    | '/modulos'
+  id:
+    | '__root__'
+    | '/'
+    | '/mapa'
+    | '/skills'
+    | '/aulas/$lessonId'
+    | '/modulos/$slug'
+    | '/modulos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MapaRoute: typeof MapaRoute
   SkillsRoute: typeof SkillsRoute
+  AulasLessonIdRoute: typeof AulasLessonIdRoute
   ModulosSlugRoute: typeof ModulosSlugRoute
   ModulosIndexRoute: typeof ModulosIndexRoute
 }
@@ -102,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SkillsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/aulas/$lessonId': {
+      id: '/aulas/$lessonId'
+      path: '/aulas/$lessonId'
+      fullPath: '/aulas/$lessonId'
+      preLoaderRoute: typeof AulasLessonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/modulos/': {
       id: '/modulos/'
       path: '/modulos'
@@ -123,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MapaRoute: MapaRoute,
   SkillsRoute: SkillsRoute,
+  AulasLessonIdRoute: AulasLessonIdRoute,
   ModulosSlugRoute: ModulosSlugRoute,
   ModulosIndexRoute: ModulosIndexRoute,
 }
