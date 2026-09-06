@@ -16,6 +16,27 @@ export interface QuizQuestion {
   explanation: string;
 }
 
+export type ExamLevel = "facil" | "medio" | "dificil";
+
+export interface ExamQuestion extends QuizQuestion {
+  level: ExamLevel;
+}
+
+export interface ModuleExam {
+  moduleId: string;
+  questions: ExamQuestion[];
+}
+
+export interface ExamResult {
+  best: number;
+  passedAt: string | null;
+}
+
+export interface ExamAttemptDay {
+  date: string;
+  count: number;
+}
+
 export interface Lesson {
   id: string;
   moduleId: string;
@@ -166,6 +187,8 @@ export interface UserProgress {
   streak: number;
   lastActive: string | null;
   currentLessonId: string | null;
+  moduleExams: Record<string, ExamResult>;
+  examAttempts: Record<string, ExamAttemptDay>;
 }
 
 export interface LevelTier {
