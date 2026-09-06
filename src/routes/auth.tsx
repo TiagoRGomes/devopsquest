@@ -10,9 +10,9 @@ import { Panel } from "@/components/ui-bits";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    mode: search["mode"] === "signup" ? ("signup" as const) : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { mode?: "signup" } =>
+    search["mode"] === "signup" ? { mode: "signup" } : {},
+
   head: () => ({
     meta: [
       { title: "Entrar — Jornada DevOps" },
