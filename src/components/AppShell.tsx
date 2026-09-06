@@ -10,6 +10,7 @@ import {
   FlaskConical,
   Gauge,
   Library,
+  LogIn,
   Map,
   Menu,
   Skull,
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProgress } from "@/lib/progress";
+import { initials, useAuth } from "@/lib/auth";
 import { XpBar } from "@/components/ui-bits";
 import { GlobalSearch } from "@/components/GlobalSearch";
 
@@ -89,6 +91,7 @@ function Brand() {
 export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { progress, level, hydrated } = useProgress();
+  const { user, profile } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -110,7 +113,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <NavLinks />
           </div>
           <p className="text-[11px] leading-relaxed text-muted-foreground">
-            Progresso salvo neste navegador.
+            {user ? "Progresso salvo na sua conta." : "Entre para salvar seu progresso na nuvem."}
           </p>
         </aside>
 
