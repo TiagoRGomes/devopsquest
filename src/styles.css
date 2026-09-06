@@ -212,3 +212,23 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
 }
+
+@media print {
+  .no-print,
+  header,
+  nav,
+  footer,
+  aside {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  #certificate-print {
+    box-shadow: none !important;
+    border-color: #999 !important;
+    color: #111 !important;
+    page-break-inside: avoid;
+  }
+}
