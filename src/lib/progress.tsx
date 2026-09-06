@@ -8,12 +8,13 @@ import {
   type ReactNode,
 } from "react";
 import { toast } from "sonner";
-import type { UserProgress } from "./types";
+import type { ExamResult, UserProgress } from "./types";
 import { ALL_LESSONS, MODULES } from "@/data/curriculum";
 import { LABS } from "@/data/labs";
 import { BOSSES, CHALLENGES } from "@/data/challenges";
 import { PROJECT_STEPS } from "@/data/project";
 import { BADGES, levelFromXp } from "@/data/world";
+import { DAILY_ATTEMPTS, PASS_SCORE, getExam, previousModuleId } from "@/data/exams";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./auth";
 
@@ -32,6 +33,8 @@ export const EMPTY_PROGRESS: UserProgress = {
   streak: 0,
   lastActive: null,
   currentLessonId: null,
+  moduleExams: {},
+  examAttempts: {},
 };
 
 const XP = {
@@ -42,6 +45,7 @@ const XP = {
   boss: 750,
   projectStep: 200,
   module: 1000,
+  exam: 500,
 } as const;
 
 function todayISO() {
@@ -65,6 +69,12 @@ interface ProgressContextValue {
   saveNote: (lessonId: string, note: string) => void;
   setCurrentLesson: (lessonId: string) => void;
   reset: () => void;
+  examResult: (moduleId: string) => ExamResult;
+  attemptsLeftToday: (moduleId: string) => number;
+  submitExam: (moduleId: string, score: number) => { passed: boolean; attemptsLeft: number };
+  isModuleUnlocked: (moduleId: string) => boolean;
+  moduleCertificates: string[];
+  courseComplete: boolean;
   earnedBadges: string[];
   moduleProgress: (moduleId: string) => { done: number; total: number; percent: number };
   regionProgress: (moduleIds: string[]) => number;
@@ -111,6 +121,21 @@ function union(a: string[], b: string[]) {
   return Array.from(new Set([...a, ...b]));
 }
 
+function mergeExams(
+  remote: Record<string, ExamResult> = {},
+  local: Record<string, ExamResult> = {},
+): Record<string, ExamResult> {
+  const out: Record<string, ExamResult> = { ...remote };
+  for (const [id, value] of Object.entries(local)) {
+    const prev = out[id];
+    out[id] = {
+      best: Math.max(prev?.best ?? 0, value.best),
+      passedAt: prev?.passedAt ?? value.passedAt,
+    };
+  }
+  return out;
+}
+
 function mergeProgress(remote: UserProgress, local: UserProgress | null): UserProgress {
   if (!local) return remote;
   return {
@@ -126,6 +151,8 @@ function mergeProgress(remote: UserProgress, local: UserProgress | null): UserPr
     streak: Math.max(remote.streak, local.streak),
     lastActive: remote.lastActive ?? local.lastActive,
     currentLessonId: local.currentLessonId ?? remote.currentLessonId,
+    moduleExams: mergeExams(remote.moduleExams, local.moduleExams),
+    examAttempts: { ...remote.examAttempts, ...local.examAttempts },
   };
 }
 
@@ -142,6 +169,8 @@ interface ProgressRow {
   streak: number;
   last_active: string | null;
   current_lesson_id: string | null;
+  module_exams: unknown;
+  exam_attempts: unknown;
 }
 
 function rowToProgress(row: ProgressRow): UserProgress {
@@ -158,6 +187,8 @@ function rowToProgress(row: ProgressRow): UserProgress {
     streak: row.streak ?? 0,
     lastActive: row.last_active ?? null,
     currentLessonId: row.current_lesson_id ?? null,
+    moduleExams: (row.module_exams as Record<string, ExamResult> | null) ?? {},
+    examAttempts: (row.exam_attempts as UserProgress["examAttempts"] | null) ?? {},
   };
 }
 
@@ -176,6 +207,8 @@ function progressToRow(userId: string, p: UserProgress) {
     streak: p.streak,
     last_active: p.lastActive,
     current_lesson_id: p.currentLessonId,
+    module_exams: p.moduleExams,
+    exam_attempts: p.examAttempts,
   };
 }
 
@@ -225,9 +258,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }
     if (!userId) return;
     const timer = setTimeout(() => {
-      void supabase.from("progress").upsert(progressToRow(userId, progress), {
+      void supabase.from("progress").upsert(progressToRow(userId, progress) as never, {
         onConflict: "user_id",
       });
+
     }, 700);
     return () => clearTimeout(timer);
   }, [progress, hydrated, userId]);
@@ -350,6 +384,70 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     toast.success("Progresso reiniciado");
   }, []);
 
+  const examResult = useCallback(
+    (moduleId: string): ExamResult => progress.moduleExams[moduleId] ?? { best: 0, passedAt: null },
+    [progress.moduleExams],
+  );
+
+  const attemptsLeftToday = useCallback(
+    (moduleId: string) => {
+      const entry = progress.examAttempts[moduleId];
+      if (!entry || entry.date !== todayISO()) return DAILY_ATTEMPTS;
+      return Math.max(0, DAILY_ATTEMPTS - entry.count);
+    },
+    [progress.examAttempts],
+  );
+
+  const submitExam = useCallback(
+    (moduleId: string, score: number) => {
+      const today = todayISO();
+      const entry = progress.examAttempts[moduleId];
+      const usedToday = entry && entry.date === today ? entry.count : 0;
+      const passed = score >= PASS_SCORE;
+      const alreadyPassed = Boolean(progress.moduleExams[moduleId]?.passedAt);
+
+      setProgress((prev) => {
+        const prevResult = prev.moduleExams[moduleId] ?? { best: 0, passedAt: null };
+        return {
+          ...prev,
+          examAttempts: { ...prev.examAttempts, [moduleId]: { date: today, count: usedToday + 1 } },
+          moduleExams: {
+            ...prev.moduleExams,
+            [moduleId]: {
+              best: Math.max(prevResult.best, score),
+              passedAt: prevResult.passedAt ?? (passed ? today : null),
+            },
+          },
+        };
+      });
+
+      if (passed && !alreadyPassed) {
+        const mod = MODULES.find((m) => m.id === moduleId);
+        award(XP.exam, `Exame aprovado: ${mod?.title ?? moduleId}`);
+      }
+
+      return { passed, attemptsLeft: Math.max(0, DAILY_ATTEMPTS - (usedToday + 1)) };
+    },
+    [award, progress.examAttempts, progress.moduleExams],
+  );
+
+  const isModuleUnlocked = useCallback(
+    (moduleId: string) => {
+      const prevId = previousModuleId(moduleId);
+      if (!prevId) return true;
+      if (!getExam(prevId)) return true;
+      return Boolean(progress.moduleExams[prevId]?.passedAt);
+    },
+    [progress.moduleExams],
+  );
+
+  const moduleCertificates = useMemo(
+    () => MODULES.filter((m) => progress.moduleExams[m.id]?.passedAt).map((m) => m.id),
+    [progress.moduleExams],
+  );
+
+  const courseComplete = moduleCertificates.length === MODULES.length;
+
   const moduleProgress = useCallback(
     (moduleId: string) => {
       const mod = MODULES.find((m) => m.id === moduleId);
@@ -425,6 +523,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     saveNote,
     setCurrentLesson,
     reset,
+    examResult,
+    attemptsLeftToday,
+    submitExam,
+    isModuleUnlocked,
+    moduleCertificates,
+    courseComplete,
     earnedBadges,
     moduleProgress,
     regionProgress,

@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { BookOpen, Check, FlaskConical, Skull } from "lucide-react";
+import { Award, BookOpen, Check, FlaskConical, GraduationCap, Lock, Skull } from "lucide-react";
 import { useProgress } from "@/lib/progress";
+import { useI18n } from "@/lib/i18n";
+import { PASS_SCORE, getExam } from "@/data/exams";
 import { getModule } from "@/data/curriculum";
 import { labsByModule } from "@/data/labs";
 import { getBoss } from "@/data/challenges";
@@ -35,7 +37,8 @@ export const Route = createFileRoute("/modulos/$slug")({
 function ModuloDetail() {
   const { slug } = Route.useParams();
   const mod = getModule(slug);
-  const { progress, moduleProgress, completeLab } = useProgress();
+  const { progress, moduleProgress, completeLab, isModuleUnlocked, examResult, attemptsLeftToday } = useProgress();
+  const { t } = useI18n();
 
   if (!mod) {
     return <EmptyState title="Módulo não encontrado" description="Escolha outro módulo na lista." />;
@@ -45,6 +48,10 @@ function ModuloDetail() {
   const p = moduleProgress(mod.id);
   const boss = mod.bossId ? getBoss(mod.bossId) : undefined;
   const badge = BADGES.find((b) => b.id === mod.badge);
+  const unlocked = isModuleUnlocked(mod.id);
+  const exam = getExam(mod.id);
+  const examStatus = examResult(mod.id);
+  const attemptsLeft = attemptsLeftToday(mod.id);
 
   return (
     <div className="space-y-6">
@@ -100,6 +107,52 @@ function ModuloDetail() {
           </ul>
         </Panel>
       </div>
+
+      {!unlocked && (
+        <Panel className="border-warning/50">
+          <p className="flex items-center gap-2 font-display font-semibold text-warning">
+            <Lock className="size-4" /> {t("exam.locked")}
+          </p>
+          <p className="mt-1.5 text-sm text-muted-foreground">{t("exam.lockedText")}</p>
+        </Panel>
+      )}
+
+      {exam && unlocked && (
+        <Panel className={examStatus.passedAt ? "border-success/50" : "border-primary/40"}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="flex items-center gap-2 font-display font-semibold text-foreground">
+                <GraduationCap className="size-4 text-primary" /> {t("exam.title")}
+              </p>
+              <p className="mt-1.5 text-sm text-muted-foreground">{t("exam.subtitle", { pass: PASS_SCORE })}</p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <Chip tone={attemptsLeft > 0 ? "primary" : "danger"}>
+                  {t("exam.attemptsLeft", { n: attemptsLeft, max: 3 })}
+                </Chip>
+                {examStatus.best > 0 && <Chip tone="accent">{t("exam.best")}: {examStatus.best}%</Chip>}
+                {examStatus.passedAt && <Chip tone="success">{t("exam.passed")}</Chip>}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                to="/exame/$slug"
+                params={{ slug: mod.slug }}
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                <GraduationCap className="size-4" /> {t("exam.openExam")}
+              </Link>
+              {examStatus.passedAt && (
+                <Link
+                  to="/certificados"
+                  className="inline-flex items-center gap-2 rounded-lg border border-success/50 bg-success/10 px-3.5 py-2 text-sm text-success"
+                >
+                  <Award className="size-4" /> {t("exam.viewCertificate")}
+                </Link>
+              )}
+            </div>
+          </div>
+        </Panel>
+      )}
 
       <Panel>
         <SectionTitle eyebrow="Aulas" title={`${mod.lessons.length} aulas neste módulo`} />
