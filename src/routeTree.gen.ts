@@ -11,10 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BossBattlesRouteImport } from './routes/boss-battles'
+import { Route as CarreiraRouteImport } from './routes/carreira'
+import { Route as ConquistasRouteImport } from './routes/conquistas'
 import { Route as DesafiosRouteImport } from './routes/desafios'
 import { Route as LaboratoriosRouteImport } from './routes/laboratorios'
 import { Route as MapaRouteImport } from './routes/mapa'
+import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as ProjetoRouteImport } from './routes/projeto'
+import { Route as RecursosRouteImport } from './routes/recursos'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as AulasLessonIdRouteImport } from './routes/aulas.$lessonId'
 import { Route as ModulosIndexRouteImport } from './routes/modulos.index'
@@ -28,6 +32,16 @@ const IndexRoute = IndexRouteImport.update({
 const BossBattlesRoute = BossBattlesRouteImport.update({
   id: '/boss-battles',
   path: '/boss-battles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CarreiraRoute = CarreiraRouteImport.update({
+  id: '/carreira',
+  path: '/carreira',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConquistasRoute = ConquistasRouteImport.update({
+  id: '/conquistas',
+  path: '/conquistas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesafiosRoute = DesafiosRouteImport.update({
@@ -45,9 +59,19 @@ const MapaRoute = MapaRouteImport.update({
   path: '/mapa',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjetoRoute = ProjetoRouteImport.update({
   id: '/projeto',
   path: '/projeto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecursosRoute = RecursosRouteImport.update({
+  id: '/recursos',
+  path: '/recursos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SkillsRoute = SkillsRouteImport.update({
@@ -74,10 +98,14 @@ const ModulosSlugRoute = ModulosSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/boss-battles': typeof BossBattlesRoute
+  '/carreira': typeof CarreiraRoute
+  '/conquistas': typeof ConquistasRoute
   '/desafios': typeof DesafiosRoute
   '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
+  '/perfil': typeof PerfilRoute
   '/projeto': typeof ProjetoRoute
+  '/recursos': typeof RecursosRoute
   '/skills': typeof SkillsRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/modulos/$slug': typeof ModulosSlugRoute
@@ -86,10 +114,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/boss-battles': typeof BossBattlesRoute
+  '/carreira': typeof CarreiraRoute
+  '/conquistas': typeof ConquistasRoute
   '/desafios': typeof DesafiosRoute
   '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
+  '/perfil': typeof PerfilRoute
   '/projeto': typeof ProjetoRoute
+  '/recursos': typeof RecursosRoute
   '/skills': typeof SkillsRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/modulos/$slug': typeof ModulosSlugRoute
@@ -99,10 +131,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/boss-battles': typeof BossBattlesRoute
+  '/carreira': typeof CarreiraRoute
+  '/conquistas': typeof ConquistasRoute
   '/desafios': typeof DesafiosRoute
   '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
+  '/perfil': typeof PerfilRoute
   '/projeto': typeof ProjetoRoute
+  '/recursos': typeof RecursosRoute
   '/skills': typeof SkillsRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/modulos/$slug': typeof ModulosSlugRoute
@@ -113,10 +149,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/boss-battles'
+    | '/carreira'
+    | '/conquistas'
     | '/desafios'
     | '/laboratorios'
     | '/mapa'
+    | '/perfil'
     | '/projeto'
+    | '/recursos'
     | '/skills'
     | '/aulas/$lessonId'
     | '/modulos/$slug'
@@ -125,10 +165,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/boss-battles'
+    | '/carreira'
+    | '/conquistas'
     | '/desafios'
     | '/laboratorios'
     | '/mapa'
+    | '/perfil'
     | '/projeto'
+    | '/recursos'
     | '/skills'
     | '/aulas/$lessonId'
     | '/modulos/$slug'
@@ -137,10 +181,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/boss-battles'
+    | '/carreira'
+    | '/conquistas'
     | '/desafios'
     | '/laboratorios'
     | '/mapa'
+    | '/perfil'
     | '/projeto'
+    | '/recursos'
     | '/skills'
     | '/aulas/$lessonId'
     | '/modulos/$slug'
@@ -150,10 +198,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BossBattlesRoute: typeof BossBattlesRoute
+  CarreiraRoute: typeof CarreiraRoute
+  ConquistasRoute: typeof ConquistasRoute
   DesafiosRoute: typeof DesafiosRoute
   LaboratoriosRoute: typeof LaboratoriosRoute
   MapaRoute: typeof MapaRoute
+  PerfilRoute: typeof PerfilRoute
   ProjetoRoute: typeof ProjetoRoute
+  RecursosRoute: typeof RecursosRoute
   SkillsRoute: typeof SkillsRoute
   AulasLessonIdRoute: typeof AulasLessonIdRoute
   ModulosSlugRoute: typeof ModulosSlugRoute
@@ -174,6 +226,20 @@ declare module '@tanstack/react-router' {
       path: '/boss-battles'
       fullPath: '/boss-battles'
       preLoaderRoute: typeof BossBattlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/carreira': {
+      id: '/carreira'
+      path: '/carreira'
+      fullPath: '/carreira'
+      preLoaderRoute: typeof CarreiraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conquistas': {
+      id: '/conquistas'
+      path: '/conquistas'
+      fullPath: '/conquistas'
+      preLoaderRoute: typeof ConquistasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/desafios': {
@@ -197,11 +263,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MapaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projeto': {
       id: '/projeto'
       path: '/projeto'
       fullPath: '/projeto'
       preLoaderRoute: typeof ProjetoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recursos': {
+      id: '/recursos'
+      path: '/recursos'
+      fullPath: '/recursos'
+      preLoaderRoute: typeof RecursosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/skills': {
@@ -238,10 +318,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BossBattlesRoute: BossBattlesRoute,
+  CarreiraRoute: CarreiraRoute,
+  ConquistasRoute: ConquistasRoute,
   DesafiosRoute: DesafiosRoute,
   LaboratoriosRoute: LaboratoriosRoute,
   MapaRoute: MapaRoute,
+  PerfilRoute: PerfilRoute,
   ProjetoRoute: ProjetoRoute,
+  RecursosRoute: RecursosRoute,
   SkillsRoute: SkillsRoute,
   AulasLessonIdRoute: AulasLessonIdRoute,
   ModulosSlugRoute: ModulosSlugRoute,
