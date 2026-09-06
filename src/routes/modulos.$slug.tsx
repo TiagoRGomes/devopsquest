@@ -28,9 +28,10 @@ export const Route = createFileRoute("/modulos/$slug")({
       ],
     };
   },
-  notFoundComponent: () => (
-    <EmptyState title="Módulo não encontrado" description="Volte para a lista de módulos e escolha outro." />
-  ),
+  notFoundComponent: () => {
+    const { t } = useI18n();
+    return <EmptyState title={t("mod.notFoundTitle")} description={t("mod.notFoundDescList")} />;
+  },
   component: ModuloDetail,
 });
 
@@ -41,7 +42,7 @@ function ModuloDetail() {
   const { t } = useI18n();
 
   if (!mod) {
-    return <EmptyState title="Módulo não encontrado" description="Escolha outro módulo na lista." />;
+    return <EmptyState title={t("mod.notFoundTitle")} description={t("mod.notFoundDescPick")} />;
   }
 
   const labs = labsByModule(mod.id);
@@ -56,23 +57,23 @@ function ModuloDetail() {
   return (
     <div className="space-y-6">
       <Panel className="bg-hero">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">Módulo {mod.index}</p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{t("mod.moduleIndex", { index: mod.index })}</p>
         <h1 className="mt-1.5 font-display text-2xl font-semibold text-foreground sm:text-3xl">{mod.title}</h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{mod.overview}</p>
         <div className="mt-4 flex flex-wrap gap-1.5">
-          <Chip tone="primary">{mod.weeks} semanas</Chip>
+          <Chip tone="primary">{t("mod.weeks", { n: mod.weeks })}</Chip>
           <Chip tone="accent">{mod.xp} XP</Chip>
-          {badge && <Chip tone="legendary">Badge: {badge.name}</Chip>}
+          {badge && <Chip tone="legendary">{t("mod.badge", { name: badge.name })}</Chip>}
         </div>
         <XpBar percent={p.percent} className="mt-5 max-w-lg" />
         <p className="mt-2 text-xs text-muted-foreground">
-          {p.done}/{p.total} itens concluídos
+          {t("mod.itemsDone", { done: p.done, total: p.total })}
         </p>
       </Panel>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Panel>
-          <h2 className="font-display font-semibold text-foreground">O que você vai saber fazer</h2>
+          <h2 className="font-display font-semibold text-foreground">{t("mod.objectives")}</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {mod.objectives.map((o) => (
               <li key={o} className="flex gap-2">
@@ -83,13 +84,13 @@ function ModuloDetail() {
           </ul>
         </Panel>
         <Panel>
-          <h2 className="font-display font-semibold text-foreground">Pré-requisitos</h2>
+          <h2 className="font-display font-semibold text-foreground">{t("mod.prerequisites")}</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {mod.prerequisites.map((r) => (
               <li key={r}>• {r}</li>
             ))}
           </ul>
-          <h3 className="mt-4 font-medium text-foreground">Tópicos</h3>
+          <h3 className="mt-4 font-medium text-foreground">{t("mod.topics")}</h3>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {mod.topics.map((t) => (
               <Chip key={t}>{t}</Chip>
@@ -97,9 +98,9 @@ function ModuloDetail() {
           </div>
         </Panel>
         <Panel>
-          <h2 className="font-display font-semibold text-foreground">Entrega do módulo</h2>
+          <h2 className="font-display font-semibold text-foreground">{t("mod.delivery")}</h2>
           <p className="mt-3 text-sm text-muted-foreground">{mod.delivery}</p>
-          <h3 className="mt-4 font-medium text-foreground">Checklist</h3>
+          <h3 className="mt-4 font-medium text-foreground">{t("mod.checklist")}</h3>
           <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
             {mod.checklist.map((c) => (
               <li key={c}>☐ {c}</li>
@@ -155,7 +156,7 @@ function ModuloDetail() {
       )}
 
       <Panel>
-        <SectionTitle eyebrow="Aulas" title={`${mod.lessons.length} aulas neste módulo`} />
+        <SectionTitle eyebrow={t("mod.lessonsEyebrow")} title={t("mod.lessonsTitle", { n: mod.lessons.length })} />
         <ol className="mt-4 space-y-2.5">
           {mod.lessons.map((lesson, i) => {
             const done = progress.completedLessons.includes(lesson.id);
@@ -176,7 +177,7 @@ function ModuloDetail() {
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-medium text-foreground">{lesson.title}</span>
                     <span className="block text-xs text-muted-foreground">
-                      {lesson.duration} min · {lesson.tools.join(", ")}
+                      {t("mod.lessonDurationTools", { duration: lesson.duration, tools: lesson.tools.join(", ") })}
                     </span>
                   </span>
                   <DifficultyChip level={lesson.difficulty} />
@@ -189,7 +190,7 @@ function ModuloDetail() {
       </Panel>
 
       <Panel>
-        <SectionTitle eyebrow="Prática" title="Laboratórios do módulo" />
+        <SectionTitle eyebrow={t("mod.labsEyebrow")} title={t("mod.labsTitle")} />
         <ul className="mt-4 space-y-3">
           {labs.map((lab) => {
             const done = progress.completedLabs.includes(lab.id);
@@ -208,13 +209,13 @@ function ModuloDetail() {
                       disabled={done}
                       className="rounded-md border border-border px-2.5 py-1.5 text-xs text-foreground transition-colors hover:border-success/60 disabled:opacity-50"
                     >
-                      {done ? "Concluído" : `Marcar (+${lab.xp} XP)`}
+                      {done ? t("mod.labDone") : t("mod.labMark", { xp: lab.xp })}
                     </button>
                   </div>
                 </div>
                 <p className="mt-1.5 text-sm text-muted-foreground">{lab.goal}</p>
                 <Link to="/laboratorios" className="mt-2 inline-block text-xs text-primary hover:underline">
-                  Ver passo a passo
+                  {t("mod.viewSteps")}
                 </Link>
               </li>
             );
@@ -224,16 +225,16 @@ function ModuloDetail() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel className="space-y-3">
-          <h2 className="font-display font-semibold text-foreground">Troubleshooting típico</h2>
-          <InsightBox label="Quando quebra" tone="mistake">
+          <h2 className="font-display font-semibold text-foreground">{t("mod.troubleshootingTitle")}</h2>
+          <InsightBox label={t("mod.troubleWhenBreaks")} tone="mistake">
             {mod.troubleshooting}
           </InsightBox>
-          <InsightBox label="No PrintQuest" tone="tip">
+          <InsightBox label={t("mod.troublePrintQuest")} tone="tip">
             {mod.printQuest}
           </InsightBox>
         </Panel>
         <Panel>
-          <h2 className="font-display font-semibold text-foreground">Perguntas de entrevista</h2>
+          <h2 className="font-display font-semibold text-foreground">{t("mod.interviewTitle")}</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {mod.interviewQuestions.map((q) => (
               <li key={q} className="flex gap-2">
@@ -247,7 +248,7 @@ function ModuloDetail() {
               to="/boss-battles"
               className="mt-4 inline-flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/12 px-3.5 py-2 text-sm text-destructive"
             >
-              <Skull className="size-4" /> Boss do módulo: {boss.name}
+              <Skull className="size-4" /> {t("mod.bossOfModule", { name: boss.name })}
             </Link>
           )}
         </Panel>

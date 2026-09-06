@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useI18n } from "@/lib/i18n";
 import { Check, Target } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { CHALLENGES } from "@/data/challenges";
@@ -20,14 +21,15 @@ export const Route = createFileRoute("/desafios")({
 });
 
 function DesafiosPage() {
+  const { t } = useI18n();
   const { progress, completeChallenge } = useProgress();
 
   return (
     <div className="space-y-6">
       <SectionTitle
-        eyebrow="Desafios"
-        title={`${CHALLENGES.length} desafios avaliados por critérios`}
-        description="Leia o briefing, entregue no seu repositório e confira cada critério de aceitação antes de marcar como concluído."
+        eyebrow={t("chal.eyebrow")}
+        title={t("chal.title", { count: CHALLENGES.length })}
+        description={t("chal.description")}
       />
 
       <ul className="grid gap-4 lg:grid-cols-2">
@@ -42,7 +44,7 @@ function DesafiosPage() {
                 <Chip tone="primary">+{c.xp} XP</Chip>
                 {done && (
                   <Chip tone="success">
-                    <Check className="size-3" /> Entregue
+                    <Check className="size-3" /> {t("chal.delivered")}
                   </Chip>
                 )}
               </div>
@@ -54,7 +56,7 @@ function DesafiosPage() {
                   </Chip>
                 ))}
               </div>
-              <h4 className="mt-4 text-sm font-medium text-foreground">Critérios de aceitação</h4>
+              <h4 className="mt-4 text-sm font-medium text-foreground">{t("chal.acceptance")}</h4>
               <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
                 {c.acceptance.map((a) => (
                   <li key={a} className="flex gap-2">
@@ -70,7 +72,7 @@ function DesafiosPage() {
                 disabled={done}
                 className="mt-4 rounded-lg bg-primary px-3.5 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
               >
-                {done ? "Desafio concluído" : `Marcar como entregue (+${c.xp} XP)`}
+                {done ? t("chal.doneBtn") : t("chal.markDelivered", { xp: c.xp })}
               </button>
             </Panel>
           );

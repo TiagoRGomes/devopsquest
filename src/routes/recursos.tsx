@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
 import { RESOURCES, RESOURCE_CATEGORIES } from "@/data/resources";
 import { Chip, Panel, SectionTitle } from "@/components/ui-bits";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/recursos")({
   head: () => ({
@@ -20,19 +21,21 @@ export const Route = createFileRoute("/recursos")({
 });
 
 function RecursosPage() {
-  const [cat, setCat] = useState("todas");
-  const list = cat === "todas" ? RESOURCES : RESOURCES.filter((r) => r.category === cat);
+  const { t } = useI18n();
+  const ALL = t("res.all");
+  const [cat, setCat] = useState(ALL);
+  const list = cat === ALL ? RESOURCES : RESOURCES.filter((r) => r.category === cat);
 
   return (
     <div className="space-y-6">
       <SectionTitle
-        eyebrow="Recursos"
-        title="Fontes oficiais, não resumos de terceiros"
-        description="Aprender a ler documentação é parte da profissão. Estes são os lugares onde a resposta certa está."
+        eyebrow={t("res.eyebrow")}
+        title={t("res.title")}
+        description={t("res.description")}
       />
 
       <div className="flex flex-wrap gap-2">
-        {["todas", ...RESOURCE_CATEGORIES].map((c) => (
+        {[ALL, ...RESOURCE_CATEGORIES].map((c) => (
           <button
             key={c}
             type="button"
@@ -60,7 +63,7 @@ function RecursosPage() {
               rel="noreferrer noopener"
               className="mt-3 inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
             >
-              Abrir <ExternalLink className="size-3.5" />
+              {t("res.open")} <ExternalLink className="size-3.5" />
             </a>
           </Panel>
         ))}

@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Briefcase, Check, FileText, MessageSquare } from "lucide-react";
 import { CAREER_TRACKS, FIRST_JOB_CHECKLIST, INTERVIEW_BANK, RESUME_LINES } from "@/data/career";
 import { Chip, Panel, SectionTitle } from "@/components/ui-bits";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/carreira")({
   head: () => ({
@@ -21,44 +22,45 @@ export const Route = createFileRoute("/carreira")({
 
 function CarreiraPage() {
   const [openQ, setOpenQ] = useState<string | null>(null);
+  const { t } = useI18n();
 
   return (
     <div className="space-y-6">
       <SectionTitle
-        eyebrow="Carreira"
-        title="Para onde essa jornada leva"
-        description="Cinco caminhos que compartilham a mesma base. Escolha depois de dominar Linux, Git, containers, uma nuvem e IaC."
+        eyebrow={t("career.eyebrow")}
+        title={t("career.title")}
+        description={t("career.description")}
       />
 
       <ul className="grid gap-4 lg:grid-cols-2">
-        {CAREER_TRACKS.map((t) => (
-          <Panel as="li" key={t.id}>
+        {CAREER_TRACKS.map((track) => (
+          <Panel as="li" key={track.id}>
             <p className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
-              <Briefcase className="size-4 text-primary" /> {t.name}
+              <Briefcase className="size-4 text-primary" /> {track.name}
             </p>
-            <p className="mt-2 text-sm text-accent">{t.focus}</p>
-            <h3 className="mt-4 text-sm font-medium text-foreground">Dia a dia</h3>
+            <p className="mt-2 text-sm text-accent">{track.focus}</p>
+            <h3 className="mt-4 text-sm font-medium text-foreground">{t("career.dayToDay")}</h3>
             <ul className="mt-1.5 space-y-1 text-sm text-muted-foreground">
-              {t.dayToDay.map((d) => (
+              {track.dayToDay.map((d) => (
                 <li key={d}>• {d}</li>
               ))}
             </ul>
-            <h3 className="mt-4 text-sm font-medium text-foreground">Obrigatório</h3>
+            <h3 className="mt-4 text-sm font-medium text-foreground">{t("career.mustHave")}</h3>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {t.mustHave.map((s) => (
+              {track.mustHave.map((s) => (
                 <Chip key={s} tone="primary">
                   {s}
                 </Chip>
               ))}
             </div>
-            <h3 className="mt-3 text-sm font-medium text-foreground">Diferenciais</h3>
+            <h3 className="mt-3 text-sm font-medium text-foreground">{t("career.niceToHave")}</h3>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {t.niceToHave.map((s) => (
+              {track.niceToHave.map((s) => (
                 <Chip key={s}>{s}</Chip>
               ))}
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">{t.salaryNote}</p>
-            <p className="mt-2 text-sm text-foreground/80">Indicado para: {t.fitFor}</p>
+            <p className="mt-4 text-sm text-muted-foreground">{track.salaryNote}</p>
+            <p className="mt-2 text-sm text-foreground/80">{t("career.fitFor", { fit: track.fitFor })}</p>
           </Panel>
         ))}
       </ul>
@@ -66,7 +68,7 @@ function CarreiraPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel>
           <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
-            <Check className="size-4 text-success" /> Checklist da primeira vaga
+            <Check className="size-4 text-success" /> {t("career.checklistTitle")}
           </h2>
           <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
             {FIRST_JOB_CHECKLIST.map((c) => (
@@ -76,7 +78,7 @@ function CarreiraPage() {
         </Panel>
         <Panel>
           <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
-            <FileText className="size-4 text-accent" /> Linhas de currículo com resultado
+            <FileText className="size-4 text-accent" /> {t("career.resumeTitle")}
           </h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {RESUME_LINES.map((r) => (
@@ -85,17 +87,15 @@ function CarreiraPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Troque os números pelos seus, medidos no PrintQuest. Nunca invente métrica.
-          </p>
+          <p className="mt-3 text-xs text-muted-foreground">{t("career.resumeHint")}</p>
         </Panel>
       </div>
 
       <Panel>
         <SectionTitle
-          eyebrow="Entrevistas"
-          title={`${INTERVIEW_BANK.length} perguntas com resposta forte`}
-          description="Responda em voz alta antes de abrir a resposta. O que avaliam está sempre no método, não na decoreba."
+          eyebrow={t("career.interviewsEyebrow")}
+          title={t("career.interviewsTitle", { n: INTERVIEW_BANK.length })}
+          description={t("career.interviewsDescription")}
         />
         <ul className="mt-4 space-y-2.5">
           {INTERVIEW_BANK.map((q) => (
@@ -111,7 +111,7 @@ function CarreiraPage() {
               </button>
               {openQ === q.id && (
                 <div className="mt-3 space-y-2 border-t border-border pt-3">
-                  <p className="text-xs text-muted-foreground">Avaliam: {q.whatTheyEvaluate}</p>
+                  <p className="text-xs text-muted-foreground">{t("career.evaluate", { what: q.whatTheyEvaluate })}</p>
                   <p className="text-sm text-foreground/90">{q.strongAnswer}</p>
                 </div>
               )}

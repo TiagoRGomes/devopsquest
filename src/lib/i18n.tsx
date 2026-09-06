@@ -1,4 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { ptA, esA, enA } from "@/lib/i18n-pages/a";
+import { ptB, esB, enB } from "@/lib/i18n-pages/b";
+import { ptC, esC, enC } from "@/lib/i18n-pages/c";
 
 export type Lang = "pt" | "es" | "en";
 
@@ -422,7 +425,11 @@ const en: Dict = {
   "profile.remove": "Remove photo",
 };
 
-const DICTS: Record<Lang, Dict> = { pt, es, en };
+const DICTS: Record<Lang, Dict> = {
+  pt: { ...pt, ...ptA, ...ptB, ...ptC },
+  es: { ...es, ...esA, ...esB, ...esC },
+  en: { ...en, ...enA, ...enB, ...enC },
+};
 
 interface I18nValue {
   lang: Lang;

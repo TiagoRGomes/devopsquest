@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import type { Difficulty, Rarity } from "@/lib/types";
+import { useI18n } from "@/lib/i18n";
 
 export function XpBar({ percent, className }: { percent: number; className?: string }) {
   return (
@@ -165,9 +166,10 @@ export function EmptyState({ title, description }: { title: string; description:
 }
 
 export function LockedOverlay({ requiredLevel }: { requiredLevel: number }) {
+  const { t } = useI18n();
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-2.5 py-1 text-[11px] text-muted-foreground">
-      Bloqueado — nível {requiredLevel}
+      {t("ui.locked", { level: requiredLevel })}
     </span>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { createFileRoute } from "@tanstack/react-router";
 import { Check, ChevronDown } from "lucide-react";
 import { useProgress } from "@/lib/progress";
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/laboratorios")({
 });
 
 function LabsPage() {
+  const { t } = useI18n();
   const { progress, completeLab } = useProgress();
   const [filter, setFilter] = useState<string>("todos");
   const [openId, setOpenId] = useState<string | null>(null);
@@ -33,9 +35,9 @@ function LabsPage() {
   return (
     <div className="space-y-6">
       <SectionTitle
-        eyebrow="Laboratórios"
-        title={`${LABS.length} laboratórios com validação`}
-        description="Cada lab tem contexto profissional, passos, comandos, checagens de validação e os erros que mais aparecem no dia a dia."
+        eyebrow={t("labs.eyebrow")}
+        title={t("labs.title", { count: LABS.length })}
+        description={t("labs.description")}
       />
 
       <div className="flex flex-wrap gap-2">
@@ -46,7 +48,7 @@ function LabsPage() {
             filter === "todos" ? "border-primary/60 bg-primary/12 text-primary" : "border-border text-muted-foreground"
           }`}
         >
-          Todos ({LABS.length})
+          {t("labs.filterAll", { count: LABS.length })}
         </button>
         {MODULES.map((m) => (
           <button
@@ -78,7 +80,7 @@ function LabsPage() {
                     {mod && <Chip tone="accent">M{mod.index}</Chip>}
                     {done && (
                       <Chip tone="success">
-                        <Check className="size-3" /> Concluído
+                        <Check className="size-3" /> {t("labs.done")}
                       </Chip>
                     )}
                   </div>
@@ -91,7 +93,7 @@ function LabsPage() {
                     onClick={() => setOpenId(open ? null : lab.id)}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs text-foreground hover:border-primary/50"
                   >
-                    {open ? "Fechar" : "Abrir lab"}
+                    {open ? t("labs.close") : t("labs.open")}
                     <ChevronDown className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
                   </button>
                   <button
@@ -100,7 +102,7 @@ function LabsPage() {
                     disabled={done}
                     className="rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
                   >
-                    {done ? "Feito" : `Concluir +${lab.xp} XP`}
+                    {done ? t("labs.doneBtn") : t("labs.completeBtn", { xp: lab.xp })}
                   </button>
                 </div>
               </div>
@@ -109,11 +111,11 @@ function LabsPage() {
                 <div className="mt-5 space-y-4 border-t border-border pt-5">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <h4 className="text-sm font-medium text-foreground">Ambiente</h4>
+                      <h4 className="text-sm font-medium text-foreground">{t("labs.environment")}</h4>
                       <p className="mt-1 text-sm text-muted-foreground">{lab.environment}</p>
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium text-foreground">Pré-requisitos</h4>
+                      <h4 className="text-sm font-medium text-foreground">{t("labs.prerequisites")}</h4>
                       <ul className="mt-1 text-sm text-muted-foreground">
                         {lab.prerequisites.map((p) => (
                           <li key={p}>• {p}</li>
@@ -123,7 +125,7 @@ function LabsPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-medium text-foreground">Passo a passo</h4>
+                    <h4 className="text-sm font-medium text-foreground">{t("labs.stepsTitle")}</h4>
                     <ol className="mt-2 space-y-1.5 text-sm text-muted-foreground">
                       {lab.steps.map((s, i) => (
                         <li key={i}>
@@ -136,7 +138,7 @@ function LabsPage() {
                   <CodeBlock block={lab.commands} />
 
                   <div>
-                    <h4 className="text-sm font-medium text-foreground">Como validar</h4>
+                    <h4 className="text-sm font-medium text-foreground">{t("labs.validate")}</h4>
                     <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
                       {lab.validation.map((v) => (
                         <li key={v} className="flex gap-2">
@@ -148,7 +150,7 @@ function LabsPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-medium text-foreground">Erros comuns</h4>
+                    <h4 className="text-sm font-medium text-foreground">{t("labs.commonErrors")}</h4>
                     <ul className="mt-2 space-y-2 text-sm">
                       {lab.commonErrors.map((e) => (
                         <li key={e.error} className="rounded-lg border border-border bg-surface-2 px-3 py-2">
@@ -165,7 +167,7 @@ function LabsPage() {
                       onClick={() => setShowSolution(showSolution === lab.id ? null : lab.id)}
                       className="rounded-lg border border-border px-3 py-2 text-xs text-muted-foreground hover:text-foreground"
                     >
-                      {showSolution === lab.id ? "Esconder solução" : "Mostrar solução comentada"}
+                      {showSolution === lab.id ? t("labs.hideSolution") : t("labs.showSolution")}
                     </button>
                     {showSolution === lab.id && (
                       <p className="mt-2 text-sm text-foreground/90">{lab.solution}</p>

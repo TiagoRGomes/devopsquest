@@ -53,9 +53,9 @@ function PerfilPage() {
     setSaving(true);
     try {
       await updateProfile({ display_name: name.trim(), avatar_url: avatar.trim() || null });
-      toast.success("Perfil atualizado");
+      toast.success(t("prof.perfilUpdated"));
     } catch {
-      toast.error("Não foi possível salvar o perfil");
+      toast.error(t("prof.perfilError"));
     } finally {
       setSaving(false);
     }
@@ -115,7 +115,7 @@ function PerfilPage() {
             {profile?.avatar_url ? (
               <img
                 src={profile.avatar_url}
-                alt={profile.display_name ?? "Foto do perfil"}
+                alt={profile.display_name ?? t("prof.avatarAlt")}
                 className="size-full object-cover"
               />
             ) : (
@@ -124,15 +124,13 @@ function PerfilPage() {
           </span>
           <div>
             <h1 className="font-display text-2xl font-semibold text-foreground">
-              {profile?.display_name || user?.email || "Visitante"}
+              {profile?.display_name || user?.email || t("prof.defaultVisitor")}
             </h1>
             <p className="text-sm text-accent">
-              Nível {level.level} · {level.className}
+              {t("prof.levelLine", { level: level.level, className: level.className })}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {user
-                ? "Progresso salvo na sua conta — abra em qualquer aparelho."
-                : "Você está sem conta: o progresso fica só neste navegador."}
+              {user ? t("prof.cloudHint") : t("prof.localHint")}
             </p>
           </div>
           {user ? (
@@ -141,44 +139,44 @@ function PerfilPage() {
               onClick={handleSignOut}
               className="ml-auto inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3.5 py-2 text-sm text-muted-foreground hover:text-foreground"
             >
-              <LogOut className="size-4" /> Sair
+              <LogOut className="size-4" /> {t("prof.signOut")}
             </button>
           ) : (
             <Link
               to="/auth"
               className="ml-auto inline-flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
             >
-              Entrar e salvar na nuvem
+              {t("prof.signInCloud")}
             </Link>
           )}
         </div>
         <div className="mt-6 max-w-lg">
           <XpBar percent={level.progress} />
           <p className="mt-2 font-mono text-xs text-muted-foreground">
-            {level.xpIntoLevel}/{level.xpForNext} XP para o nível {level.level + 1}
+            {t("prof.xpToLevel", { into: level.xpIntoLevel, total: level.xpForNext, next: level.level + 1 })}
           </p>
         </div>
       </Panel>
 
       {user && (
         <Panel>
-          <SectionTitle eyebrow="Conta" title={t("profile.photo")} />
+          <SectionTitle eyebrow={t("prof.accountEyebrow")} title={t("profile.photo")} />
           <div className="mt-4 flex flex-wrap items-start gap-5">
             <span className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-2xl border border-border bg-surface-2 font-display text-lg text-muted-foreground">
               {avatar ? (
-                <img src={avatar} alt={name || "Foto do perfil"} className="size-full object-cover" />
+                <img src={avatar} alt={name || t("prof.avatarAlt")} className="size-full object-cover" />
               ) : (
                 initials(name, user.email)
               )}
             </span>
             <div className="min-w-[220px] flex-1 space-y-3">
               <label className="block">
-                <span className="text-xs text-muted-foreground">Nome de exibição</span>
+                <span className="text-xs text-muted-foreground">{t("prof.displayName")}</span>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="mt-1 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-                  placeholder="Seu nome"
+                  placeholder={t("prof.namePlaceholder")}
                 />
               </label>
               <div className="flex flex-wrap items-center gap-2">
@@ -220,29 +218,37 @@ function PerfilPage() {
             disabled={saving}
             className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
-            <Save className="size-4" /> Salvar perfil
+            <Save className="size-4" /> {t("prof.saveProfile")}
           </button>
         </Panel>
       )}
 
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatTile label="XP total" value={`${progress.xp}`} icon={<Zap className="size-4" />} />
-        <StatTile label="Sequência" value={`${progress.streak} dias`} icon={<Flame className="size-4" />} />
-        <StatTile label="Tempo estudado" value={`${Math.round(progress.minutesStudied / 60)}h`} icon={<Clock className="size-4" />} />
-        <StatTile label="Badges" value={`${earnedBadges.length}`} />
+        <StatTile label={t("prof.statXpTotal")} value={`${progress.xp}`} icon={<Zap className="size-4" />} />
+        <StatTile
+          label={t("prof.statStreak")}
+          value={t("prof.statStreakValue", { n: progress.streak })}
+          icon={<Flame className="size-4" />}
+        />
+        <StatTile
+          label={t("prof.statTime")}
+          value={`${Math.round(progress.minutesStudied / 60)}h`}
+          icon={<Clock className="size-4" />}
+        />
+        <StatTile label={t("prof.statBadges")} value={`${earnedBadges.length}`} />
       </div>
 
       <Panel>
-        <SectionTitle eyebrow="Progresso" title="Onde você está em cada frente" />
+        <SectionTitle eyebrow={t("prof.progressEyebrow")} title={t("prof.progressTitle")} />
         <ul className="mt-4 space-y-3">
           {[
-            { label: "Aulas", done: progress.completedLessons.length, total: ALL_LESSONS.length },
-            { label: "Laboratórios", done: progress.completedLabs.length, total: LABS.length },
-            { label: "Desafios", done: progress.completedChallenges.length, total: CHALLENGES.length },
-            { label: "Boss Battles", done: progress.defeatedBosses.length, total: BOSSES.length },
-            { label: "Quizzes", done: progress.quizPassed.length, total: ALL_LESSONS.length },
-            { label: "PrintQuest", done: progress.completedProjectSteps.length, total: PROJECT_STEPS.length },
+            { label: t("prof.row.lessons"), done: progress.completedLessons.length, total: ALL_LESSONS.length },
+            { label: t("prof.row.labs"), done: progress.completedLabs.length, total: LABS.length },
+            { label: t("prof.row.challenges"), done: progress.completedChallenges.length, total: CHALLENGES.length },
+            { label: t("prof.row.bosses"), done: progress.defeatedBosses.length, total: BOSSES.length },
+            { label: t("prof.row.quizzes"), done: progress.quizPassed.length, total: ALL_LESSONS.length },
+            { label: t("prof.row.project"), done: progress.completedProjectSteps.length, total: PROJECT_STEPS.length },
           ].map((row) => (
             <li key={row.label}>
               <div className="flex items-baseline justify-between text-sm">
@@ -258,11 +264,9 @@ function PerfilPage() {
       </Panel>
 
       <Panel>
-        <SectionTitle eyebrow="Caderno" title={`Minhas anotações (${notes.length})`} />
+        <SectionTitle eyebrow={t("prof.notebookEyebrow")} title={t("prof.notebookTitle", { n: notes.length })} />
         {notes.length === 0 ? (
-          <p className="mt-3 text-sm text-muted-foreground">
-            Você ainda não anotou nada. Cada aula tem um campo de anotações no final.
-          </p>
+          <p className="mt-3 text-sm text-muted-foreground">{t("prof.notebookEmpty")}</p>
         ) : (
           <ul className="mt-4 space-y-2.5">
             {notes.map(([lessonId, text]) => {
@@ -279,16 +283,14 @@ function PerfilPage() {
       </Panel>
 
       <Panel>
-        <h2 className="font-display font-semibold text-foreground">Reiniciar progresso</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Apaga XP, aulas, labs e anotações — inclusive na sua conta. Não dá para desfazer.
-        </p>
+        <h2 className="font-display font-semibold text-foreground">{t("prof.resetTitle")}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{t("prof.resetText")}</p>
         <button
           type="button"
           onClick={reset}
           className="mt-4 inline-flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/12 px-3.5 py-2 text-sm text-destructive hover:bg-destructive/20"
         >
-          <RotateCcw className="size-4" /> Reiniciar tudo
+          <RotateCcw className="size-4" /> {t("prof.resetButton")}
         </button>
       </Panel>
     </div>
