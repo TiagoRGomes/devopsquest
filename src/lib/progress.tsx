@@ -258,9 +258,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }
     if (!userId) return;
     const timer = setTimeout(() => {
-      void supabase.from("progress").upsert(progressToRow(userId, progress), {
+      void supabase.from("progress").upsert(progressToRow(userId, progress) as never, {
         onConflict: "user_id",
       });
+
     }, 700);
     return () => clearTimeout(timer);
   }, [progress, hydrated, userId]);
