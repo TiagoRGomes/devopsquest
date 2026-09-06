@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      progress: {
+        Row: {
+          completed_challenges: string[]
+          completed_labs: string[]
+          completed_lessons: string[]
+          completed_project_steps: string[]
+          created_at: string
+          current_lesson_id: string | null
+          defeated_bosses: string[]
+          last_active: string | null
+          minutes_studied: number
+          notes: Json
+          quiz_passed: string[]
+          streak: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          completed_challenges?: string[]
+          completed_labs?: string[]
+          completed_lessons?: string[]
+          completed_project_steps?: string[]
+          created_at?: string
+          current_lesson_id?: string | null
+          defeated_bosses?: string[]
+          last_active?: string | null
+          minutes_studied?: number
+          notes?: Json
+          quiz_passed?: string[]
+          streak?: number
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          completed_challenges?: string[]
+          completed_labs?: string[]
+          completed_lessons?: string[]
+          completed_project_steps?: string[]
+          created_at?: string
+          current_lesson_id?: string | null
+          defeated_bosses?: string[]
+          last_active?: string | null
+          minutes_studied?: number
+          notes?: Json
+          quiz_passed?: string[]
+          streak?: number
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

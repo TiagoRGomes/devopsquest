@@ -10,6 +10,7 @@ import {
   FlaskConical,
   Gauge,
   Library,
+  LogIn,
   Map,
   Menu,
   Skull,
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProgress } from "@/lib/progress";
+import { initials, useAuth } from "@/lib/auth";
 import { XpBar } from "@/components/ui-bits";
 import { GlobalSearch } from "@/components/GlobalSearch";
 
@@ -89,6 +91,7 @@ function Brand() {
 export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { progress, level, hydrated } = useProgress();
+  const { user, profile } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -110,7 +113,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <NavLinks />
           </div>
           <p className="text-[11px] leading-relaxed text-muted-foreground">
-            Progresso salvo neste navegador.
+            {user ? "Progresso salvo na sua conta." : "Entre para salvar seu progresso na nuvem."}
           </p>
         </aside>
 
@@ -138,13 +141,31 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <Zap className="size-3.5" />
                   {hydrated ? progress.xp : 0} XP
                 </span>
-                <Link
-                  to="/perfil"
-                  className="grid size-9 shrink-0 place-items-center rounded-full bg-level font-display text-xs font-semibold text-primary-foreground"
-                  aria-label="Perfil"
-                >
-                  TG
-                </Link>
+                {user ? (
+                  <Link
+                    to="/perfil"
+                    className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full bg-level font-display text-xs font-semibold text-primary-foreground"
+                    aria-label="Perfil"
+                  >
+                    {profile?.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt={profile.display_name ?? "Foto do perfil"}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      initials(profile?.display_name, user.email)
+                    )}
+                  </Link>
+                ) : (
+                  <Link
+                    to="/auth"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+                  >
+                    <LogIn className="size-3.5" />
+                    Entrar
+                  </Link>
+                )}
               </div>
             </div>
             <div className="px-4 pb-2 sm:px-6 lg:hidden">

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BossBattlesRouteImport } from './routes/boss-battles'
 import { Route as CarreiraRouteImport } from './routes/carreira'
 import { Route as ConquistasRouteImport } from './routes/conquistas'
@@ -27,6 +28,11 @@ import { Route as ModulosSlugRouteImport } from './routes/modulos.$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BossBattlesRoute = BossBattlesRouteImport.update({
@@ -97,6 +103,7 @@ const ModulosSlugRoute = ModulosSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/boss-battles': typeof BossBattlesRoute
   '/carreira': typeof CarreiraRoute
   '/conquistas': typeof ConquistasRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/boss-battles': typeof BossBattlesRoute
   '/carreira': typeof CarreiraRoute
   '/conquistas': typeof ConquistasRoute
@@ -130,6 +138,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/boss-battles': typeof BossBattlesRoute
   '/carreira': typeof CarreiraRoute
   '/conquistas': typeof ConquistasRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/boss-battles'
     | '/carreira'
     | '/conquistas'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/boss-battles'
     | '/carreira'
     | '/conquistas'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/auth'
     | '/boss-battles'
     | '/carreira'
     | '/conquistas'
@@ -197,6 +209,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   BossBattlesRoute: typeof BossBattlesRoute
   CarreiraRoute: typeof CarreiraRoute
   ConquistasRoute: typeof ConquistasRoute
@@ -219,6 +232,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/boss-battles': {
@@ -317,6 +337,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   BossBattlesRoute: BossBattlesRoute,
   CarreiraRoute: CarreiraRoute,
   ConquistasRoute: ConquistasRoute,
