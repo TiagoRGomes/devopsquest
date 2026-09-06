@@ -115,7 +115,7 @@ function ModuloDetail() {
                 >
                   <span
                     className={`grid size-7 shrink-0 place-items-center rounded-full font-mono text-xs ${
-                      done ? "bg-success/20 text-success" : "bg-surface-3 text-muted-foreground"
+                      done ? "bg-success/20 text-success" : "bg-surface text-muted-foreground"
                     }`}
                   >
                     {done ? <Check className="size-3.5" /> : i + 1}
