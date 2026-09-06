@@ -1,15 +1,19 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Clock, Flame, LogOut, RotateCcw, Save, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Clock, Flame, LogOut, RotateCcw, Save, Trash2, Upload, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { initials, useAuth } from "@/lib/auth";
 import { useProgress } from "@/lib/progress";
+import { useI18n } from "@/lib/i18n";
+import { supabase } from "@/integrations/supabase/client";
 import { ALL_LESSONS } from "@/data/curriculum";
 import { LABS } from "@/data/labs";
 import { BOSSES, CHALLENGES } from "@/data/challenges";
 import { PROJECT_STEPS } from "@/data/project";
 import { Panel, SectionTitle, StatTile, XpBar } from "@/components/ui-bits";
+
+const YEAR_SECONDS = 60 * 60 * 24 * 365;
 
 export const Route = createFileRoute("/perfil")({
   head: () => ({
@@ -29,6 +33,7 @@ export const Route = createFileRoute("/perfil")({
 function PerfilPage() {
   const { progress, level, earnedBadges, reset } = useProgress();
   const { user, profile, updateProfile, signOut } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const notes = Object.entries(progress.notes).filter(([, v]) => v.trim().length > 0);
@@ -36,6 +41,8 @@ function PerfilPage() {
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setName(profile?.display_name ?? "");
@@ -53,6 +60,45 @@ function PerfilPage() {
       setSaving(false);
     }
   }
+
+  async function handleUpload(file: File) {
+    if (!user) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t("profile.uploadError"));
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) throw upErr;
+      const { data, error: signErr } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(path, YEAR_SECONDS);
+      if (signErr || !data?.signedUrl) throw signErr ?? new Error("sign");
+      setAvatar(data.signedUrl);
+      await updateProfile({ display_name: name.trim(), avatar_url: data.signedUrl });
+      toast.success(t("profile.uploadOk"));
+    } catch {
+      toast.error(t("profile.uploadError"));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleRemovePhoto() {
+    setAvatar("");
+    try {
+      await updateProfile({ display_name: name.trim(), avatar_url: null });
+      toast.success(t("profile.uploadOk"));
+    } catch {
+      toast.error(t("profile.uploadError"));
+    }
+  }
+
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
