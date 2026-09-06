@@ -14,6 +14,8 @@ import { LABS } from "@/data/labs";
 import { BOSSES, CHALLENGES } from "@/data/challenges";
 import { PROJECT_STEPS } from "@/data/project";
 import { BADGES, levelFromXp } from "@/data/world";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./auth";
 
 const STORAGE_KEY = "devops-quest-rpg:progress:v1";
 
