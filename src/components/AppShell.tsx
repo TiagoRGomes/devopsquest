@@ -102,7 +102,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { progress, level, hydrated } = useProgress();
   const { user, profile } = useAuth();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   if (BARE_ROUTES.includes(pathname)) return <>{children}</>;
