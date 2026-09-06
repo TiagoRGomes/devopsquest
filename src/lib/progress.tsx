@@ -72,32 +72,149 @@ interface ProgressContextValue {
 
 const ProgressContext = createContext<ProgressContextValue | null>(null);
 
+function readLocal(): UserProgress {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { ...EMPTY_PROGRESS };
+    return { ...EMPTY_PROGRESS, ...(JSON.parse(raw) as Partial<UserProgress>) };
+  } catch {
+    return { ...EMPTY_PROGRESS };
+  }
+}
+
+function applyStreak(input: UserProgress): UserProgress {
+  const today = todayISO();
+  const next = { ...input };
+  if (next.lastActive && next.lastActive !== today) {
+    const gap = daysBetween(next.lastActive, today);
+    next.streak = gap === 1 ? next.streak + 1 : 1;
+  } else if (!next.lastActive) {
+    next.streak = 1;
+  }
+  next.lastActive = today;
+  return next;
+}
+
+function hasAnyProgress(p: UserProgress) {
+  return (
+    p.xp > 0 ||
+    p.completedLessons.length > 0 ||
+    p.completedLabs.length > 0 ||
+    p.completedChallenges.length > 0 ||
+    p.defeatedBosses.length > 0 ||
+    p.completedProjectSteps.length > 0 ||
+    p.quizPassed.length > 0
+  );
+}
+
+function union(a: string[], b: string[]) {
+  return Array.from(new Set([...a, ...b]));
+}
+
+function mergeProgress(remote: UserProgress, local: UserProgress | null): UserProgress {
+  if (!local) return remote;
+  return {
+    xp: Math.max(remote.xp, local.xp),
+    completedLessons: union(remote.completedLessons, local.completedLessons),
+    completedLabs: union(remote.completedLabs, local.completedLabs),
+    completedChallenges: union(remote.completedChallenges, local.completedChallenges),
+    defeatedBosses: union(remote.defeatedBosses, local.defeatedBosses),
+    completedProjectSteps: union(remote.completedProjectSteps, local.completedProjectSteps),
+    quizPassed: union(remote.quizPassed, local.quizPassed),
+    notes: { ...remote.notes, ...local.notes },
+    minutesStudied: Math.max(remote.minutesStudied, local.minutesStudied),
+    streak: Math.max(remote.streak, local.streak),
+    lastActive: remote.lastActive ?? local.lastActive,
+    currentLessonId: local.currentLessonId ?? remote.currentLessonId,
+  };
+}
+
+interface ProgressRow {
+  xp: number;
+  completed_lessons: string[];
+  completed_labs: string[];
+  completed_challenges: string[];
+  defeated_bosses: string[];
+  completed_project_steps: string[];
+  quiz_passed: string[];
+  notes: unknown;
+  minutes_studied: number;
+  streak: number;
+  last_active: string | null;
+  current_lesson_id: string | null;
+}
+
+function rowToProgress(row: ProgressRow): UserProgress {
+  return {
+    xp: row.xp ?? 0,
+    completedLessons: row.completed_lessons ?? [],
+    completedLabs: row.completed_labs ?? [],
+    completedChallenges: row.completed_challenges ?? [],
+    defeatedBosses: row.defeated_bosses ?? [],
+    completedProjectSteps: row.completed_project_steps ?? [],
+    quizPassed: row.quiz_passed ?? [],
+    notes: (row.notes as Record<string, string> | null) ?? {},
+    minutesStudied: row.minutes_studied ?? 0,
+    streak: row.streak ?? 0,
+    lastActive: row.last_active ?? null,
+    currentLessonId: row.current_lesson_id ?? null,
+  };
+}
+
+function progressToRow(userId: string, p: UserProgress) {
+  return {
+    user_id: userId,
+    xp: p.xp,
+    completed_lessons: p.completedLessons,
+    completed_labs: p.completedLabs,
+    completed_challenges: p.completedChallenges,
+    defeated_bosses: p.defeatedBosses,
+    completed_project_steps: p.completedProjectSteps,
+    quiz_passed: p.quizPassed,
+    notes: p.notes,
+    minutes_studied: p.minutesStudied,
+    streak: p.streak,
+    last_active: p.lastActive,
+    current_lesson_id: p.currentLessonId,
+  };
+}
+
 export function ProgressProvider({ children }: { children: ReactNode }) {
+  const { user, loading: authLoading } = useAuth();
+  const userId = user?.id ?? null;
   const [progress, setProgress] = useState<UserProgress>(EMPTY_PROGRESS);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = { ...EMPTY_PROGRESS, ...(JSON.parse(raw) as Partial<UserProgress>) };
-        const today = todayISO();
-        if (parsed.lastActive && parsed.lastActive !== today) {
-          const gap = daysBetween(parsed.lastActive, today);
-          parsed.streak = gap === 1 ? parsed.streak + 1 : 1;
-        } else if (!parsed.lastActive) {
-          parsed.streak = 1;
+    if (authLoading) return;
+    let cancelled = false;
+    setHydrated(false);
+
+    void (async () => {
+      const local = readLocal();
+      let base = local;
+      if (userId) {
+        const { data } = await supabase
+          .from("progress")
+          .select("*")
+          .eq("user_id", userId)
+          .maybeSingle();
+        if (data) {
+          base = mergeProgress(
+            rowToProgress(data as unknown as ProgressRow),
+            hasAnyProgress(local) ? local : null,
+          );
         }
-        parsed.lastActive = today;
-        setProgress(parsed);
-      } else {
-        setProgress({ ...EMPTY_PROGRESS, streak: 1, lastActive: todayISO() });
       }
-    } catch {
-      setProgress(EMPTY_PROGRESS);
-    }
-    setHydrated(true);
-  }, []);
+      if (cancelled) return;
+      setProgress(applyStreak(base));
+      setHydrated(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, authLoading]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -106,7 +223,14 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     } catch {
       /* armazenamento indisponível: seguimos apenas em memória */
     }
-  }, [progress, hydrated]);
+    if (!userId) return;
+    const timer = setTimeout(() => {
+      void supabase.from("progress").upsert(progressToRow(userId, progress), {
+        onConflict: "user_id",
+      });
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [progress, hydrated, userId]);
 
   const award = useCallback((amount: number, message: string) => {
     setProgress((prev) => {
