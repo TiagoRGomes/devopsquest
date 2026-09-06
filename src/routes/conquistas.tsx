@@ -7,6 +7,7 @@ import { LABS } from "@/data/labs";
 import { BOSSES, CHALLENGES } from "@/data/challenges";
 import { PROJECT_STEPS } from "@/data/project";
 import { Panel, RarityChip, SectionTitle, XpBar } from "@/components/ui-bits";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/conquistas")({
   head: () => ({
@@ -25,22 +26,23 @@ export const Route = createFileRoute("/conquistas")({
 
 function ConquistasPage() {
   const { progress, level, earnedBadges } = useProgress();
+  const { t } = useI18n();
 
   const requirements = [
-    { label: "Aulas concluídas", done: progress.completedLessons.length, total: ALL_LESSONS.length },
-    { label: "Laboratórios", done: progress.completedLabs.length, total: LABS.length },
-    { label: "Desafios", done: progress.completedChallenges.length, total: CHALLENGES.length },
-    { label: "Boss Battles", done: progress.defeatedBosses.length, total: BOSSES.length },
-    { label: "Etapas do PrintQuest", done: progress.completedProjectSteps.length, total: PROJECT_STEPS.length },
+    { label: t("badge.req.lessons"), done: progress.completedLessons.length, total: ALL_LESSONS.length },
+    { label: t("badge.req.labs"), done: progress.completedLabs.length, total: LABS.length },
+    { label: t("badge.req.challenges"), done: progress.completedChallenges.length, total: CHALLENGES.length },
+    { label: t("badge.req.bosses"), done: progress.defeatedBosses.length, total: BOSSES.length },
+    { label: t("badge.req.project"), done: progress.completedProjectSteps.length, total: PROJECT_STEPS.length },
   ];
   const completed = requirements.every((r) => r.done >= r.total);
 
   return (
     <div className="space-y-6">
       <SectionTitle
-        eyebrow="Conquistas"
-        title={`${earnedBadges.length} de ${BADGES.length} badges`}
-        description="Badges saem de entregas reais: módulo completo, boss derrotado, projeto avançado."
+        eyebrow={t("badge.eyebrow")}
+        title={t("badge.title", { earned: earnedBadges.length, total: BADGES.length })}
+        description={t("badge.description")}
       />
 
       <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -68,21 +70,19 @@ function ConquistasPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel>
-          <h2 className="font-display text-lg font-semibold text-foreground">Classes por nível</h2>
+          <h2 className="font-display text-lg font-semibold text-foreground">{t("badge.tiersTitle")}</h2>
           <ul className="mt-3 space-y-2 text-sm">
-            {LEVEL_TIERS.map((t) => {
-              const current = level.level >= t.from && level.level <= t.to;
+            {LEVEL_TIERS.map((tier) => {
+              const current = level.level >= tier.from && level.level <= tier.to;
               return (
                 <li
-                  key={t.className}
+                  key={tier.className}
                   className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2 ${
                     current ? "border-primary/50 bg-primary/12 text-foreground" : "border-border text-muted-foreground"
                   }`}
                 >
-                  <span>{t.className}</span>
-                  <span className="font-mono text-xs">
-                    Nv {t.from}–{t.to}
-                  </span>
+                  <span>{tier.className}</span>
+                  <span className="font-mono text-xs">{t("badge.levelAbbrev", { from: tier.from, to: tier.to })}</span>
                 </li>
               );
             })}
@@ -91,7 +91,7 @@ function ConquistasPage() {
 
         <Panel>
           <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
-            <ScrollText className="size-4 text-accent" /> Certificado de conclusão
+            <ScrollText className="size-4 text-accent" /> {t("badge.certTitle")}
           </h2>
           <ul className="mt-3 space-y-3">
             {requirements.map((r) => (
@@ -108,17 +108,13 @@ function ConquistasPage() {
           </ul>
           {completed ? (
             <div className="mt-5 rounded-xl border border-legendary/40 bg-legendary/10 px-4 py-4 text-center">
-              <p className="font-display text-lg font-semibold text-foreground">
-                Jornada concluída — DevOps Professional
-              </p>
+              <p className="font-display text-lg font-semibold text-foreground">{t("badge.certDone")}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {MODULES.length} módulos, {progress.xp} XP e a PrintQuest Platform no ar.
+                {t("badge.certDoneText", { modules: MODULES.length, xp: progress.xp })}
               </p>
             </div>
           ) : (
-            <p className="mt-5 text-sm text-muted-foreground">
-              Complete todos os requisitos para liberar o certificado final.
-            </p>
+            <p className="mt-5 text-sm text-muted-foreground">{t("badge.certLocked")}</p>
           )}
         </Panel>
       </div>

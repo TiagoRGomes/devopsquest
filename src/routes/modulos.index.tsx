@@ -28,9 +28,9 @@ function ModulosPage() {
   return (
     <div className="space-y-6">
       <SectionTitle
-        eyebrow="Currículo"
-        title="Minha trilha completa"
-        description={`${MODULES.length} módulos, ${TOTAL_WEEKS} semanas e ${TOTAL_MODULE_XP} XP em conteúdo. Cada módulo termina com uma entrega que você pode mostrar em entrevista.`}
+        eyebrow={t("mod.eyebrow")}
+        title={t("mod.title")}
+        description={t("mod.desc", { modules: MODULES.length, weeks: TOTAL_WEEKS, xp: TOTAL_MODULE_XP })}
       />
 
       <ul className="grid gap-4 lg:grid-cols-2">
@@ -66,14 +66,14 @@ function ModulosPage() {
               </div>
               <XpBar percent={p.percent} className="mt-4 h-1.5" />
               <p className="mt-2 text-xs text-muted-foreground">
-                {m.lessons.length} aulas · {labs.length} labs · {m.weeks} semanas · {m.xp} XP · {p.percent}% concluído
+                {t("mod.lessonsLabsWeeksXp", { lessons: m.lessons.length, labs: labs.length, weeks: m.weeks, xp: m.xp, percent: p.percent })}
               </p>
               <Link
                 to="/modulos/$slug"
                 params={{ slug: m.slug }}
                 className="mt-4 inline-flex rounded-lg border border-primary/50 bg-primary/12 px-3.5 py-2 text-sm font-medium text-primary hover:bg-primary/20"
               >
-                Abrir módulo
+                {t("mod.openModule")}
               </Link>
               {!unlocked && <p className="mt-2 text-xs text-muted-foreground">{t("exam.lockedText")}</p>}
             </Panel>

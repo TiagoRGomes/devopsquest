@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Check, Clock } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { getLesson, getLessonNeighbors, getModuleById } from "@/data/curriculum";
 import { Chip, DifficultyChip, EmptyState, InsightBox, Panel } from "@/components/ui-bits";
+import { useI18n } from "@/lib/i18n";
 import { CodeBlock } from "@/components/CodeBlock";
 
 export const Route = createFileRoute("/aulas/$lessonId")({
@@ -25,15 +26,17 @@ export const Route = createFileRoute("/aulas/$lessonId")({
       ],
     };
   },
-  notFoundComponent: () => (
-    <EmptyState title="Aula não encontrada" description="Escolha uma aula na página de módulos." />
-  ),
+  notFoundComponent: () => {
+    const { t } = useI18n();
+    return <EmptyState title={t("lesson.notFoundTitle")} description={t("lesson.notFoundDesc")} />;
+  },
   component: LessonPage,
 });
 
 function LessonPage() {
   const { lessonId } = Route.useParams();
   const lesson = getLesson(lessonId);
+  const { t } = useI18n();
   const { progress, completeLesson, passQuiz, saveNote, setCurrentLesson } = useProgress();
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [checked, setChecked] = useState(false);
@@ -48,7 +51,7 @@ function LessonPage() {
   }, [lessonId]);
 
   if (!lesson) {
-    return <EmptyState title="Aula não encontrada" description="Escolha uma aula na página de módulos." />;
+    return <EmptyState title={t("lesson.notFoundTitle")} description={t("lesson.notFoundDesc")} />;
   }
 
   const mod = getModuleById(lesson.moduleId);
@@ -63,7 +66,7 @@ function LessonPage() {
       <header>
         {mod && (
           <Link to="/modulos/$slug" params={{ slug: mod.slug }} className="text-sm text-primary hover:underline">
-            Módulo {mod.index} · {mod.title}
+            {t("lesson.moduleLink", { index: mod.index, title: mod.title })}
           </Link>
         )}
         <h1 className="mt-2 font-display text-2xl font-semibold text-foreground sm:text-3xl">{lesson.title}</h1>
@@ -82,7 +85,7 @@ function LessonPage() {
       </header>
 
       <Panel>
-        <h2 className="font-display font-semibold text-foreground">Objetivos desta aula</h2>
+        <h2 className="font-display font-semibold text-foreground">{t("lesson.objectivesTitle")}</h2>
         <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
           {lesson.objectives.map((o) => (
             <li key={o} className="flex gap-2">
@@ -103,7 +106,7 @@ function LessonPage() {
 
       {lesson.code.length > 0 && (
         <section className="space-y-4">
-          <h2 className="font-display text-lg font-semibold text-foreground">Na prática</h2>
+          <h2 className="font-display text-lg font-semibold text-foreground">{t("lesson.inPractice")}</h2>
           {lesson.code.map((block, i) => (
             <CodeBlock key={i} block={block} />
           ))}
@@ -111,27 +114,27 @@ function LessonPage() {
       )}
 
       <section className="space-y-3">
-        <InsightBox label="Por que isso importa" tone="why">
+        <InsightBox label={t("lesson.whyMatters")} tone="why">
           {lesson.whyItMatters}
         </InsightBox>
-        <InsightBox label="Erro comum" tone="mistake">
+        <InsightBox label={t("lesson.commonMistake")} tone="mistake">
           {lesson.commonMistake}
         </InsightBox>
-        <InsightBox label="Dica de produção" tone="tip">
+        <InsightBox label={t("lesson.productionTip")} tone="tip">
           {lesson.productionTip}
         </InsightBox>
         {lesson.securityAlert && (
-          <InsightBox label="Alerta de segurança" tone="security">
+          <InsightBox label={t("lesson.securityAlert")} tone="security">
             {lesson.securityAlert}
           </InsightBox>
         )}
-        <InsightBox label="Pergunta de entrevista" tone="interview">
+        <InsightBox label={t("lesson.interviewQuestion")} tone="interview">
           {lesson.interviewQuestion}
         </InsightBox>
       </section>
 
       <Panel>
-        <h2 className="font-display font-semibold text-foreground">Glossário</h2>
+        <h2 className="font-display font-semibold text-foreground">{t("lesson.glossary")}</h2>
         <dl className="mt-3 space-y-2.5">
           {lesson.glossary.map((g) => (
             <div key={g.term}>
@@ -143,13 +146,13 @@ function LessonPage() {
       </Panel>
 
       <Panel>
-        <h2 className="font-display font-semibold text-foreground">Conexão com o PrintQuest</h2>
+        <h2 className="font-display font-semibold text-foreground">{t("lesson.printQuestConnection")}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{lesson.printQuestLink}</p>
       </Panel>
 
       {lesson.quiz.length > 0 && (
         <Panel>
-          <h2 className="font-display font-semibold text-foreground">Quiz da aula</h2>
+          <h2 className="font-display font-semibold text-foreground">{t("lesson.quizTitle")}</h2>
           <ol className="mt-4 space-y-5">
             {lesson.quiz.map((q, qi) => (
               <li key={qi}>
@@ -203,25 +206,25 @@ function LessonPage() {
               }}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
             >
-              Corrigir respostas
+              {t("lesson.checkAnswers")}
             </button>
-            {quizDone && <Chip tone="success">Quiz concluído</Chip>}
-            {checked && !allCorrect && <Chip tone="warning">Revise as marcadas em vermelho</Chip>}
+            {quizDone && <Chip tone="success">{t("lesson.quizDone")}</Chip>}
+            {checked && !allCorrect && <Chip tone="warning">{t("lesson.reviewRed")}</Chip>}
           </div>
         </Panel>
       )}
 
       <Panel>
-        <h2 className="font-display font-semibold text-foreground">Minhas anotações</h2>
+        <h2 className="font-display font-semibold text-foreground">{t("lesson.myNotes")}</h2>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
           onBlur={() => saveNote(lesson.id, note)}
           rows={4}
-          placeholder="Comandos que você quer lembrar, dúvidas, links…"
+          placeholder={t("lesson.notesPlaceholder")}
           className="mt-3 w-full rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary/60"
         />
-        <p className="mt-1.5 text-xs text-muted-foreground">Salvo automaticamente neste navegador.</p>
+        <p className="mt-1.5 text-xs text-muted-foreground">{t("lesson.autoSaved")}</p>
       </Panel>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5">
@@ -231,7 +234,7 @@ function LessonPage() {
             params={{ lessonId: previous.id }}
             className="inline-flex items-center gap-2 rounded-lg border border-border px-3.5 py-2 text-sm text-foreground hover:border-primary/50"
           >
-            <ArrowLeft className="size-4" /> Anterior
+            <ArrowLeft className="size-4" /> {t("lesson.previous")}
           </Link>
         ) : (
           <span />
@@ -242,7 +245,7 @@ function LessonPage() {
           disabled={done}
           className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          <Check className="size-4" /> {done ? "Aula concluída" : `Concluir aula (+${lesson.xp} XP)`}
+          <Check className="size-4" /> {done ? t("lesson.lessonDone") : t("lesson.completeLesson", { xp: lesson.xp })}
         </button>
         {next ? (
           <Link
@@ -250,7 +253,7 @@ function LessonPage() {
             params={{ lessonId: next.id }}
             className="inline-flex items-center gap-2 rounded-lg border border-border px-3.5 py-2 text-sm text-foreground hover:border-primary/50"
           >
-            Próxima <ArrowRight className="size-4" />
+            {t("lesson.next")} <ArrowRight className="size-4" />
           </Link>
         ) : (
           <span />

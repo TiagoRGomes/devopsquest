@@ -33,7 +33,7 @@ export const Route = createFileRoute("/exame/$slug")({
       ],
     };
   },
-  notFoundComponent: () => <EmptyState title="Exame não encontrado" description="Escolha um módulo na lista." />,
+  notFoundComponent: () => <NotFoundExam />,
   component: ExamePage,
 });
 
@@ -42,6 +42,11 @@ const LEVEL_TONE: Record<ExamLevel, "success" | "warning" | "danger"> = {
   medio: "warning",
   dificil: "danger",
 };
+
+function NotFoundExam() {
+  const { t } = useI18n();
+  return <EmptyState title={t("certx.notFound")} description={t("certx.notFoundDesc")} />;
+}
 
 function ExamePage() {
   const { slug } = Route.useParams();
@@ -55,7 +60,7 @@ function ExamePage() {
   const questions = useMemo(() => exam?.questions ?? [], [exam]);
 
   if (!mod || !exam) {
-    return <EmptyState title="Exame não encontrado" description="Escolha um módulo na lista." />;
+    return <NotFoundExam />;
   }
 
   const unlocked = isModuleUnlocked(mod.id);

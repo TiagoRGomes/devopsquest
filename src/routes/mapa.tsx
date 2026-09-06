@@ -5,6 +5,7 @@ import { REGIONS } from "@/data/world";
 import { getModuleById } from "@/data/curriculum";
 import { getBoss } from "@/data/challenges";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/mapa")({
   head: () => ({
@@ -22,14 +23,15 @@ export const Route = createFileRoute("/mapa")({
 });
 
 function MapaPage() {
+  const { t } = useI18n();
   const { level, regionProgress, progress } = useProgress();
 
   return (
     <div className="space-y-6">
       <SectionTitle
-        eyebrow="Mapa da Jornada"
-        title="Dez regiões, uma carreira"
-        description="Cada região representa um bloco de competências que aparece nas vagas. Avance na ordem — as bases sustentam tudo o que vem depois."
+        eyebrow={t("map.eyebrow")}
+        title={t("map.title")}
+        description={t("map.desc")}
       />
 
       <ol className="space-y-4">
@@ -50,10 +52,10 @@ function MapaPage() {
                     <h3 className="font-display text-lg font-semibold text-foreground">{region.name}</h3>
                     <Chip tone="accent">{region.theme}</Chip>
                     {unlocked ? (
-                      <Chip tone="success">Liberada</Chip>
+                      <Chip tone="success">{t("map.unlocked")}</Chip>
                     ) : (
                       <Chip tone="muted">
-                        <Lock className="size-3" /> Nível {region.requiredLevel}
+                        <Lock className="size-3" /> {t("map.level", { n: region.requiredLevel })}
                       </Chip>
                     )}
                   </div>
@@ -61,29 +63,29 @@ function MapaPage() {
                   <p className="mt-2 flex items-start gap-2 text-sm text-foreground/90">
                     <MapPin className="mt-0.5 size-4 shrink-0 text-accent" />
                     <span>
-                      <strong className="font-medium">Quest:</strong> {region.quest}
+                      <strong className="font-medium">{t("map.questLabel")}</strong> {region.quest}
                     </span>
                   </p>
                   {boss && (
                     <p className="mt-1.5 flex items-start gap-2 text-sm text-foreground/90">
                       <Skull className={`mt-0.5 size-4 shrink-0 ${bossDone ? "text-success" : "text-destructive"}`} />
                       <span>
-                        <strong className="font-medium">Boss:</strong> {boss.name}
-                        {bossDone && " — derrotado"}
+                        <strong className="font-medium">{t("map.bossLabel")}</strong> {boss.name}
+                        {bossDone && t("map.defeated")}
                       </span>
                     </p>
                   )}
                   <p className="mt-1.5 flex items-start gap-2 text-sm text-foreground/90">
                     <Trophy className="mt-0.5 size-4 shrink-0 text-legendary" />
                     <span>
-                      <strong className="font-medium">Recompensa:</strong> {region.badge} · {region.xp} XP
+                      <strong className="font-medium">{t("map.rewardLabel")}</strong> {region.badge} · {region.xp} XP
                     </span>
                   </p>
                 </div>
 
                 <div className="w-full max-w-xs">
                   <div className="flex items-baseline justify-between text-xs">
-                    <span className="text-muted-foreground">Progresso</span>
+                    <span className="text-muted-foreground">{t("map.progress")}</span>
                     <span className="font-mono text-accent">{percent}%</span>
                   </div>
                   <XpBar percent={percent} className="mt-1.5" />

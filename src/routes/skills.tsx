@@ -4,6 +4,7 @@ import { useProgress } from "@/lib/progress";
 import { SKILLS, SKILL_TREES } from "@/data/world";
 import { getLesson } from "@/data/curriculum";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/skills")({
   head: () => ({
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/skills")({
 });
 
 function SkillsPage() {
+  const { t } = useI18n();
   const { progress } = useProgress();
 
   function skillState(skillId: string): { unlocked: boolean; mastered: boolean; percent: number } {
@@ -38,8 +40,8 @@ function SkillsPage() {
     <div className="space-y-6">
       <SectionTitle
         eyebrow="Skill Tree"
-        title="Habilidades desbloqueadas pela prática"
-        description={`Cada nó é liberado quando você conclui as aulas ligadas a ele. ${mastered} de ${SKILLS.length} habilidades dominadas.`}
+        title={t("skills.title")}
+        description={t("skills.desc", { mastered, total: SKILLS.length })}
       />
 
       <div className="space-y-6">
@@ -55,24 +57,24 @@ function SkillsPage() {
                       <p className="font-medium text-foreground">{skill.name}</p>
                       {state.mastered ? (
                         <Chip tone="success">
-                          <Check className="size-3" /> Dominada
+                          <Check className="size-3" /> {t("skills.mastered")}
                         </Chip>
                       ) : state.unlocked ? (
-                        <Chip tone="primary">Disponível</Chip>
+                        <Chip tone="primary">{t("skills.available")}</Chip>
                       ) : (
                         <Chip tone="muted">
-                          <Lock className="size-3" /> Trancada
+                          <Lock className="size-3" /> {t("skills.locked")}
                         </Chip>
                       )}
                     </div>
                     <p className="mt-2 text-sm text-muted-foreground">{skill.description}</p>
                     <XpBar percent={state.percent} className="mt-3 h-1.5" />
                     <p className="mt-2 text-xs text-muted-foreground">
-                      Recompensa: {skill.reward} · {skill.xp} XP
+                      {t("skills.reward", { reward: skill.reward, xp: skill.xp })}
                     </p>
                     {skill.requires.length > 0 && (
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Requer: {skill.requires.map((r) => SKILLS.find((s) => s.id === r)?.name ?? r).join(", ")}
+                        {t("skills.requires", { list: skill.requires.map((r) => SKILLS.find((s) => s.id === r)?.name ?? r).join(", ") })}
                       </p>
                     )}
                     <div className="mt-3 flex flex-wrap gap-1.5">

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useI18n } from "@/lib/i18n";
 import { Check, GitBranch } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { MATURITY_AXES, PROJECT, PROJECT_STEPS, maturityScore } from "@/data/project";
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/projeto")({
 });
 
 function ProjetoPage() {
+  const { t } = useI18n();
   const { progress, toggleProjectStep } = useProgress();
   const maturity = maturityScore(progress.completedProjectSteps);
   const phases = Array.from(new Set(PROJECT_STEPS.map((s) => s.phase)));
@@ -27,7 +29,7 @@ function ProjetoPage() {
   return (
     <div className="space-y-6">
       <Panel className="bg-hero">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">Projeto final</p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{t("proj.eyebrow")}</p>
         <h1 className="mt-1.5 font-display text-2xl font-semibold text-foreground sm:text-3xl">{PROJECT.name}</h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{PROJECT.pitch}</p>
         <div className="mt-4 flex flex-wrap gap-1.5">
@@ -39,7 +41,7 @@ function ProjetoPage() {
         </div>
         <div className="mt-5 max-w-lg">
           <div className="flex items-baseline justify-between text-sm">
-            <span className="text-muted-foreground">Maturidade da plataforma</span>
+            <span className="text-muted-foreground">{t("proj.maturity")}</span>
             <span className="font-mono text-accent">{maturity.overall}%</span>
           </div>
           <XpBar percent={maturity.overall} className="mt-2" />
@@ -58,7 +60,7 @@ function ProjetoPage() {
       </div>
 
       <Panel>
-        <SectionTitle eyebrow="Avaliação" title="Eixos de maturidade" />
+        <SectionTitle eyebrow={t("proj.evaluationEyebrow")} title={t("proj.axesTitle")} />
         <ul className="mt-4 space-y-3">
           {maturity.perAxis.map((a) => {
             const axis = MATURITY_AXES.find((m) => m.axis === a.axis);
@@ -89,7 +91,7 @@ function ProjetoPage() {
                       <p className="text-sm font-medium text-foreground">{step.title}</p>
                       <p className="mt-1 text-sm text-muted-foreground">{step.description}</p>
                       <p className="mt-1.5 text-xs text-muted-foreground">
-                        Entrega: {step.deliverable} · repo {step.repo}
+                        {t("proj.deliverable", { deliverable: step.deliverable, repo: step.repo })}
                       </p>
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {step.stack.map((t) => (
@@ -106,7 +108,7 @@ function ProjetoPage() {
                           : "border-border text-foreground hover:border-primary/50"
                       }`}
                     >
-                      <Check className="size-3.5" /> {done ? "Concluída" : "Marcar etapa"}
+                      <Check className="size-3.5" /> {done ? t("proj.done") : t("proj.markStep")}
                     </button>
                   </div>
                 </li>
