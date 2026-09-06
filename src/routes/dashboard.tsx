@@ -8,6 +8,7 @@ import { PROJECT_STEPS, maturityScore } from "@/data/project";
 import { REGIONS, XP_RULES } from "@/data/world";
 import { Chip, Panel, SectionTitle, StatTile, XpBar } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
+import { contentText, slugifyClassName } from "@/lib/content-i18n";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function Dashboard() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { progress, level, earnedBadges, moduleProgress } = useProgress();
   const upcoming = nextLesson(progress.completedLessons);
   const upcomingModule = MODULES.find((m) => m.id === upcoming?.moduleId);
@@ -37,7 +38,7 @@ function Dashboard() {
     <div className="space-y-8">
       <section className="panel overflow-hidden bg-hero p-6 sm:p-8">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
-          {t("dash.levelClass", { level: level.level, className: level.className })}
+          {t("dash.levelClass", { level: level.level, className: contentText(lang, `class.${slugifyClassName(level.className)}`, "title", level.className) })}
         </p>
         <h1 className="mt-2 max-w-3xl font-display text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
           {t("dash.heroTitle")}
@@ -72,7 +73,7 @@ function Dashboard() {
               {progress.completedLessons.length ? t("dash.continue") : t("dash.start")}
             </Link>
             <span className="text-sm text-muted-foreground">
-              {t("dash.next")} <span className="text-foreground">{upcoming.title}</span>
+              {t("dash.next")} <span className="text-foreground">{contentText(lang, upcoming.id, "title", upcoming.title)}</span>
               {upcomingModule && ` · ${t("dash.moduleShort", { index: upcomingModule.index })}`}
             </span>
           </div>
@@ -120,7 +121,7 @@ function Dashboard() {
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-sm font-medium text-foreground">
-                        <span className="font-mono text-xs text-muted-foreground">M{m.index}</span> {m.title}
+                        <span className="font-mono text-xs text-muted-foreground">M{m.index}</span> {contentText(lang, m.id, "title", m.title)}
                       </p>
                       <span className="font-mono text-xs text-accent">{p.percent}%</span>
                     </div>
@@ -201,7 +202,7 @@ function Dashboard() {
             {REGIONS.map((r) => (
               <li key={r.id} className="rounded-lg border border-border bg-surface-2 px-3 py-2.5">
                 <p className="text-sm text-foreground">
-                  <span className="font-mono text-xs text-muted-foreground">{r.order}.</span> {r.name}
+                  <span className="font-mono text-xs text-muted-foreground">{r.order}.</span> {contentText(lang, r.id, "name", r.name)}
                 </p>
                 <p className="text-xs text-muted-foreground">{r.theme}</p>
               </li>

@@ -29,6 +29,7 @@ import { useI18n } from "@/lib/i18n";
 import { XpBar } from "@/components/ui-bits";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { contentText, slugifyClassName } from "@/lib/content-i18n";
 
 const NAV = [
   { to: "/dashboard", key: "nav.dashboard", icon: Gauge },
@@ -51,7 +52,7 @@ const BARE_ROUTES = ["/", "/auth"];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { t } = useI18n();
+  const { t , lang } = useI18n();
 
   return (
     <nav className="space-y-1" aria-label={t("nav.aria")}>
@@ -118,7 +119,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </p>
               <p className="font-mono text-xs text-accent">{progress.xp} XP</p>
             </div>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">{level.className}</p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">{contentText(lang, `class.${slugifyClassName(level.className)}`, "title", level.className)}</p>
             <XpBar percent={level.progress} className="mt-2.5" />
             <p className="mt-1.5 font-mono text-[10px] text-muted-foreground">
               {level.xpIntoLevel}/{level.xpForNext} {t("shell.xpToLevel")} {level.level + 1}
