@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useProgress } from "@/lib/progress";
 import { useI18n } from "@/lib/i18n";
 import { getModule } from "@/data/curriculum";
-import { DAILY_ATTEMPTS, PASS_SCORE, getExam, previousModuleId } from "@/data/exams";
+import { DAILY_ATTEMPTS, PASS_SCORE, getExam } from "@/data/exams";
 import { Chip, EmptyState, Panel, XpBar } from "@/components/ui-bits";
 import type { ExamLevel } from "@/lib/types";
 
@@ -59,8 +59,6 @@ function ExamePage() {
   }
 
   const unlocked = isModuleUnlocked(mod.id);
-  const prevId = previousModuleId(mod.id);
-  const prevMod = prevId ? getModule(getModule(slug) ? (prevId as string) : "") : null;
   const best = examResult(mod.id);
   const left = attemptsLeftToday(mod.id);
   const answered = Object.keys(answers).length;
@@ -120,7 +118,6 @@ function ExamePage() {
           </Chip>
           {best.best > 0 && <Chip tone="accent">{t("exam.best")}: {best.best}%</Chip>}
           {best.passedAt && <Chip tone="success">{t("exam.passed")}</Chip>}
-          {prevMod && <Chip>{prevMod.title}</Chip>}
         </div>
       </div>
 
