@@ -47,8 +47,10 @@ export type Database = {
           created_at: string
           current_lesson_id: string | null
           defeated_bosses: string[]
+          exam_attempts: Json
           last_active: string | null
           minutes_studied: number
+          module_exams: Json
           notes: Json
           quiz_passed: string[]
           streak: number
@@ -64,8 +66,10 @@ export type Database = {
           created_at?: string
           current_lesson_id?: string | null
           defeated_bosses?: string[]
+          exam_attempts?: Json
           last_active?: string | null
           minutes_studied?: number
+          module_exams?: Json
           notes?: Json
           quiz_passed?: string[]
           streak?: number
@@ -81,8 +85,10 @@ export type Database = {
           created_at?: string
           current_lesson_id?: string | null
           defeated_bosses?: string[]
+          exam_attempts?: Json
           last_active?: string | null
           minutes_studied?: number
+          module_exams?: Json
           notes?: Json
           quiz_passed?: string[]
           streak?: number
