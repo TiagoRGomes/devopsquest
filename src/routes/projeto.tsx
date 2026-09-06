@@ -66,9 +66,9 @@ function ProjetoPage() {
               <li key={a.axis}>
                 <div className="flex items-baseline justify-between text-sm">
                   <span className="text-foreground">{a.axis}</span>
-                  <span className="font-mono text-xs text-accent">{a.percent}%</span>
+                  <span className="font-mono text-xs text-accent">{a.score}%</span>
                 </div>
-                <XpBar percent={a.percent} className="mt-1.5 h-1.5" />
+                <XpBar percent={a.score} className="mt-1.5 h-1.5" />
                 {axis && <p className="mt-1 text-xs text-muted-foreground">{axis.description}</p>}
               </li>
             );
