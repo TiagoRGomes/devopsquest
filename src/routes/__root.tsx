@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ProgressProvider } from "../lib/progress";
 import { AuthProvider } from "../lib/auth";
+import { I18nProvider } from "../lib/i18n";
 import { AppShell } from "../components/AppShell";
 import { Toaster } from "../components/ui/sonner";
 
@@ -81,13 +82,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DevOps Quest RPG — carreira DevOps do zero ao Ninja" },
+      { title: "Jornada DevOps — carreira DevOps do zero ao Ninja" },
       {
         name: "description",
         content:
           "Plataforma gamificada em português para aprender DevOps do zero ao nível profissional, com labs, desafios e projeto real.",
       },
-      { property: "og:title", content: "DevOps Quest RPG" },
+      { property: "og:title", content: "Jornada DevOps" },
       {
         property: "og:description",
         content: "Trilha completa de DevOps com XP, níveis, laboratórios práticos e projeto de portfólio.",
@@ -129,15 +130,18 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ProgressProvider>
-          <AppShell>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-          </AppShell>
-          <Toaster position="bottom-right" />
-        </ProgressProvider>
-      </AuthProvider>
+      <I18nProvider>
+        <AuthProvider>
+          <ProgressProvider>
+            <AppShell>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </AppShell>
+            <Toaster position="bottom-right" />
+          </ProgressProvider>
+        </AuthProvider>
+      </I18nProvider>
     </QueryClientProvider>
+
   );
 }

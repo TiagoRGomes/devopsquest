@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BossBattlesRouteImport } from './routes/boss-battles'
 import { Route as CarreiraRouteImport } from './routes/carreira'
 import { Route as ConquistasRouteImport } from './routes/conquistas'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DesafiosRouteImport } from './routes/desafios'
 import { Route as LaboratoriosRouteImport } from './routes/laboratorios'
 import { Route as MapaRouteImport } from './routes/mapa'
@@ -48,6 +49,11 @@ const CarreiraRoute = CarreiraRouteImport.update({
 const ConquistasRoute = ConquistasRouteImport.update({
   id: '/conquistas',
   path: '/conquistas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesafiosRoute = DesafiosRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/boss-battles': typeof BossBattlesRoute
   '/carreira': typeof CarreiraRoute
   '/conquistas': typeof ConquistasRoute
+  '/dashboard': typeof DashboardRoute
   '/desafios': typeof DesafiosRoute
   '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/boss-battles': typeof BossBattlesRoute
   '/carreira': typeof CarreiraRoute
   '/conquistas': typeof ConquistasRoute
+  '/dashboard': typeof DashboardRoute
   '/desafios': typeof DesafiosRoute
   '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/boss-battles': typeof BossBattlesRoute
   '/carreira': typeof CarreiraRoute
   '/conquistas': typeof ConquistasRoute
+  '/dashboard': typeof DashboardRoute
   '/desafios': typeof DesafiosRoute
   '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/boss-battles'
     | '/carreira'
     | '/conquistas'
+    | '/dashboard'
     | '/desafios'
     | '/laboratorios'
     | '/mapa'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/boss-battles'
     | '/carreira'
     | '/conquistas'
+    | '/dashboard'
     | '/desafios'
     | '/laboratorios'
     | '/mapa'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/boss-battles'
     | '/carreira'
     | '/conquistas'
+    | '/dashboard'
     | '/desafios'
     | '/laboratorios'
     | '/mapa'
@@ -213,6 +225,7 @@ export interface RootRouteChildren {
   BossBattlesRoute: typeof BossBattlesRoute
   CarreiraRoute: typeof CarreiraRoute
   ConquistasRoute: typeof ConquistasRoute
+  DashboardRoute: typeof DashboardRoute
   DesafiosRoute: typeof DesafiosRoute
   LaboratoriosRoute: typeof LaboratoriosRoute
   MapaRoute: typeof MapaRoute
@@ -260,6 +273,13 @@ declare module '@tanstack/react-router' {
       path: '/conquistas'
       fullPath: '/conquistas'
       preLoaderRoute: typeof ConquistasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/desafios': {
@@ -341,6 +361,7 @@ const rootRouteChildren: RootRouteChildren = {
   BossBattlesRoute: BossBattlesRoute,
   CarreiraRoute: CarreiraRoute,
   ConquistasRoute: ConquistasRoute,
+  DashboardRoute: DashboardRoute,
   DesafiosRoute: DesafiosRoute,
   LaboratoriosRoute: LaboratoriosRoute,
   MapaRoute: MapaRoute,
