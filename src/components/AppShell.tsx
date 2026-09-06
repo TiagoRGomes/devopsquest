@@ -13,6 +13,7 @@ import {
   LogIn,
   Map,
   Menu,
+  ScrollText,
   Skull,
   Swords,
   Target,
@@ -40,6 +41,7 @@ const NAV = [
   { to: "/projeto", key: "nav.project", icon: Boxes },
   { to: "/carreira", key: "nav.career", icon: Briefcase },
   { to: "/conquistas", key: "nav.badges", icon: Award },
+  { to: "/certificados", key: "exam.nav", icon: ScrollText },
   { to: "/recursos", key: "nav.resources", icon: Library },
   { to: "/perfil", key: "nav.profile", icon: UserCog },
 ] as const;

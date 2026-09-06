@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Award, Lock } from "lucide-react";
 import { useProgress } from "@/lib/progress";
+import { useI18n } from "@/lib/i18n";
 import { MODULES, TOTAL_MODULE_XP, TOTAL_WEEKS } from "@/data/curriculum";
 import { labsByModule } from "@/data/labs";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
@@ -20,7 +22,8 @@ export const Route = createFileRoute("/modulos/")({
 });
 
 function ModulosPage() {
-  const { moduleProgress } = useProgress();
+  const { moduleProgress, isModuleUnlocked, examResult } = useProgress();
+  const { t } = useI18n();
 
   return (
     <div className="space-y-6">
@@ -34,6 +37,8 @@ function ModulosPage() {
         {MODULES.map((m) => {
           const p = moduleProgress(m.id);
           const labs = labsByModule(m.id);
+          const unlocked = isModuleUnlocked(m.id);
+          const exam = examResult(m.id);
           return (
             <Panel as="li" key={m.id}>
               <div className="flex flex-wrap items-center gap-2">
@@ -41,6 +46,16 @@ function ModulosPage() {
                   {m.index}
                 </span>
                 <h3 className="font-display text-lg font-semibold text-foreground">{m.title}</h3>
+                {!unlocked && (
+                  <span className="ml-auto inline-flex items-center gap-1 rounded-md border border-warning/50 bg-warning/10 px-2 py-1 text-xs text-warning">
+                    <Lock className="size-3" /> {t("exam.locked")}
+                  </span>
+                )}
+                {exam.passedAt && (
+                  <span className="ml-auto inline-flex items-center gap-1 rounded-md border border-success/50 bg-success/10 px-2 py-1 text-xs text-success">
+                    <Award className="size-3" /> {exam.best}%
+                  </span>
+                )}
               </div>
               <p className="mt-2 text-sm text-accent">{m.tagline}</p>
               <p className="mt-2 text-sm text-muted-foreground">{m.overview}</p>
@@ -60,6 +75,7 @@ function ModulosPage() {
               >
                 Abrir módulo
               </Link>
+              {!unlocked && <p className="mt-2 text-xs text-muted-foreground">{t("exam.lockedText")}</p>}
             </Panel>
           );
         })}
