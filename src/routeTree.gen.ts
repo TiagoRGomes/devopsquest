@@ -10,7 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BossBattlesRouteImport } from './routes/boss-battles'
+import { Route as DesafiosRouteImport } from './routes/desafios'
+import { Route as LaboratoriosRouteImport } from './routes/laboratorios'
 import { Route as MapaRouteImport } from './routes/mapa'
+import { Route as ProjetoRouteImport } from './routes/projeto'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as AulasLessonIdRouteImport } from './routes/aulas.$lessonId'
 import { Route as ModulosIndexRouteImport } from './routes/modulos.index'
@@ -21,9 +25,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BossBattlesRoute = BossBattlesRouteImport.update({
+  id: '/boss-battles',
+  path: '/boss-battles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesafiosRoute = DesafiosRouteImport.update({
+  id: '/desafios',
+  path: '/desafios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LaboratoriosRoute = LaboratoriosRouteImport.update({
+  id: '/laboratorios',
+  path: '/laboratorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MapaRoute = MapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjetoRoute = ProjetoRouteImport.update({
+  id: '/projeto',
+  path: '/projeto',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SkillsRoute = SkillsRouteImport.update({
@@ -49,7 +73,11 @@ const ModulosSlugRoute = ModulosSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/boss-battles': typeof BossBattlesRoute
+  '/desafios': typeof DesafiosRoute
+  '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
+  '/projeto': typeof ProjetoRoute
   '/skills': typeof SkillsRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/modulos/$slug': typeof ModulosSlugRoute
@@ -57,7 +85,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/boss-battles': typeof BossBattlesRoute
+  '/desafios': typeof DesafiosRoute
+  '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
+  '/projeto': typeof ProjetoRoute
   '/skills': typeof SkillsRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/modulos/$slug': typeof ModulosSlugRoute
@@ -66,7 +98,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/boss-battles': typeof BossBattlesRoute
+  '/desafios': typeof DesafiosRoute
+  '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
+  '/projeto': typeof ProjetoRoute
   '/skills': typeof SkillsRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/modulos/$slug': typeof ModulosSlugRoute
@@ -76,7 +112,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/boss-battles'
+    | '/desafios'
+    | '/laboratorios'
     | '/mapa'
+    | '/projeto'
     | '/skills'
     | '/aulas/$lessonId'
     | '/modulos/$slug'
@@ -84,7 +124,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/boss-battles'
+    | '/desafios'
+    | '/laboratorios'
     | '/mapa'
+    | '/projeto'
     | '/skills'
     | '/aulas/$lessonId'
     | '/modulos/$slug'
@@ -92,7 +136,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/boss-battles'
+    | '/desafios'
+    | '/laboratorios'
     | '/mapa'
+    | '/projeto'
     | '/skills'
     | '/aulas/$lessonId'
     | '/modulos/$slug'
@@ -101,7 +149,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BossBattlesRoute: typeof BossBattlesRoute
+  DesafiosRoute: typeof DesafiosRoute
+  LaboratoriosRoute: typeof LaboratoriosRoute
   MapaRoute: typeof MapaRoute
+  ProjetoRoute: typeof ProjetoRoute
   SkillsRoute: typeof SkillsRoute
   AulasLessonIdRoute: typeof AulasLessonIdRoute
   ModulosSlugRoute: typeof ModulosSlugRoute
@@ -117,11 +169,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/boss-battles': {
+      id: '/boss-battles'
+      path: '/boss-battles'
+      fullPath: '/boss-battles'
+      preLoaderRoute: typeof BossBattlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/desafios': {
+      id: '/desafios'
+      path: '/desafios'
+      fullPath: '/desafios'
+      preLoaderRoute: typeof DesafiosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/laboratorios': {
+      id: '/laboratorios'
+      path: '/laboratorios'
+      fullPath: '/laboratorios'
+      preLoaderRoute: typeof LaboratoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mapa': {
       id: '/mapa'
       path: '/mapa'
       fullPath: '/mapa'
       preLoaderRoute: typeof MapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projeto': {
+      id: '/projeto'
+      path: '/projeto'
+      fullPath: '/projeto'
+      preLoaderRoute: typeof ProjetoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/skills': {
@@ -157,7 +237,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BossBattlesRoute: BossBattlesRoute,
+  DesafiosRoute: DesafiosRoute,
+  LaboratoriosRoute: LaboratoriosRoute,
   MapaRoute: MapaRoute,
+  ProjetoRoute: ProjetoRoute,
   SkillsRoute: SkillsRoute,
   AulasLessonIdRoute: AulasLessonIdRoute,
   ModulosSlugRoute: ModulosSlugRoute,
