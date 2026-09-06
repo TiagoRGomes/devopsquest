@@ -10,33 +10,206 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BossBattlesRouteImport } from './routes/boss-battles'
+import { Route as CarreiraRouteImport } from './routes/carreira'
+import { Route as ConquistasRouteImport } from './routes/conquistas'
+import { Route as DesafiosRouteImport } from './routes/desafios'
+import { Route as LaboratoriosRouteImport } from './routes/laboratorios'
+import { Route as MapaRouteImport } from './routes/mapa'
+import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as ProjetoRouteImport } from './routes/projeto'
+import { Route as RecursosRouteImport } from './routes/recursos'
+import { Route as SkillsRouteImport } from './routes/skills'
+import { Route as AulasLessonIdRouteImport } from './routes/aulas.$lessonId'
+import { Route as ModulosIndexRouteImport } from './routes/modulos.index'
+import { Route as ModulosSlugRouteImport } from './routes/modulos.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BossBattlesRoute = BossBattlesRouteImport.update({
+  id: '/boss-battles',
+  path: '/boss-battles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CarreiraRoute = CarreiraRouteImport.update({
+  id: '/carreira',
+  path: '/carreira',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConquistasRoute = ConquistasRouteImport.update({
+  id: '/conquistas',
+  path: '/conquistas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesafiosRoute = DesafiosRouteImport.update({
+  id: '/desafios',
+  path: '/desafios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LaboratoriosRoute = LaboratoriosRouteImport.update({
+  id: '/laboratorios',
+  path: '/laboratorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapaRoute = MapaRouteImport.update({
+  id: '/mapa',
+  path: '/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjetoRoute = ProjetoRouteImport.update({
+  id: '/projeto',
+  path: '/projeto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecursosRoute = RecursosRouteImport.update({
+  id: '/recursos',
+  path: '/recursos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkillsRoute = SkillsRouteImport.update({
+  id: '/skills',
+  path: '/skills',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AulasLessonIdRoute = AulasLessonIdRouteImport.update({
+  id: '/aulas/$lessonId',
+  path: '/aulas/$lessonId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModulosIndexRoute = ModulosIndexRouteImport.update({
+  id: '/modulos/',
+  path: '/modulos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModulosSlugRoute = ModulosSlugRouteImport.update({
+  id: '/modulos/$slug',
+  path: '/modulos/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/boss-battles': typeof BossBattlesRoute
+  '/carreira': typeof CarreiraRoute
+  '/conquistas': typeof ConquistasRoute
+  '/desafios': typeof DesafiosRoute
+  '/laboratorios': typeof LaboratoriosRoute
+  '/mapa': typeof MapaRoute
+  '/perfil': typeof PerfilRoute
+  '/projeto': typeof ProjetoRoute
+  '/recursos': typeof RecursosRoute
+  '/skills': typeof SkillsRoute
+  '/aulas/$lessonId': typeof AulasLessonIdRoute
+  '/modulos/$slug': typeof ModulosSlugRoute
+  '/modulos/': typeof ModulosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/boss-battles': typeof BossBattlesRoute
+  '/carreira': typeof CarreiraRoute
+  '/conquistas': typeof ConquistasRoute
+  '/desafios': typeof DesafiosRoute
+  '/laboratorios': typeof LaboratoriosRoute
+  '/mapa': typeof MapaRoute
+  '/perfil': typeof PerfilRoute
+  '/projeto': typeof ProjetoRoute
+  '/recursos': typeof RecursosRoute
+  '/skills': typeof SkillsRoute
+  '/aulas/$lessonId': typeof AulasLessonIdRoute
+  '/modulos/$slug': typeof ModulosSlugRoute
+  '/modulos': typeof ModulosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/boss-battles': typeof BossBattlesRoute
+  '/carreira': typeof CarreiraRoute
+  '/conquistas': typeof ConquistasRoute
+  '/desafios': typeof DesafiosRoute
+  '/laboratorios': typeof LaboratoriosRoute
+  '/mapa': typeof MapaRoute
+  '/perfil': typeof PerfilRoute
+  '/projeto': typeof ProjetoRoute
+  '/recursos': typeof RecursosRoute
+  '/skills': typeof SkillsRoute
+  '/aulas/$lessonId': typeof AulasLessonIdRoute
+  '/modulos/$slug': typeof ModulosSlugRoute
+  '/modulos/': typeof ModulosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/boss-battles'
+    | '/carreira'
+    | '/conquistas'
+    | '/desafios'
+    | '/laboratorios'
+    | '/mapa'
+    | '/perfil'
+    | '/projeto'
+    | '/recursos'
+    | '/skills'
+    | '/aulas/$lessonId'
+    | '/modulos/$slug'
+    | '/modulos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/boss-battles'
+    | '/carreira'
+    | '/conquistas'
+    | '/desafios'
+    | '/laboratorios'
+    | '/mapa'
+    | '/perfil'
+    | '/projeto'
+    | '/recursos'
+    | '/skills'
+    | '/aulas/$lessonId'
+    | '/modulos/$slug'
+    | '/modulos'
+  id:
+    | '__root__'
+    | '/'
+    | '/boss-battles'
+    | '/carreira'
+    | '/conquistas'
+    | '/desafios'
+    | '/laboratorios'
+    | '/mapa'
+    | '/perfil'
+    | '/projeto'
+    | '/recursos'
+    | '/skills'
+    | '/aulas/$lessonId'
+    | '/modulos/$slug'
+    | '/modulos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BossBattlesRoute: typeof BossBattlesRoute
+  CarreiraRoute: typeof CarreiraRoute
+  ConquistasRoute: typeof ConquistasRoute
+  DesafiosRoute: typeof DesafiosRoute
+  LaboratoriosRoute: typeof LaboratoriosRoute
+  MapaRoute: typeof MapaRoute
+  PerfilRoute: typeof PerfilRoute
+  ProjetoRoute: typeof ProjetoRoute
+  RecursosRoute: typeof RecursosRoute
+  SkillsRoute: typeof SkillsRoute
+  AulasLessonIdRoute: typeof AulasLessonIdRoute
+  ModulosSlugRoute: typeof ModulosSlugRoute
+  ModulosIndexRoute: typeof ModulosIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +221,115 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/boss-battles': {
+      id: '/boss-battles'
+      path: '/boss-battles'
+      fullPath: '/boss-battles'
+      preLoaderRoute: typeof BossBattlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/carreira': {
+      id: '/carreira'
+      path: '/carreira'
+      fullPath: '/carreira'
+      preLoaderRoute: typeof CarreiraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conquistas': {
+      id: '/conquistas'
+      path: '/conquistas'
+      fullPath: '/conquistas'
+      preLoaderRoute: typeof ConquistasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/desafios': {
+      id: '/desafios'
+      path: '/desafios'
+      fullPath: '/desafios'
+      preLoaderRoute: typeof DesafiosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/laboratorios': {
+      id: '/laboratorios'
+      path: '/laboratorios'
+      fullPath: '/laboratorios'
+      preLoaderRoute: typeof LaboratoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mapa': {
+      id: '/mapa'
+      path: '/mapa'
+      fullPath: '/mapa'
+      preLoaderRoute: typeof MapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projeto': {
+      id: '/projeto'
+      path: '/projeto'
+      fullPath: '/projeto'
+      preLoaderRoute: typeof ProjetoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recursos': {
+      id: '/recursos'
+      path: '/recursos'
+      fullPath: '/recursos'
+      preLoaderRoute: typeof RecursosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/skills': {
+      id: '/skills'
+      path: '/skills'
+      fullPath: '/skills'
+      preLoaderRoute: typeof SkillsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aulas/$lessonId': {
+      id: '/aulas/$lessonId'
+      path: '/aulas/$lessonId'
+      fullPath: '/aulas/$lessonId'
+      preLoaderRoute: typeof AulasLessonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/modulos/': {
+      id: '/modulos/'
+      path: '/modulos'
+      fullPath: '/modulos/'
+      preLoaderRoute: typeof ModulosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/modulos/$slug': {
+      id: '/modulos/$slug'
+      path: '/modulos/$slug'
+      fullPath: '/modulos/$slug'
+      preLoaderRoute: typeof ModulosSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BossBattlesRoute: BossBattlesRoute,
+  CarreiraRoute: CarreiraRoute,
+  ConquistasRoute: ConquistasRoute,
+  DesafiosRoute: DesafiosRoute,
+  LaboratoriosRoute: LaboratoriosRoute,
+  MapaRoute: MapaRoute,
+  PerfilRoute: PerfilRoute,
+  ProjetoRoute: ProjetoRoute,
+  RecursosRoute: RecursosRoute,
+  SkillsRoute: SkillsRoute,
+  AulasLessonIdRoute: AulasLessonIdRoute,
+  ModulosSlugRoute: ModulosSlugRoute,
+  ModulosIndexRoute: ModulosIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
