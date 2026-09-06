@@ -36,21 +36,22 @@ export const XP_PER_LEVEL = Array.from({ length: 50 }, (_, i) => {
 export function levelFromXp(xp: number) {
   let level = 1;
   for (let i = 0; i < XP_PER_LEVEL.length; i++) {
-    if (xp >= XP_PER_LEVEL[i]) level = i + 1;
+    if (xp >= (XP_PER_LEVEL[i] ?? Infinity)) level = i + 1;
   }
-  const currentFloor = XP_PER_LEVEL[level - 1];
-  const nextFloor = XP_PER_LEVEL[Math.min(level, XP_PER_LEVEL.length - 1)];
-  const tier = LEVEL_TIERS.find((t) => level >= t.from && level <= t.to) ?? LEVEL_TIERS[0];
+  const currentFloor = XP_PER_LEVEL[level - 1] ?? 0;
+  const nextFloor = XP_PER_LEVEL[Math.min(level, XP_PER_LEVEL.length - 1)] ?? currentFloor + 1;
+  const tier = LEVEL_TIERS.find((t) => level >= t.from && level <= t.to);
   const span = Math.max(nextFloor - currentFloor, 1);
   return {
     level,
-    className: tier.className,
+    className: tier?.className ?? "Aprendiz de Infraestrutura",
     xpIntoLevel: xp - currentFloor,
     xpForNext: span,
     progress: Math.min(100, Math.round(((xp - currentFloor) / span) * 100)),
     nextLevelXp: nextFloor,
   };
 }
+
 
 export const REGIONS: Region[] = [
   {

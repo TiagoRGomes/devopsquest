@@ -273,7 +273,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         "boss-queda-producao": "sre-guardian",
         "boss-processo-zumbi": "log-hunter",
       };
-      if (map[boss.id]) earned.push(map[boss.id]);
+      const badgeId = map[boss.id];
+      if (badgeId) earned.push(badgeId);
     }
     if (progress.completedChallenges.length >= 6) earned.push("bash-scripter");
     if (progress.completedChallenges.length >= 10) earned.push("security-sentinel");
