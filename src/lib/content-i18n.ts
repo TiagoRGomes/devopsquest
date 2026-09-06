@@ -24,3 +24,13 @@ export function contentList(lang: Lang, id: string, field: string, fallback: str
   if (!joined) return fallback;
   return joined.split("|").map((s) => s.trim());
 }
+
+/** Converte o nome da classe de nível em uma chave estável. */
+export function slugifyClassName(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
