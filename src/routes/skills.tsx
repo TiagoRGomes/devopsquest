@@ -23,7 +23,7 @@ export const Route = createFileRoute("/skills")({
 function SkillsPage() {
   const { progress } = useProgress();
 
-  function skillState(skillId: string) {
+  function skillState(skillId: string): { unlocked: boolean; mastered: boolean; percent: number } {
     const skill = SKILLS.find((s) => s.id === skillId);
     if (!skill) return { unlocked: false, mastered: false, percent: 0 };
     const done = skill.lessonIds.filter((id) => progress.completedLessons.includes(id)).length;
