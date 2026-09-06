@@ -263,8 +263,7 @@ export const EXAMS_B: ModuleExam[] = [
           "Editar o container em execução",
         ],
         answerIndex: 0,
-        explanation "": "",
-        // placeholder removido
+        explanation: "Restaurar serviço primeiro: rollout undo volta para a revisão saudável em segundos.",
       },
       {
         level: "dificil",
@@ -463,7 +462,7 @@ export const EXAMS_B: ModuleExam[] = [
           "Trocar o dashboard",
         ],
         answerIndex: 0,
-        explanation "": "",
+        explanation: "p99 alto com p50 normal indica problema de cauda, não de capacidade média.",
       },
     ],
   },
