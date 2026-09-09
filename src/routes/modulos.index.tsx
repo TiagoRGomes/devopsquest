@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Award, Lock } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { useI18n } from "@/lib/i18n";
+import { contentText } from "@/lib/content-i18n";
 import { MODULES, TOTAL_MODULE_XP, TOTAL_WEEKS } from "@/data/curriculum";
 import { labsByModule } from "@/data/labs";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/modulos/")({
 
 function ModulosPage() {
   const { moduleProgress, isModuleUnlocked, examResult } = useProgress();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   return (
     <div className="space-y-6">
@@ -39,13 +40,16 @@ function ModulosPage() {
           const labs = labsByModule(m.id);
           const unlocked = isModuleUnlocked(m.id);
           const exam = examResult(m.id);
+          const title = contentText(lang, m.id, "title", m.title);
+          const tagline = contentText(lang, m.id, "tagline", m.tagline);
+          const overview = contentText(lang, m.id, "overview", m.overview);
           return (
             <Panel as="li" key={m.id}>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="grid size-8 place-items-center rounded-lg bg-level font-mono text-xs font-semibold text-primary-foreground">
                   {m.index}
                 </span>
-                <h3 className="font-display text-lg font-semibold text-foreground">{m.title}</h3>
+                <h3 className="font-display text-lg font-semibold text-foreground">{title}</h3>
                 {!unlocked && (
                   <span className="ml-auto inline-flex items-center gap-1 rounded-md border border-warning/50 bg-warning/10 px-2 py-1 text-xs text-warning">
                     <Lock className="size-3" /> {t("exam.locked")}
@@ -57,8 +61,8 @@ function ModulosPage() {
                   </span>
                 )}
               </div>
-              <p className="mt-2 text-sm text-accent">{m.tagline}</p>
-              <p className="mt-2 text-sm text-muted-foreground">{m.overview}</p>
+              <p className="mt-2 text-sm text-accent">{tagline}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{overview}</p>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {m.topics.slice(0, 6).map((t) => (
                   <Chip key={t}>{t}</Chip>

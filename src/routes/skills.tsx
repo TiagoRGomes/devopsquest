@@ -5,6 +5,7 @@ import { SKILLS, SKILL_TREES } from "@/data/world";
 import { getLesson } from "@/data/curriculum";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
+import { contentText } from "@/lib/content-i18n";
 
 export const Route = createFileRoute("/skills")({
   head: () => ({
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/skills")({
 });
 
 function SkillsPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { progress } = useProgress();
 
   function skillState(skillId: string): { unlocked: boolean; mastered: boolean; percent: number } {
@@ -88,7 +89,7 @@ function SkillsPage() {
                             params={{ lessonId: id }}
                             className="rounded-md border border-border bg-surface-2 px-2 py-1 text-[11px] text-foreground hover:border-primary/50"
                           >
-                            {lesson.title}
+                            {contentText(lang, lesson.id, "title", lesson.title)}
                           </Link>
                         );
                       })}

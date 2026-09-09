@@ -5,6 +5,7 @@ import { useProgress } from "@/lib/progress";
 import { getLesson, getLessonNeighbors, getModuleById } from "@/data/curriculum";
 import { Chip, DifficultyChip, EmptyState, InsightBox, Panel } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
+import { contentText, contentList } from "@/lib/content-i18n";
 import { CodeBlock } from "@/components/CodeBlock";
 
 export const Route = createFileRoute("/aulas/$lessonId")({
@@ -36,7 +37,7 @@ export const Route = createFileRoute("/aulas/$lessonId")({
 function LessonPage() {
   const { lessonId } = Route.useParams();
   const lesson = getLesson(lessonId);
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { progress, completeLesson, passQuiz, saveNote, setCurrentLesson } = useProgress();
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [checked, setChecked] = useState(false);
@@ -60,16 +61,19 @@ function LessonPage() {
   const quizDone = progress.quizPassed.includes(lesson.id);
   const allCorrect =
     lesson.quiz.length > 0 && lesson.quiz.every((q, i) => answers[i] === q.answerIndex);
+  const lessonTitle = contentText(lang, lesson.id, "title", lesson.title);
+  const modTitle = mod ? contentText(lang, mod.id, "title", mod.title) : undefined;
+  const lessonObjectives = contentList(lang, lesson.id, "objectives", lesson.objectives);
 
   return (
     <article className="mx-auto max-w-4xl space-y-6">
       <header>
         {mod && (
           <Link to="/modulos/$slug" params={{ slug: mod.slug }} className="text-sm text-primary hover:underline">
-            {t("lesson.moduleLink", { index: mod.index, title: mod.title })}
+            {t("lesson.moduleLink", { index: mod.index, title: modTitle ?? "" })}
           </Link>
         )}
-        <h1 className="mt-2 font-display text-2xl font-semibold text-foreground sm:text-3xl">{lesson.title}</h1>
+        <h1 className="mt-2 font-display text-2xl font-semibold text-foreground sm:text-3xl">{lessonTitle}</h1>
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
           <DifficultyChip level={lesson.difficulty} />
           <Chip>
@@ -87,7 +91,7 @@ function LessonPage() {
       <Panel>
         <h2 className="font-display font-semibold text-foreground">{t("lesson.objectivesTitle")}</h2>
         <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-          {lesson.objectives.map((o) => (
+          {lessonObjectives.map((o) => (
             <li key={o} className="flex gap-2">
               <Check className="mt-0.5 size-4 shrink-0 text-success" />
               {o}

@@ -13,9 +13,10 @@ import { ALL_LESSONS, MODULES } from "@/data/curriculum";
 import { LABS } from "@/data/labs";
 import { BOSSES, CHALLENGES } from "@/data/challenges";
 import { useI18n } from "@/lib/i18n";
+import { contentText } from "@/lib/content-i18n";
 
 export function GlobalSearch() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -54,26 +55,32 @@ export function GlobalSearch() {
         <CommandList>
           <CommandEmpty>{t("search.empty")}</CommandEmpty>
           <CommandGroup heading={t("search.modules")}>
-            {MODULES.map((m) => (
-              <CommandItem
-                key={m.id}
-                value={`modulo ${m.index} ${m.title} ${m.topics.join(" ")}`}
-                onSelect={() => go(`/modulos/${m.slug}`)}
-              >
-                {t("search.module", { index: m.index, title: m.title })}
-              </CommandItem>
-            ))}
+            {MODULES.map((m) => {
+              const title = contentText(lang, m.id, "title", m.title);
+              return (
+                <CommandItem
+                  key={m.id}
+                  value={`modulo ${m.index} ${title} ${m.topics.join(" ")}`}
+                  onSelect={() => go(`/modulos/${m.slug}`)}
+                >
+                  {t("search.module", { index: m.index, title })}
+                </CommandItem>
+              );
+            })}
           </CommandGroup>
           <CommandGroup heading={t("search.lessons")}>
-            {ALL_LESSONS.map((l) => (
-              <CommandItem
-                key={l.id}
-                value={`aula ${l.title} ${l.tools.join(" ")}`}
-                onSelect={() => go(`/aulas/${l.id}`)}
-              >
-                {l.title}
-              </CommandItem>
-            ))}
+            {ALL_LESSONS.map((l) => {
+              const title = contentText(lang, l.id, "title", l.title);
+              return (
+                <CommandItem
+                  key={l.id}
+                  value={`aula ${title} ${l.tools.join(" ")}`}
+                  onSelect={() => go(`/aulas/${l.id}`)}
+                >
+                  {title}
+                </CommandItem>
+              );
+            })}
           </CommandGroup>
           <CommandGroup heading={t("search.labs")}>
             {LABS.map((l) => (
