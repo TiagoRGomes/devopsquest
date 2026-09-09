@@ -17,6 +17,7 @@ import { BOSSES } from "@/data/challenges";
 import { REGIONS } from "@/data/world";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
+import { contentText } from "@/lib/content-i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const Route = createFileRoute("/")({
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { session } = useAuth();
 
   const stats = [
@@ -195,8 +196,10 @@ function Landing() {
                   <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
                     {String(r.order).padStart(2, "0")}
                   </p>
-                  <p className="mt-1 font-display text-base font-semibold text-foreground">{r.name}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{r.theme}</p>
+                  <p className="mt-1 font-display text-base font-semibold text-foreground">
+                    {contentText(lang, r.id, "name", r.name)}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{contentText(lang, r.id, "theme", r.theme)}</p>
                 </li>
               ))}
             </ol>

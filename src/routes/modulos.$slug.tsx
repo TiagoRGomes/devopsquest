@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Award, BookOpen, Check, FlaskConical, GraduationCap, Lock, Skull } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { useI18n } from "@/lib/i18n";
+import { contentText, contentList } from "@/lib/content-i18n";
 import { PASS_SCORE, getExam } from "@/data/exams";
 import { getModule } from "@/data/curriculum";
 import { labsByModule } from "@/data/labs";
@@ -39,7 +40,7 @@ function ModuloDetail() {
   const { slug } = Route.useParams();
   const mod = getModule(slug);
   const { progress, moduleProgress, completeLab, isModuleUnlocked, examResult, attemptsLeftToday } = useProgress();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   if (!mod) {
     return <EmptyState title={t("mod.notFoundTitle")} description={t("mod.notFoundDescPick")} />;
@@ -53,17 +54,21 @@ function ModuloDetail() {
   const exam = getExam(mod.id);
   const examStatus = examResult(mod.id);
   const attemptsLeft = attemptsLeftToday(mod.id);
+  const modTitle = contentText(lang, mod.id, "title", mod.title);
+  const modOverview = contentText(lang, mod.id, "overview", mod.overview);
+  const modObjectives = contentList(lang, mod.id, "objectives", mod.objectives);
+  const badgeName = badge ? contentText(lang, badge.id, "name", badge.name) : undefined;
 
   return (
     <div className="space-y-6">
       <Panel className="bg-hero">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{t("mod.moduleIndex", { index: mod.index })}</p>
-        <h1 className="mt-1.5 font-display text-2xl font-semibold text-foreground sm:text-3xl">{mod.title}</h1>
-        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{mod.overview}</p>
+        <h1 className="mt-1.5 font-display text-2xl font-semibold text-foreground sm:text-3xl">{modTitle}</h1>
+        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{modOverview}</p>
         <div className="mt-4 flex flex-wrap gap-1.5">
           <Chip tone="primary">{t("mod.weeks", { n: mod.weeks })}</Chip>
           <Chip tone="accent">{mod.xp} XP</Chip>
-          {badge && <Chip tone="legendary">{t("mod.badge", { name: badge.name })}</Chip>}
+          {badge && <Chip tone="legendary">{t("mod.badge", { name: badgeName ?? "" })}</Chip>}
         </div>
         <XpBar percent={p.percent} className="mt-5 max-w-lg" />
         <p className="mt-2 text-xs text-muted-foreground">
@@ -75,7 +80,7 @@ function ModuloDetail() {
         <Panel>
           <h2 className="font-display font-semibold text-foreground">{t("mod.objectives")}</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            {mod.objectives.map((o) => (
+            {modObjectives.map((o) => (
               <li key={o} className="flex gap-2">
                 <Check className="mt-0.5 size-4 shrink-0 text-success" />
                 {o}
@@ -175,7 +180,7 @@ function ModuloDetail() {
                     {done ? <Check className="size-3.5" /> : i + 1}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-medium text-foreground">{lesson.title}</span>
+                    <span className="block text-sm font-medium text-foreground">{contentText(lang, lesson.id, "title", lesson.title)}</span>
                     <span className="block text-xs text-muted-foreground">
                       {t("mod.lessonDurationTools", { duration: lesson.duration, tools: lesson.tools.join(", ") })}
                     </span>

@@ -8,6 +8,7 @@ import { BOSSES, CHALLENGES } from "@/data/challenges";
 import { PROJECT_STEPS } from "@/data/project";
 import { Panel, RarityChip, SectionTitle, XpBar } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
+import { contentText, slugifyClassName } from "@/lib/content-i18n";
 
 export const Route = createFileRoute("/conquistas")({
   head: () => ({
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/conquistas")({
 
 function ConquistasPage() {
   const { progress, level, earnedBadges } = useProgress();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   const requirements = [
     { label: t("badge.req.lessons"), done: progress.completedLessons.length, total: ALL_LESSONS.length },
@@ -48,6 +49,8 @@ function ConquistasPage() {
       <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {BADGES.map((badge) => {
           const earned = earnedBadges.includes(badge.id);
+          const badgeName = contentText(lang, badge.id, "name", badge.name);
+          const badgeDescription = contentText(lang, badge.id, "description", badge.condition);
           return (
             <Panel as="li" key={badge.id} className={earned ? "" : "opacity-60"}>
               <div className="flex items-start justify-between gap-2">
@@ -57,11 +60,11 @@ function ConquistasPage() {
                   ) : (
                     <Lock className="size-4 text-muted-foreground" />
                   )}
-                  {badge.name}
+                  {badgeName}
                 </p>
                 <RarityChip rarity={badge.rarity} />
               </div>
-              <p className="mt-2 text-sm text-muted-foreground">{badge.condition}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{badgeDescription}</p>
               <p className="mt-1.5 font-mono text-xs text-accent">+{badge.xp} XP</p>
             </Panel>
           );
@@ -74,6 +77,7 @@ function ConquistasPage() {
           <ul className="mt-3 space-y-2 text-sm">
             {LEVEL_TIERS.map((tier) => {
               const current = level.level >= tier.from && level.level <= tier.to;
+              const className = contentText(lang, `class.${slugifyClassName(tier.className)}`, "title", tier.className);
               return (
                 <li
                   key={tier.className}
@@ -81,7 +85,7 @@ function ConquistasPage() {
                     current ? "border-primary/50 bg-primary/12 text-foreground" : "border-border text-muted-foreground"
                   }`}
                 >
-                  <span>{tier.className}</span>
+                  <span>{className}</span>
                   <span className="font-mono text-xs">{t("badge.levelAbbrev", { from: tier.from, to: tier.to })}</span>
                 </li>
               );

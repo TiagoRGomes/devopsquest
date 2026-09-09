@@ -6,6 +6,7 @@ import { getModuleById } from "@/data/curriculum";
 import { getBoss } from "@/data/challenges";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
+import { contentText } from "@/lib/content-i18n";
 
 export const Route = createFileRoute("/mapa")({
   head: () => ({
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/mapa")({
 });
 
 function MapaPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { level, regionProgress, progress } = useProgress();
 
   return (
@@ -40,6 +41,8 @@ function MapaPage() {
           const percent = regionProgress(region.moduleIds);
           const boss = getBoss(region.bossId);
           const bossDone = progress.defeatedBosses.includes(region.bossId);
+          const regionName = contentText(lang, region.id, "name", region.name);
+          const regionTheme = contentText(lang, region.id, "theme", region.theme);
 
           return (
             <Panel as="li" key={region.id} className={unlocked ? "" : "opacity-70"}>
@@ -49,8 +52,8 @@ function MapaPage() {
                     <span className="grid size-8 place-items-center rounded-lg bg-level font-mono text-xs font-semibold text-primary-foreground">
                       {region.order}
                     </span>
-                    <h3 className="font-display text-lg font-semibold text-foreground">{region.name}</h3>
-                    <Chip tone="accent">{region.theme}</Chip>
+                    <h3 className="font-display text-lg font-semibold text-foreground">{regionName}</h3>
+                    <Chip tone="accent">{regionTheme}</Chip>
                     {unlocked ? (
                       <Chip tone="success">{t("map.unlocked")}</Chip>
                     ) : (
@@ -100,7 +103,7 @@ function MapaPage() {
                             params={{ slug: mod.slug }}
                             className="block truncate rounded-md border border-border bg-surface-2 px-2.5 py-1.5 text-xs text-foreground hover:border-primary/50"
                           >
-                            M{mod.index} · {mod.title}
+                            M{mod.index} · {contentText(lang, mod.id, "title", mod.title)}
                           </Link>
                         </li>
                       );
