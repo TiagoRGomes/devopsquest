@@ -500,8 +500,8 @@ gh release create v1.2.0 --generate-notes
 git describe --tags --abbrev=0        # ultima tag alcancavel
 git log v1.1.0..v1.2.0 --oneline      # o que entrou na versao
 
-docker build -t ghcr.io/tiago/cloudshop-api:v1.2.0 .
-docker push ghcr.io/tiago/cloudshop-api:v1.2.0`,
+docker build -t ghcr.io/sua-org/cloudshop-api:v1.2.0 .
+docker push ghcr.io/sua-org/cloudshop-api:v1.2.0`,
           },
         ],
         whyItMatters: "Sem versão imutável não existe rollback confiável nem auditoria do que está rodando.",

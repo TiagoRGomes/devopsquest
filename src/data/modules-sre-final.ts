@@ -425,8 +425,8 @@ politica:
 ## Acoes
 | Acao | Responsavel | Prazo |
 |---|---|---|
-| Corrigir vazamento de conexao e cobrir com teste | Tiago | 2026-09-16 |
-| Alerta de saturacao do pool | Tiago | 2026-09-18 |
+| Corrigir vazamento de conexao e cobrir com teste | Aluno | 2026-09-16 |
+| Alerta de saturacao do pool | Aluno | 2026-09-18 |
 | Teste de carga nas rotas de escrita no CI | Time | 2026-09-30 |
 
 **Sem culpa:** a pessoa seguiu o processo existente; o sistema permitiu que a falha chegasse a producao.`,
@@ -610,10 +610,10 @@ jobs:
     steps:
       - uses: sigstore/cosign-installer@v3
       - run: |
-          cosign sign --yes ghcr.io/tiago/cloudshop/api@\${{ needs.imagem.outputs.digest }}
+          cosign sign --yes ghcr.io/sua-org/cloudshop/api@\${{ needs.imagem.outputs.digest }}
           cosign verify --certificate-identity-regexp ".*" \\
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \\
-            ghcr.io/tiago/cloudshop/api@\${{ needs.imagem.outputs.digest }}`,
+            ghcr.io/sua-org/cloudshop/api@\${{ needs.imagem.outputs.digest }}`,
             securityNote:
               "ignore-unfixed evita bloquear por vulnerabilidade sem correção, mas registre-as e revise semanalmente.",
           },

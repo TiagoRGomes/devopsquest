@@ -634,9 +634,9 @@ gh api repos/:owner/:repo/branches/main/protection --jq '.required_status_checks
       code: `git tag -a v0.1.0 -m "primeira imagem" && git push origin v0.1.0
 gh run watch
 
-docker pull ghcr.io/tiago/cloudshop/api:0.1.0
-docker inspect --format '{{index .RepoDigests 0}}' ghcr.io/tiago/cloudshop/api:0.1.0
-docker run --rm -d -p 3003:3000 ghcr.io/tiago/cloudshop/api@sha256:<digest>
+docker pull ghcr.io/sua-org/cloudshop/api:0.1.0
+docker inspect --format '{{index .RepoDigests 0}}' ghcr.io/sua-org/cloudshop/api:0.1.0
+docker run --rm -d -p 3003:3000 ghcr.io/sua-org/cloudshop/api@sha256:<digest>
 curl -s localhost:3003/health`,
     },
     validation: ["Tag semântica e tag por SHA publicadas", "Digest registrado no repositório", "Imagem roda a partir do digest"],
@@ -1075,7 +1075,7 @@ kubectl -n cloudshop scale deploy/cloudshop-api --replicas=5
 sleep 20 && kubectl -n cloudshop get deploy cloudshop-api -o jsonpath='{.spec.replicas}{"\\n"}'   # volta ao valor do Git
 
 cd cloudshop-gitops/overlays/staging
-kustomize edit set image ghcr.io/tiago/cloudshop/api=ghcr.io/tiago/cloudshop/api:v0.2.0
+kustomize edit set image ghcr.io/sua-org/cloudshop/api=ghcr.io/sua-org/cloudshop/api:v0.2.0
 git commit -am "chore: api v0.2.0" && git push
 argocd app wait cloudshop-staging --health --timeout 180`,
       securityNote: "Use deploy key com permissão de leitura para o ArgoCD acessar o repositório privado.",
@@ -1306,7 +1306,7 @@ curl -sG localhost:9090/api/v1/query --data-urlencode \\
  'query=sum(rate(http_request_duration_seconds_count{status!~"5.."}[30d]))/sum(rate(http_request_duration_seconds_count[30d]))' | jq -r '.data.result[0].value[1]'
 
 # incidente controlado
-kubectl -n cloudshop set image deploy/cloudshop-api api=ghcr.io/tiago/cloudshop/api:versao-ruim
+kubectl -n cloudshop set image deploy/cloudshop-api api=ghcr.io/sua-org/cloudshop/api:versao-ruim
 date -u +%FT%TZ   # inicio
 kubectl -n cloudshop rollout undo deploy/cloudshop-api
 date -u +%FT%TZ   # fim`,
@@ -1384,7 +1384,7 @@ trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 cloudshop-ap
 trivy config infra/
 syft cloudshop-api:ci -o spdx-json > sbom.json 2>/dev/null || docker sbom cloudshop-api:ci > sbom.txt
 cosign verify --certificate-oidc-issuer https://token.actions.githubusercontent.com \\
-  --certificate-identity-regexp ".*" ghcr.io/tiago/cloudshop/api:latest`,
+  --certificate-identity-regexp ".*" ghcr.io/sua-org/cloudshop/api:latest`,
     },
     validation: ["Build falha com vulnerabilidade crítica corrigível", "SBOM gerado", "Imagem verificável por assinatura"],
     commonErrors: [

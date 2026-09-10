@@ -195,7 +195,7 @@ docker run -d --name db --network cloudshop-net \\
 
 docker run -d --name api --network cloudshop-net -p 3000:3000 \\
   -e DATABASE_HOST=db -e DATABASE_PORT=5432 -e NODE_ENV=production \\
-  ghcr.io/tiago/cloudshop-api:v1.0.0
+  ghcr.io/sua-org/cloudshop-api:v1.0.0
 
 docker exec -it api getent hosts db     # DNS interno resolvendo
 docker volume inspect cloudshop-pgdata
@@ -662,7 +662,7 @@ jobs:
     "Action": "sts:AssumeRoleWithWebIdentity",
     "Condition": {
       "StringEquals": { "token.actions.githubusercontent.com:aud": "sts.amazonaws.com" },
-      "StringLike": { "token.actions.githubusercontent.com:sub": "repo:tiago/cloudshop-app:ref:refs/tags/v*" }
+      "StringLike": { "token.actions.githubusercontent.com:sub": "repo:sua-org/cloudshop-app:ref:refs/tags/v*" }
     }
   }]
 }`,
@@ -751,7 +751,7 @@ jobs:
           { term: "GHCR", definition: "GitHub Container Registry, registry de imagens integrado ao GitHub." },
           { term: "OCI labels", definition: "Metadados padronizados que descrevem origem e versão da imagem." },
         ],
-        printQuestLink: "Publicar ghcr.io/tiago/cloudshop/api a cada tag de versão.",
+        printQuestLink: "Publicar ghcr.io/sua-org/cloudshop/api a cada tag de versão.",
         quiz: [
           {
             question: "Qual identificador é imutável para uma imagem?",

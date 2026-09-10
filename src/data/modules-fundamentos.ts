@@ -205,14 +205,14 @@ source ~/.bashrc`,
           {
             label: "Chave SSH e configuração do Git",
             language: "bash",
-            code: `ssh-keygen -t ed25519 -C "tiago@cloudshop" -f ~/.ssh/id_ed25519
+            code: `ssh-keygen -t ed25519 -C "voce@exemplo.com" -f ~/.ssh/id_ed25519
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 cat ~/.ssh/id_ed25519.pub   # cole em GitHub > Settings > SSH keys
 
 ssh -T git@github.com       # deve responder com o seu usuario
 
-git config --global user.name "Tiago Gomes"
+git config --global user.name "Seu Nome"
 git config --global user.email "voce@exemplo.com"
 git config --global init.defaultBranch main
 git config --global pull.rebase true

@@ -154,7 +154,7 @@ spec:
         runAsUser: 10001
       containers:
         - name: api
-          image: ghcr.io/tiago/cloudshop/api:v1.2.0
+          image: ghcr.io/sua-org/cloudshop/api:v1.2.0
           ports: [{ containerPort: 3000, name: http }]
           envFrom:
             - configMapRef: { name: cloudshop-api-config }
@@ -416,7 +416,7 @@ appVersion: "1.2.0"
 # values.yaml
 replicaCount: 2
 image:
-  repository: ghcr.io/tiago/cloudshop/api
+  repository: ghcr.io/sua-org/cloudshop/api
   tag: ""            # obrigatorio via --set ou values de ambiente
   pullPolicy: IfNotPresent
 resources:
@@ -560,7 +560,7 @@ replicas:
   - name: cloudshop-api
     count: 3
 images:
-  - name: ghcr.io/tiago/cloudshop/api
+  - name: ghcr.io/sua-org/cloudshop/api
     newTag: v1.2.0
 patches:
   - target: { kind: Deployment, name: cloudshop-api }
@@ -636,7 +636,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:tiago/cloudshop-gitops.git
+    repoURL: git@github.com:sua-org/cloudshop-gitops.git
     targetRevision: main
     path: overlays/staging
   destination:
@@ -703,7 +703,7 @@ argocd app history cloudshop-producao
 
 # promocao de staging para producao
 cd cloudshop-gitops/overlays/producao
-kustomize edit set image ghcr.io/tiago/cloudshop/api=ghcr.io/tiago/cloudshop/api:v1.2.0
+kustomize edit set image ghcr.io/sua-org/cloudshop/api=ghcr.io/sua-org/cloudshop/api:v1.2.0
 git commit -am "chore(prod): promove api para v1.2.0" && git push`,
           },
           {
@@ -850,13 +850,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: tiago/cloudshop-gitops
+          repository: sua-org/cloudshop-gitops
           token: \${{ secrets.GITOPS_PR_TOKEN }}
       - uses: imranismail/setup-kustomize@v2
       - name: Atualizar tag da imagem no overlay de staging
         run: |
           cd overlays/staging
-          kustomize edit set image ghcr.io/tiago/cloudshop/api=ghcr.io/tiago/cloudshop/api:sha-\${{ github.event.workflow_run.head_sha }}
+          kustomize edit set image ghcr.io/sua-org/cloudshop/api=ghcr.io/sua-org/cloudshop/api:sha-\${{ github.event.workflow_run.head_sha }}
       - uses: peter-evans/create-pull-request@v6
         with:
           token: \${{ secrets.GITOPS_PR_TOKEN }}

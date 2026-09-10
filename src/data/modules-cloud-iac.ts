@@ -251,7 +251,7 @@ aws ec2 describe-security-groups \\
 aws ec2 run-instances --image-id ami-0abcdef1234567890 --instance-type t3.micro \\
   --subnet-id "$PRIV" --security-group-ids "$SG_APP" \\
   --iam-instance-profile Name=cloudshop-api \\
-  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=cloudshop-api},{Key=env,Value=dev},{Key=owner,Value=tiago}]'
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=cloudshop-api},{Key=env,Value=dev},{Key=owner,Value=equipe-plataforma}]'
 
 # S3 privado e criptografado para o frontend
 aws s3api create-bucket --bucket cloudshop-web-dev --region us-east-1
@@ -422,7 +422,7 @@ provider "aws" {
     tags = {
       project = "cloudshop"
       env     = var.env
-      owner   = "tiago"
+      owner   = "equipe-plataforma"
       managed = "terraform"
     }
   }
