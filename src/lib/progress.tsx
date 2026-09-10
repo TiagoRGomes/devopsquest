@@ -365,7 +365,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       if (already) {
         toast.info("Etapa desmarcada");
       } else {
-        award(XP.projectStep, "Etapa do PrintQuest concluída");
+        award(XP.projectStep, "Etapa do CloudShop concluída");
       }
     },
     [award, progress.completedProjectSteps],

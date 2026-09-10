@@ -13,7 +13,7 @@ export const CLOUD_IAC_MODULES: Module[] = [
     regionId: "imperio-cloud",
     bossId: "boss-security-group",
     overview:
-      "AWS domina as vagas em português, e o que se cobra não é decorar serviço: é desenhar rede segura, aplicar menor privilégio, escolher o compute adequado, proteger dados e controlar custo. Neste módulo você constrói a VPC do PrintQuest do zero, sobe API e banco em subnets corretas, publica o frontend com CDN e configura orçamento, tags e alarme antes de qualquer surpresa na fatura.",
+      "AWS domina as vagas em português, e o que se cobra não é decorar serviço: é desenhar rede segura, aplicar menor privilégio, escolher o compute adequado, proteger dados e controlar custo. Neste módulo você constrói a VPC do CloudShop do zero, sobe API e banco em subnets corretas, publica o frontend com CDN e configura orçamento, tags e alarme antes de qualquer surpresa na fatura.",
     objectives: [
       "Aplicar IAM com menor privilégio usando roles em vez de chaves",
       "Desenhar VPC com subnets pública e privada, IGW e NAT",
@@ -23,7 +23,7 @@ export const CLOUD_IAC_MODULES: Module[] = [
     ],
     prerequisites: ["Módulos 1, 2 e 4 concluídos"],
     topics: ["IAM", "VPC", "Subnets", "Route tables", "IGW", "NAT", "Security Groups", "EC2", "S3", "CloudFront", "RDS", "ALB", "DNS", "Tags", "Custos"],
-    delivery: "Deploy seguro do PrintQuest na AWS com orçamento configurado e checklist de destruição validado.",
+    delivery: "Deploy seguro do CloudShop na AWS com orçamento configurado e checklist de destruição validado.",
     checklist: [
       "Nenhuma chave de acesso de longa duração em uso",
       "Banco em subnet privada, sem IP público",
@@ -38,7 +38,7 @@ export const CLOUD_IAC_MODULES: Module[] = [
       "Como você daria acesso ao S3 para uma aplicação em EC2 sem usar chaves?",
       "Como controlaria custo em uma conta usada por vários times?",
     ],
-    printQuest: "Publicar o PrintQuest na AWS: frontend no S3 com CloudFront, API em EC2 atrás de ALB e banco em RDS privado.",
+    printQuest: "Publicar o CloudShop na AWS: frontend no S3 com CloudFront, API em EC2 atrás de ALB e banco em RDS privado.",
     lessons: [
       {
         id: "l-6-1",
@@ -65,13 +65,13 @@ export const CLOUD_IAC_MODULES: Module[] = [
       "Sid": "LerEscreverAssetsDoProjeto",
       "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:PutObject"],
-      "Resource": "arn:aws:s3:::printquest-assets/uploads/*"
+      "Resource": "arn:aws:s3:::cloudshop-assets/uploads/*"
     },
     {
       "Sid": "LerSegredoDoBanco",
       "Effect": "Allow",
       "Action": "secretsmanager:GetSecretValue",
-      "Resource": "arn:aws:secretsmanager:us-east-1:123456789012:secret:printquest/db-*"
+      "Resource": "arn:aws:secretsmanager:us-east-1:123456789012:secret:cloudshop/db-*"
     }
   ]
 }`,
@@ -98,7 +98,7 @@ aws accessanalyzer list-findings --analyzer-arn "$ANALYZER_ARN" 2>/dev/null | he
           { term: "role", definition: "Identidade IAM assumível temporariamente por serviços, usuários ou federação." },
           { term: "CloudTrail", definition: "Serviço de auditoria que registra chamadas de API na conta." },
         ],
-        printQuestLink: "Criar a role da API do PrintQuest com acesso mínimo ao bucket de uploads e ao segredo do banco.",
+        printQuestLink: "Criar a role da API do CloudShop com acesso mínimo ao bucket de uploads e ao segredo do banco.",
         quiz: [
           {
             question: "Qual a forma recomendada de uma aplicação em EC2 acessar o S3?",
@@ -124,10 +124,10 @@ aws accessanalyzer list-findings --analyzer-arn "$ANALYZER_ARN" 2>/dev/null | he
         ],
         code: [
           {
-            label: "Criar a VPC do PrintQuest por CLI",
+            label: "Criar a VPC do CloudShop por CLI",
             language: "bash",
             code: `VPC_ID=$(aws ec2 create-vpc --cidr-block 10.20.0.0/16 \\
-  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=printquest},{Key=env,Value=dev}]' \\
+  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=cloudshop},{Key=env,Value=dev}]' \\
   --query Vpc.VpcId --output text)
 
 PUB=$(aws ec2 create-subnet --vpc-id "$VPC_ID" --cidr-block 10.20.1.0/24 \\
@@ -157,7 +157,7 @@ aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID" \\
           { term: "IGW", definition: "Internet Gateway: componente que permite tráfego entre a VPC e a internet." },
           { term: "NAT Gateway", definition: "Serviço que permite saída à internet de subnets privadas, sem entrada." },
         ],
-        printQuestLink: "Construir a VPC 10.20.0.0/16 do PrintQuest com camadas pública, aplicação e dados.",
+        printQuestLink: "Construir a VPC 10.20.0.0/16 do CloudShop com camadas pública, aplicação e dados.",
         quiz: [
           {
             question: "O que torna uma subnet pública?",
@@ -190,10 +190,10 @@ aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID" \\
           {
             label: "SG referenciando SG e auditoria de exposição",
             language: "bash",
-            code: `SG_APP=$(aws ec2 create-security-group --group-name printquest-app \\
-  --description "API PrintQuest" --vpc-id "$VPC_ID" --query GroupId --output text)
-SG_DB=$(aws ec2 create-security-group --group-name printquest-db \\
-  --description "RDS PrintQuest" --vpc-id "$VPC_ID" --query GroupId --output text)
+            code: `SG_APP=$(aws ec2 create-security-group --group-name cloudshop-app \\
+  --description "API CloudShop" --vpc-id "$VPC_ID" --query GroupId --output text)
+SG_DB=$(aws ec2 create-security-group --group-name cloudshop-db \\
+  --description "RDS CloudShop" --vpc-id "$VPC_ID" --query GroupId --output text)
 
 # somente o ALB acessa a aplicacao na 3000
 aws ec2 authorize-security-group-ingress --group-id "$SG_APP" \\
@@ -219,7 +219,7 @@ aws ec2 describe-security-groups \\
           { term: "stateful", definition: "Firewall que rastreia conexões e libera a resposta automaticamente." },
           { term: "referência de SG", definition: "Regra cuja origem é outro Security Group, e não um bloco de IPs." },
         ],
-        printQuestLink: "Fechar o acesso ao banco do PrintQuest apenas ao SG da API.",
+        printQuestLink: "Fechar o acesso ao banco do CloudShop apenas ao SG da API.",
         quiz: [
           {
             question: "Qual origem é correta na regra 5432 do SG do banco?",
@@ -239,7 +239,7 @@ aws ec2 describe-security-groups \\
         xp: 25,
         objectives: ["Escolher o compute adequado", "Publicar frontend estático com CDN", "Subir banco gerenciado com backup"],
         body: [
-          "Compute: EC2 dá controle total e é ótimo para aprender; ECS Fargate elimina gestão de servidor; Lambda serve carga por evento. Para o PrintQuest, EC2 primeiro (para praticar Linux e Ansible) e depois Kubernetes, refletindo a trajetória real de muitas empresas.",
+          "Compute: EC2 dá controle total e é ótimo para aprender; ECS Fargate elimina gestão de servidor; Lambda serve carga por evento. Para o CloudShop, EC2 primeiro (para praticar Linux e Ansible) e depois Kubernetes, refletindo a trajetória real de muitas empresas.",
           "Frontend estático não deve ficar em servidor: publique no S3 com bucket privado e sirva via CloudFront usando Origin Access Control, com HTTPS e cache adequado. Isso reduz custo, melhora latência e elimina uma superfície de ataque.",
           "Banco em produção é serviço gerenciado: RDS com backup automatizado, retenção definida, criptografia em repouso, senha em Secrets Manager e — quando o SLA exigir — multi-AZ. Restaurar backup precisa ser testado, senão você tem apenas a esperança de ter backup.",
         ],
@@ -250,22 +250,22 @@ aws ec2 describe-security-groups \\
             code: `# EC2 com role, sem chave de acesso e sem IP publico
 aws ec2 run-instances --image-id ami-0abcdef1234567890 --instance-type t3.micro \\
   --subnet-id "$PRIV" --security-group-ids "$SG_APP" \\
-  --iam-instance-profile Name=printquest-api \\
-  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=printquest-api},{Key=env,Value=dev},{Key=owner,Value=tiago}]'
+  --iam-instance-profile Name=cloudshop-api \\
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=cloudshop-api},{Key=env,Value=dev},{Key=owner,Value=equipe-plataforma}]'
 
 # S3 privado e criptografado para o frontend
-aws s3api create-bucket --bucket printquest-web-dev --region us-east-1
-aws s3api put-public-access-block --bucket printquest-web-dev \\
+aws s3api create-bucket --bucket cloudshop-web-dev --region us-east-1
+aws s3api put-public-access-block --bucket cloudshop-web-dev \\
   --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
-aws s3api put-bucket-encryption --bucket printquest-web-dev \\
+aws s3api put-bucket-encryption --bucket cloudshop-web-dev \\
   --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
-aws s3 sync ./dist s3://printquest-web-dev --delete
+aws s3 sync ./dist s3://cloudshop-web-dev --delete
 
 # RDS privado com backup de 7 dias
-aws rds create-db-instance --db-instance-identifier printquest-dev \\
+aws rds create-db-instance --db-instance-identifier cloudshop-dev \\
   --db-instance-class db.t4g.micro --engine postgres --allocated-storage 20 \\
-  --master-username printquest --manage-master-user-password \\
-  --vpc-security-group-ids "$SG_DB" --db-subnet-group-name printquest-private \\
+  --master-username cloudshop --manage-master-user-password \\
+  --vpc-security-group-ids "$SG_DB" --db-subnet-group-name cloudshop-private \\
   --backup-retention-period 7 --storage-encrypted --no-publicly-accessible`,
             securityNote:
               "--manage-master-user-password guarda a senha no Secrets Manager e evita senha em histórico de shell ou script.",
@@ -280,7 +280,7 @@ aws rds create-db-instance --db-instance-identifier printquest-dev \\
           { term: "OAC", definition: "Origin Access Control: permite ao CloudFront ler um bucket privado." },
           { term: "multi-AZ", definition: "Replicação do banco em outra zona de disponibilidade para failover." },
         ],
-        printQuestLink: "Subir a infraestrutura de dev do PrintQuest com frontend em CDN e banco privado.",
+        printQuestLink: "Subir a infraestrutura de dev do CloudShop com frontend em CDN e banco privado.",
         quiz: [
           {
             question: "Como servir um site estático do S3 com segurança?",
@@ -324,9 +324,9 @@ aws ec2 describe-nat-gateways --filter Name=state,Values=available --query 'NatG
 aws elbv2 describe-load-balancers --query 'LoadBalancers[].LoadBalancerName'
 
 # checklist de destruicao do laboratorio
-aws rds delete-db-instance --db-instance-identifier printquest-dev --skip-final-snapshot
+aws rds delete-db-instance --db-instance-identifier cloudshop-dev --skip-final-snapshot
 aws ec2 terminate-instances --instance-ids "$INSTANCE_ID"
-aws s3 rm s3://printquest-web-dev --recursive && aws s3api delete-bucket --bucket printquest-web-dev`,
+aws s3 rm s3://cloudshop-web-dev --recursive && aws s3api delete-bucket --bucket cloudshop-web-dev`,
             securityNote:
               "--skip-final-snapshot apaga o banco sem cópia. Use apenas em ambiente descartável e nunca em produção.",
           },
@@ -340,7 +340,7 @@ aws s3 rm s3://printquest-web-dev --recursive && aws s3api delete-bucket --bucke
           { term: "FinOps", definition: "Prática de gestão financeira da nuvem, unindo engenharia e finanças." },
           { term: "recurso órfão", definition: "Recurso que continua cobrando sem estar associado a nada em uso." },
         ],
-        printQuestLink: "Documentar o custo mensal estimado do PrintQuest e o procedimento de destruição.",
+        printQuestLink: "Documentar o custo mensal estimado do CloudShop e o procedimento de destruição.",
         quiz: [
           {
             question: "Qual recurso frequentemente gera custo inesperado em laboratórios?",
@@ -389,7 +389,7 @@ aws s3 rm s3://printquest-web-dev --recursive && aws s3api delete-bucket --bucke
       "Como você isolaria dev, staging e produção?",
       "O que é idempotência e como o Ansible a garante?",
     ],
-    printQuest: "Descrever toda a infraestrutura do PrintQuest em código e configurar o host com Ansible.",
+    printQuest: "Descrever toda a infraestrutura do CloudShop em código e configurar o host com Ansible.",
     lessons: [
       {
         id: "l-7-1",
@@ -407,7 +407,7 @@ aws s3 rm s3://printquest-web-dev --recursive && aws s3api delete-bucket --bucke
         ],
         code: [
           {
-            label: "Configuração base do PrintQuest",
+            label: "Configuração base do CloudShop",
             language: "hcl",
             code: `terraform {
   required_version = "~> 1.9"
@@ -420,9 +420,9 @@ provider "aws" {
   region = var.region
   default_tags {
     tags = {
-      project = "printquest"
+      project = "cloudshop"
       env     = var.env
-      owner   = "tiago"
+      owner   = "equipe-plataforma"
       managed = "terraform"
     }
   }
@@ -442,7 +442,7 @@ variable "vpc_cidr" {
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
-  tags                 = { Name = "printquest-\${var.env}" }
+  tags                 = { Name = "cloudshop-\${var.env}" }
 }
 
 output "vpc_id" {
@@ -474,7 +474,7 @@ terraform destroy -var-file=env/dev.tfvars`,
           { term: "provider", definition: "Plugin que traduz configuração Terraform em chamadas de API de uma plataforma." },
           { term: "state", definition: "Arquivo que mapeia recursos declarados aos recursos reais e seus atributos." },
         ],
-        printQuestLink: "Criar a VPC do PrintQuest via Terraform, substituindo os comandos manuais do módulo anterior.",
+        printQuestLink: "Criar a VPC do CloudShop via Terraform, substituindo os comandos manuais do módulo anterior.",
         quiz: [
           {
             question: "Para que serve o state do Terraform?",
@@ -510,7 +510,7 @@ terraform destroy -var-file=env/dev.tfvars`,
             code: `# backend.tf
 terraform {
   backend "s3" {
-    bucket       = "printquest-tfstate"
+    bucket       = "cloudshop-tfstate"
     key          = "dev/infra.tfstate"
     region       = "us-east-1"
     encrypt      = true
@@ -534,7 +534,7 @@ terraform {
 terraform workspace list
 terraform state pull > backup-state.json     # copia de seguranca antes de operar
 terraform state mv aws_instance.old aws_instance.api
-terraform import aws_s3_bucket.assets printquest-assets
+terraform import aws_s3_bucket.assets cloudshop-assets
 terraform force-unlock <LOCK_ID>             # somente se o lock ficou orfao`,
           },
         ],
@@ -547,7 +547,7 @@ terraform force-unlock <LOCK_ID>             # somente se o lock ficou orfao`,
           { term: "backend", definition: "Onde o Terraform armazena o state e coordena o lock." },
           { term: "workspace", definition: "Instâncias separadas de state dentro da mesma configuração." },
         ],
-        printQuestLink: "Mover o state do PrintQuest para S3 com lock e criar os ambientes dev e staging.",
+        printQuestLink: "Mover o state do CloudShop para S3 com lock e criar os ambientes dev e staging.",
         quiz: [
           {
             question: "Qual a função do lock no backend remoto?",
@@ -572,7 +572,7 @@ terraform force-unlock <LOCK_ID>             # somente se o lock ficou orfao`,
         xp: 25,
         objectives: ["Escrever módulo com interface clara", "Reutilizar entre ambientes", "Detectar drift automaticamente"],
         body: [
-          "Módulo é a unidade de reuso: entradas (variables), lógica (resources) e saídas (outputs). Um bom módulo tem interface pequena, valores padrão sensatos e nenhuma suposição escondida sobre o ambiente. Módulo de rede, de aplicação e de banco cobrem a maior parte das necessidades de um projeto do porte do PrintQuest.",
+          "Módulo é a unidade de reuso: entradas (variables), lógica (resources) e saídas (outputs). Um bom módulo tem interface pequena, valores padrão sensatos e nenhuma suposição escondida sobre o ambiente. Módulo de rede, de aplicação e de banco cobrem a maior parte das necessidades de um projeto do porte do CloudShop.",
           "Drift é a divergência entre o código e a realidade, geralmente causada por alteração manual no console durante uma emergência. O problema não é apenas estético: o próximo apply pode desfazer uma correção urgente ou destruir algo que passou a ser necessário.",
           "A defesa é processo: plan agendado em CI que falha quando há diferença, notificação para o time e regra clara de que alteração manual precisa ser refletida no código no mesmo dia. Quando o recurso já existe fora do Terraform, use import (ou blocos import) para trazê-lo ao controle.",
         ],
@@ -588,7 +588,7 @@ variable "azs"       { type = list(string), default = ["us-east-1a", "us-east-1b
 # modules/network/main.tf
 resource "aws_vpc" "this" {
   cidr_block = var.cidr
-  tags       = { Name = "printquest-\${var.env}" }
+  tags       = { Name = "cloudshop-\${var.env}" }
 }
 
 resource "aws_subnet" "private" {
@@ -596,7 +596,7 @@ resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.this.id
   availability_zone = each.key
   cidr_block        = cidrsubnet(var.cidr, 8, each.value + 10)
-  tags              = { Name = "printquest-\${var.env}-priv-\${each.key}" }
+  tags              = { Name = "cloudshop-\${var.env}-priv-\${each.key}" }
 }
 
 output "vpc_id"      { value = aws_vpc.this.id }
@@ -631,7 +631,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::123456789012:role/printquest-plan
+          role-to-assume: arn:aws:iam::123456789012:role/cloudshop-plan
           aws-region: us-east-1
       - uses: hashicorp/setup-terraform@v3
       - run: terraform -chdir=infra/envs/\${{ matrix.env }} init
@@ -649,7 +649,7 @@ jobs:
           { term: "drift", definition: "Divergência entre o estado descrito no código e o estado real da infraestrutura." },
           { term: "import", definition: "Trazer um recurso existente para o controle do Terraform." },
         ],
-        printQuestLink: "Extrair o módulo de rede do PrintQuest e usá-lo em dev e staging.",
+        printQuestLink: "Extrair o módulo de rede do CloudShop e usá-lo em dev e staging.",
         quiz: [
           {
             question: "O que o exit code 2 de terraform plan -detailed-exitcode indica?",
@@ -681,11 +681,11 @@ jobs:
 # [api]
 # 10.20.11.20 ansible_user=ubuntu
 
-- name: Configurar host da API do PrintQuest
+- name: Configurar host da API do CloudShop
   hosts: api
   become: true
   vars:
-    app_dir: /opt/printquest
+    app_dir: /opt/cloudshop
     node_version: "22"
   tasks:
     - name: Pacotes base presentes
@@ -696,7 +696,7 @@ jobs:
 
     - name: Usuario de servico existe
       ansible.builtin.user:
-        name: printquest
+        name: cloudshop
         system: true
         shell: /usr/sbin/nologin
 
@@ -704,14 +704,14 @@ jobs:
       ansible.builtin.file:
         path: "{{ app_dir }}"
         state: directory
-        owner: printquest
-        group: printquest
+        owner: cloudshop
+        group: cloudshop
         mode: "0750"
 
     - name: Configuracao do Nginx a partir do template
       ansible.builtin.template:
         src: templates/nginx-api.conf.j2
-        dest: /etc/nginx/conf.d/printquest.conf
+        dest: /etc/nginx/conf.d/cloudshop.conf
         mode: "0644"
       notify: reload nginx
 
@@ -724,7 +724,7 @@ jobs:
 
     - name: Servico habilitado e rodando
       ansible.builtin.systemd:
-        name: printquest-api
+        name: cloudshop-api
         enabled: true
         state: started
 
@@ -757,7 +757,7 @@ ansible-lint site.yml`,
           { term: "role", definition: "Estrutura padronizada que agrupa tasks, templates e variáveis reutilizáveis." },
           { term: "handler", definition: "Task executada apenas quando notificada por uma mudança." },
         ],
-        printQuestLink: "Configurar o host de produção do PrintQuest inteiramente por Ansible.",
+        printQuestLink: "Configurar o host de produção do CloudShop inteiramente por Ansible.",
         quiz: [
           {
             question: "Um playbook idempotente executado duas vezes deve resultar em:",
@@ -807,7 +807,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::123456789012:role/printquest-plan
+          role-to-assume: arn:aws:iam::123456789012:role/cloudshop-plan
           aws-region: us-east-1
       - uses: hashicorp/setup-terraform@v3
       - run: terraform -chdir=infra/envs/staging init
@@ -824,7 +824,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::123456789012:role/printquest-apply
+          role-to-assume: arn:aws:iam::123456789012:role/cloudshop-apply
           aws-region: us-east-1
       - uses: hashicorp/setup-terraform@v3
       - run: terraform -chdir=infra/envs/staging init
@@ -841,7 +841,7 @@ jobs:
 plugin: amazon.aws.aws_ec2
 regions: [us-east-1]
 filters:
-  tag:project: printquest
+  tag:project: cloudshop
   tag:env: staging
   instance-state-name: running
 keyed_groups:
@@ -862,7 +862,7 @@ hostnames:
           { term: "inventário dinâmico", definition: "Inventário gerado consultando a API da nuvem em vez de arquivo fixo." },
           { term: "output", definition: "Valor exportado pelo Terraform para consumo por outras ferramentas." },
         ],
-        printQuestLink: "Automatizar provisionamento e configuração do staging do PrintQuest em um único fluxo.",
+        printQuestLink: "Automatizar provisionamento e configuração do staging do CloudShop em um único fluxo.",
         quiz: [
           {
             question: "Onde o apply do Terraform deve rodar em um time maduro?",

@@ -11,7 +11,7 @@ export const XP_RULES = [
   { action: "Streak de 7 dias", xp: 300 },
   { action: "Semana concluída", xp: 200 },
   { action: "Boss Battle", xp: 750 },
-  { action: "Projeto final PrintQuest", xp: 5000 },
+  { action: "Projeto final CloudShop", xp: 5000 },
 ];
 
 export const LEVEL_TIERS: LevelTier[] = [
@@ -167,7 +167,7 @@ export const REGIONS: Region[] = [
     description:
       "Pods, Deployments, Services, Ingress, probes, limites, RBAC e charts Helm. O terreno onde o Platform Engineer nasce.",
     moduleIds: ["mod-8"],
-    quest: "Rodar o PrintQuest em Kind com Helm e validar um rollback real.",
+    quest: "Rodar o CloudShop em Kind com Helm e validar um rollback real.",
     badge: "Kubernetes Operator",
     labId: "lab-8-1",
     bossId: "boss-crashloopbackoff",
@@ -265,7 +265,7 @@ export const BADGES: BadgeDef[] = [
   { id: "bash-scripter", name: "Bash Scripter", rarity: "Raro", xp: 250, condition: "Entregar health-check e backup automatizados em Bash.", icon: "SquareTerminal" },
   { id: "nginx-defender", name: "Nginx Defender", rarity: "Épico", xp: 350, condition: "Derrotar o Dragão 502.", icon: "Shield" },
   { id: "docker-initiate", name: "Docker Initiate", rarity: "Comum", xp: 150, condition: "Construir a primeira imagem própria.", icon: "Container" },
-  { id: "container-architect", name: "Container Architect", rarity: "Épico", xp: 400, condition: "Stack completo do PrintQuest em Compose com healthchecks.", icon: "Boxes" },
+  { id: "container-architect", name: "Container Architect", rarity: "Épico", xp: 400, condition: "Stack completo do CloudShop em Compose com healthchecks.", icon: "Boxes" },
   { id: "pipeline-builder", name: "Pipeline Builder", rarity: "Épico", xp: 400, condition: "CI obrigatório em PR com testes e build de imagem.", icon: "Workflow" },
   { id: "cloud-explorer", name: "Cloud Explorer", rarity: "Épico", xp: 450, condition: "Primeiro deploy na AWS dentro do orçamento.", icon: "Cloud" },
   { id: "iam-guardian", name: "IAM Guardian", rarity: "Épico", xp: 400, condition: "Aplicar menor privilégio e remover chaves de longa duração.", icon: "KeyRound" },
@@ -279,5 +279,5 @@ export const BADGES: BadgeDef[] = [
   { id: "sre-guardian", name: "SRE Guardian", rarity: "Lendário", xp: 700, condition: "SLO definido, alerta por error budget e postmortem escrito.", icon: "HeartPulse" },
   { id: "security-sentinel", name: "Security Sentinel", rarity: "Lendário", xp: 700, condition: "Scan de dependências e imagens bloqueando o pipeline.", icon: "ShieldCheck" },
   { id: "cost-optimizer", name: "Cost Optimizer", rarity: "Épico", xp: 450, condition: "Reduzir o custo mensal do ambiente sem perder SLO.", icon: "PiggyBank" },
-  { id: "devops-professional", name: "DevOps Professional", rarity: "Lendário", xp: 1000, condition: "Projeto final PrintQuest completo e documentado.", icon: "Trophy" },
+  { id: "devops-professional", name: "DevOps Professional", rarity: "Lendário", xp: 1000, condition: "Projeto final CloudShop completo e documentado.", icon: "Trophy" },
 ];

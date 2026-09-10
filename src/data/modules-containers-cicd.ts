@@ -13,7 +13,7 @@ export const CONTAINERS_CICD_MODULES: Module[] = [
     regionId: "vale-containers",
     bossId: "boss-crashloop-container",
     overview:
-      "Container é a unidade de entrega moderna. Aqui você aprende a construir imagens pequenas e seguras, entender cache de layers, gerenciar dados com volumes, conectar serviços em redes e orquestrar o stack completo do PrintQuest — frontend Vue, API Node e PostgreSQL — com Docker Compose, incluindo healthchecks e variáveis de ambiente.",
+      "Container é a unidade de entrega moderna. Aqui você aprende a construir imagens pequenas e seguras, entender cache de layers, gerenciar dados com volumes, conectar serviços em redes e orquestrar o stack completo do CloudShop — frontend Vue, API Node e PostgreSQL — com Docker Compose, incluindo healthchecks e variáveis de ambiente.",
     objectives: [
       "Diferenciar imagem, container e registry",
       "Escrever Dockerfile eficiente com multi-stage",
@@ -38,7 +38,7 @@ export const CONTAINERS_CICD_MODULES: Module[] = [
       "Como você reduziria uma imagem de 1,2 GB para menos de 200 MB?",
       "Por que rodar container como root é problema?",
     ],
-    printQuest: "Containerizar o PrintQuest inteiro e subir o ambiente de desenvolvimento com um comando.",
+    printQuest: "Containerizar o CloudShop inteiro e subir o ambiente de desenvolvimento com um comando.",
     lessons: [
       {
         id: "l-4-1",
@@ -80,7 +80,7 @@ docker system prune -f             # limpar recursos nao usados`,
           { term: "layer", definition: "Camada imutável da imagem, reaproveitada em cache e entre imagens." },
           { term: "cgroups", definition: "Mecanismo do kernel que limita CPU, memória e I/O de um grupo de processos." },
         ],
-        printQuestLink: "Rodar a API do PrintQuest em container pela primeira vez.",
+        printQuestLink: "Rodar a API do CloudShop em container pela primeira vez.",
         quiz: [
           {
             question: "O que acontece com os dados escritos dentro do container ao removê-lo?",
@@ -152,7 +152,7 @@ docker-compose*.yml
           { term: "contexto de build", definition: "Conjunto de arquivos enviados ao daemon Docker durante o build." },
           { term: "distroless", definition: "Imagem sem shell nem gerenciador de pacotes, contendo só o runtime necessário." },
         ],
-        printQuestLink: "Escrever o Dockerfile definitivo da API do PrintQuest com usuário não-root.",
+        printQuestLink: "Escrever o Dockerfile definitivo da API do CloudShop com usuário não-root.",
         quiz: [
           {
             question: "Por que copiar package.json antes do código-fonte?",
@@ -185,21 +185,21 @@ docker-compose*.yml
           {
             label: "Volumes, rede e conexão entre serviços",
             language: "bash",
-            code: `docker network create printquest-net
-docker volume create printquest-pgdata
+            code: `docker network create cloudshop-net
+docker volume create cloudshop-pgdata
 
-docker run -d --name db --network printquest-net \\
+docker run -d --name db --network cloudshop-net \\
   -e POSTGRES_PASSWORD_FILE=/run/secrets/pg \\
-  -v printquest-pgdata:/var/lib/postgresql/data \\
+  -v cloudshop-pgdata:/var/lib/postgresql/data \\
   postgres:16-alpine
 
-docker run -d --name api --network printquest-net -p 3000:3000 \\
+docker run -d --name api --network cloudshop-net -p 3000:3000 \\
   -e DATABASE_HOST=db -e DATABASE_PORT=5432 -e NODE_ENV=production \\
-  ghcr.io/tiago/printquest-api:v1.0.0
+  ghcr.io/sua-org/cloudshop-api:v1.0.0
 
 docker exec -it api getent hosts db     # DNS interno resolvendo
-docker volume inspect printquest-pgdata
-docker run --rm -v printquest-pgdata:/data alpine ls -la /data | head`,
+docker volume inspect cloudshop-pgdata
+docker run --rm -v cloudshop-pgdata:/data alpine ls -la /data | head`,
             securityNote:
               "Evite -e SENHA=valor: a variável fica visível em docker inspect e no histórico do shell. Use arquivo de secret montado.",
           },
@@ -213,7 +213,7 @@ docker run --rm -v printquest-pgdata:/data alpine ls -la /data | head`,
           { term: "volume nomeado", definition: "Área de armazenamento gerenciada pelo Docker, independente do ciclo do container." },
           { term: "DNS interno", definition: "Resolução automática de nomes de serviço dentro de uma rede Docker." },
         ],
-        printQuestLink: "Garantir persistência dos pedidos do PrintQuest em volume dedicado.",
+        printQuestLink: "Garantir persistência dos pedidos do CloudShop em volume dedicado.",
         quiz: [
           {
             question: "Dentro de um container, a que localhost se refere?",
@@ -226,7 +226,7 @@ docker run --rm -v printquest-pgdata:/data alpine ls -la /data | head`,
       {
         id: "l-4-4",
         moduleId: "mod-4",
-        title: "Docker Compose: o stack do PrintQuest em um comando",
+        title: "Docker Compose: o stack do CloudShop em um comando",
         duration: 50,
         difficulty: "Intermediário",
         tools: ["Docker Compose", "Vue", "Node", "PostgreSQL"],
@@ -239,20 +239,20 @@ docker run --rm -v printquest-pgdata:/data alpine ls -la /data | head`,
         ],
         code: [
           {
-            label: "docker-compose.yml do PrintQuest",
+            label: "docker-compose.yml do CloudShop",
             language: "yaml",
             code: `services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: printquest
-      POSTGRES_USER: printquest
+      POSTGRES_DB: cloudshop
+      POSTGRES_USER: cloudshop
       POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
     secrets: [pg_password]
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U printquest -d printquest"]
+      test: ["CMD-SHELL", "pg_isready -U cloudshop -d cloudshop"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -266,7 +266,7 @@ docker run --rm -v printquest-pgdata:/data alpine ls -la /data | head`,
       NODE_ENV: production
       DATABASE_HOST: db
       DATABASE_PORT: "5432"
-      DATABASE_NAME: printquest
+      DATABASE_NAME: cloudshop
     depends_on:
       db:
         condition: service_healthy
@@ -309,7 +309,7 @@ secrets:
             code: `docker compose up -d --build
 docker compose ps
 docker compose logs -f api
-docker compose exec db psql -U printquest -d printquest -c '\\dt'
+docker compose exec db psql -U cloudshop -d cloudshop -c '\\dt'
 docker compose config          # valida e resolve o arquivo final
 docker compose down            # mantem volumes
 docker compose down -v         # remove volumes: apaga o banco`,
@@ -324,7 +324,7 @@ docker compose down -v         # remove volumes: apaga o banco`,
           { term: "healthcheck", definition: "Comando periódico que determina se o container está saudável." },
           { term: "override", definition: "Arquivo Compose complementar que ajusta a configuração por ambiente." },
         ],
-        printQuestLink: "Entregar o ambiente completo do PrintQuest com um docker compose up.",
+        printQuestLink: "Entregar o ambiente completo do CloudShop com um docker compose up.",
         quiz: [
           {
             question: "O que faz condition: service_healthy?",
@@ -375,18 +375,18 @@ CMD ["nginx", "-g", "daemon off;"]`,
           {
             label: "Scan, SBOM e execução endurecida",
             language: "bash",
-            code: `DOCKER_BUILDKIT=1 docker build -t printquest-web:v1 .
-docker images printquest-web:v1 --format '{{.Size}}'
+            code: `DOCKER_BUILDKIT=1 docker build -t cloudshop-web:v1 .
+docker images cloudshop-web:v1 --format '{{.Size}}'
 
-trivy image --severity HIGH,CRITICAL --exit-code 1 printquest-web:v1
-docker sbom printquest-web:v1 2>/dev/null | head
+trivy image --severity HIGH,CRITICAL --exit-code 1 cloudshop-web:v1
+docker sbom cloudshop-web:v1 2>/dev/null | head
 
 docker run -d --name web \\
   --read-only --tmpfs /tmp --tmpfs /var/cache/nginx \\
   --cap-drop ALL --security-opt no-new-privileges \\
-  --memory 256m --cpus 0.5 -p 8080:80 printquest-web:v1
+  --memory 256m --cpus 0.5 -p 8080:80 cloudshop-web:v1
 
-docker history printquest-web:v1 | head   # confirme que nao ha segredo`,
+docker history cloudshop-web:v1 | head   # confirme que nao ha segredo`,
             securityNote:
               "docker history revela comandos de build. Se um segredo passou por ARG, considere-o comprometido e rotacione.",
           },
@@ -400,7 +400,7 @@ docker history printquest-web:v1 | head   # confirme que nao ha segredo`,
           { term: "multi-stage", definition: "Dockerfile com vários FROM, copiando apenas artefatos entre estágios." },
           { term: "SBOM", definition: "Inventário dos componentes de software presentes no artefato." },
         ],
-        printQuestLink: "Reduzir a imagem do frontend do PrintQuest e bloquear o build em vulnerabilidade crítica.",
+        printQuestLink: "Reduzir a imagem do frontend do CloudShop e bloquear o build em vulnerabilidade crítica.",
         quiz: [
           {
             question: "Qual o principal benefício do multi-stage build?",
@@ -454,7 +454,7 @@ docker history printquest-web:v1 | head   # confirme que nao ha segredo`,
       "Como você evita usar chaves de nuvem de longa duração no CI?",
       "Como faria rollback de um deploy ruim em menos de cinco minutos?",
     ],
-    printQuest: "Automatizar build, teste e publicação da imagem do PrintQuest a cada merge.",
+    printQuest: "Automatizar build, teste e publicação da imagem do CloudShop a cada merge.",
     lessons: [
       {
         id: "l-5-1",
@@ -472,7 +472,7 @@ docker history printquest-web:v1 | head   # confirme que nao ha segredo`,
         ],
         code: [
           {
-            label: "CI do PrintQuest em PRs",
+            label: "CI do CloudShop em PRs",
             language: "yaml",
             code: `name: ci
 
@@ -529,7 +529,7 @@ jobs:
           { term: "runner", definition: "Máquina que executa um job do workflow." },
           { term: "concurrency", definition: "Regra que limita execuções simultâneas e pode cancelar as anteriores." },
         ],
-        printQuestLink: "Tornar o CI obrigatório para merge no printquest-app.",
+        printQuestLink: "Tornar o CI obrigatório para merge no cloudshop-app.",
         quiz: [
           {
             question: "Como transportar arquivos entre dois jobs?",
@@ -565,13 +565,13 @@ jobs:
         image: postgres:16-alpine
         env:
           POSTGRES_PASSWORD: test
-          POSTGRES_DB: printquest_test
+          POSTGRES_DB: cloudshop_test
         ports: ["5432:5432"]
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 10s --health-timeout 5s --health-retries 5
     env:
-      DATABASE_URL: postgres://postgres:test@localhost:5432/printquest_test
+      DATABASE_URL: postgres://postgres:test@localhost:5432/cloudshop_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -598,7 +598,7 @@ jobs:
           { term: "service container", definition: "Container auxiliar iniciado pelo runner para dependências de teste." },
           { term: "chave de cache", definition: "Identificador derivado de arquivos que determina reaproveitamento do cache." },
         ],
-        printQuestLink: "Rodar as migrações e testes de integração do PrintQuest a cada PR.",
+        printQuestLink: "Rodar as migrações e testes de integração do CloudShop a cada PR.",
         quiz: [
           {
             question: "Qual a melhor base para a chave de cache de dependências Node?",
@@ -644,10 +644,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::123456789012:role/printquest-deploy
+          role-to-assume: arn:aws:iam::123456789012:role/cloudshop-deploy
           aws-region: us-east-1
       - run: aws sts get-caller-identity
-      - run: aws ecs update-service --cluster printquest --service api --force-new-deployment`,
+      - run: aws ecs update-service --cluster cloudshop --service api --force-new-deployment`,
             securityNote:
               "A trust policy da role deve restringir sub para o repositório e o ref específicos; sem isso, qualquer repo poderia assumi-la.",
           },
@@ -662,7 +662,7 @@ jobs:
     "Action": "sts:AssumeRoleWithWebIdentity",
     "Condition": {
       "StringEquals": { "token.actions.githubusercontent.com:aud": "sts.amazonaws.com" },
-      "StringLike": { "token.actions.githubusercontent.com:sub": "repo:tiago/printquest-app:ref:refs/tags/v*" }
+      "StringLike": { "token.actions.githubusercontent.com:sub": "repo:sua-org/cloudshop-app:ref:refs/tags/v*" }
     }
   }]
 }`,
@@ -677,7 +677,7 @@ jobs:
           { term: "OIDC", definition: "Protocolo de identidade que permite trocar token de confiança por credencial temporária." },
           { term: "environment", definition: "Recurso do GitHub que agrupa secrets e regras de aprovação por destino de deploy." },
         ],
-        printQuestLink: "Configurar a role de deploy do PrintQuest restrita a tags do repositório.",
+        printQuestLink: "Configurar a role de deploy do CloudShop restrita a tags do repositório.",
         quiz: [
           {
             question: "Qual permissão o workflow precisa para usar OIDC?",
@@ -751,7 +751,7 @@ jobs:
           { term: "GHCR", definition: "GitHub Container Registry, registry de imagens integrado ao GitHub." },
           { term: "OCI labels", definition: "Metadados padronizados que descrevem origem e versão da imagem." },
         ],
-        printQuestLink: "Publicar ghcr.io/tiago/printquest/api a cada tag de versão.",
+        printQuestLink: "Publicar ghcr.io/sua-org/cloudshop/api a cada tag de versão.",
         quiz: [
           {
             question: "Qual identificador é imutável para uma imagem?",
@@ -807,7 +807,7 @@ jobs:
           echo "aplicando $ALVO (anterior: $ANTERIOR)"
           ./scripts/deploy.sh "$ALVO"
       - name: Verificar saude
-        run: ./scripts/health-check.sh https://api.printquest.dev/health
+        run: ./scripts/health-check.sh https://api.cloudshop.dev/health
       - name: Rollback automatico se falhar
         if: failure()
         run: ./scripts/deploy.sh "$ANTERIOR"`,
@@ -835,7 +835,7 @@ gh variable set ACTIONS_STEP_DEBUG --body true`,
           { term: "act", definition: "Ferramenta que executa workflows do GitHub Actions localmente em containers." },
           { term: "MTTR", definition: "Tempo médio de restauração do serviço após um incidente." },
         ],
-        printQuestLink: "Criar o workflow de rollback do PrintQuest e testá-lo com a versão anterior.",
+        printQuestLink: "Criar o workflow de rollback do CloudShop e testá-lo com a versão anterior.",
         quiz: [
           {
             question: "Deploy quebrou produção. Primeira ação correta?",

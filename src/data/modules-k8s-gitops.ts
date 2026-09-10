@@ -13,7 +13,7 @@ export const K8S_GITOPS_MODULES: Module[] = [
     regionId: "montanhas-k8s",
     bossId: "boss-crashloopbackoff",
     overview:
-      "Kubernetes é o divisor de águas entre quem opera servidores e quem opera plataforma. Você vai rodar o PrintQuest em um cluster local (Kind), entender Pods, Deployments, Services, ConfigMaps e Secrets, expor a aplicação com Ingress e TLS, configurar probes e limites que evitam incidentes, aplicar RBAC e empacotar tudo em um chart Helm com rollback validado.",
+      "Kubernetes é o divisor de águas entre quem opera servidores e quem opera plataforma. Você vai rodar o CloudShop em um cluster local (Kind), entender Pods, Deployments, Services, ConfigMaps e Secrets, expor a aplicação com Ingress e TLS, configurar probes e limites que evitam incidentes, aplicar RBAC e empacotar tudo em um chart Helm com rollback validado.",
     objectives: [
       "Explicar o modelo declarativo e o loop de reconciliação",
       "Escrever manifests de Deployment, Service e Ingress",
@@ -23,7 +23,7 @@ export const K8S_GITOPS_MODULES: Module[] = [
     ],
     prerequisites: ["Módulos 4 e 5 concluídos"],
     topics: ["Pods", "Deployments", "Services", "ConfigMaps", "Secrets", "Ingress", "Probes", "Limits", "RBAC", "Rollout/rollback", "Helm"],
-    delivery: "PrintQuest rodando em Kind via Helm, com Ingress, probes, limites e rollback comprovado.",
+    delivery: "CloudShop rodando em Kind via Helm, com Ingress, probes, limites e rollback comprovado.",
     checklist: [
       "kubectl get pods mostra todos os pods Running e Ready",
       "readinessProbe impede tráfego antes da aplicação estar pronta",
@@ -38,7 +38,7 @@ export const K8S_GITOPS_MODULES: Module[] = [
       "O que acontece quando um container excede o limite de memória?",
       "Como você faria rollback de um deploy no Kubernetes?",
     ],
-    printQuest: "Migrar o PrintQuest do Compose para Kubernetes com chart Helm próprio.",
+    printQuest: "Migrar o CloudShop do Compose para Kubernetes com chart Helm próprio.",
     lessons: [
       {
         id: "l-8-1",
@@ -75,11 +75,11 @@ nodes:
   - role: worker
 EOF
 
-kind create cluster --name printquest --config kind.yaml
+kind create cluster --name cloudshop --config kind.yaml
 kubectl cluster-info
 kubectl get nodes -o wide
-kubectl create namespace printquest
-kubectl config set-context --current --namespace=printquest
+kubectl create namespace cloudshop
+kubectl config set-context --current --namespace=cloudshop
 
 kubectl get all
 kubectl api-resources | head -20
@@ -96,7 +96,7 @@ kubectl get events --sort-by=.lastTimestamp | tail -20`,
           { term: "reconciliação", definition: "Ciclo contínuo que aproxima o estado real do estado declarado." },
           { term: "kubelet", definition: "Agente em cada nó que executa containers e reporta status ao control plane." },
         ],
-        printQuestLink: "Criar o cluster local onde o PrintQuest será migrado.",
+        printQuestLink: "Criar o cluster local onde o CloudShop será migrado.",
         quiz: [
           {
             question: "Você apaga um pod gerenciado por Deployment. O que acontece?",
@@ -122,21 +122,21 @@ kubectl get events --sort-by=.lastTimestamp | tail -20`,
         ],
         code: [
           {
-            label: "Manifests da API do PrintQuest",
+            label: "Manifests da API do CloudShop",
             language: "yaml",
             code: `apiVersion: v1
 kind: ConfigMap
-metadata: { name: printquest-api-config }
+metadata: { name: cloudshop-api-config }
 data:
   NODE_ENV: production
-  DATABASE_HOST: printquest-db
+  DATABASE_HOST: cloudshop-db
   DATABASE_PORT: "5432"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: printquest-api
-  labels: { app: printquest, component: api }
+  name: cloudshop-api
+  labels: { app: cloudshop, component: api }
 spec:
   replicas: 2
   revisionHistoryLimit: 5
@@ -144,24 +144,24 @@ spec:
     type: RollingUpdate
     rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }
   selector:
-    matchLabels: { app: printquest, component: api }
+    matchLabels: { app: cloudshop, component: api }
   template:
     metadata:
-      labels: { app: printquest, component: api }
+      labels: { app: cloudshop, component: api }
     spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
       containers:
         - name: api
-          image: ghcr.io/tiago/printquest/api:v1.2.0
+          image: ghcr.io/sua-org/cloudshop/api:v1.2.0
           ports: [{ containerPort: 3000, name: http }]
           envFrom:
-            - configMapRef: { name: printquest-api-config }
+            - configMapRef: { name: cloudshop-api-config }
           env:
             - name: DATABASE_PASSWORD
               valueFrom:
-                secretKeyRef: { name: printquest-db, key: password }
+                secretKeyRef: { name: cloudshop-db, key: password }
           resources:
             requests: { cpu: 100m, memory: 128Mi }
             limits:   { cpu: 500m, memory: 256Mi }
@@ -172,10 +172,10 @@ spec:
 ---
 apiVersion: v1
 kind: Service
-metadata: { name: printquest-api }
+metadata: { name: cloudshop-api }
 spec:
   type: ClusterIP
-  selector: { app: printquest, component: api }
+  selector: { app: cloudshop, component: api }
   ports: [{ port: 80, targetPort: http }]`,
             securityNote:
               "Nunca versione Secret com valor em base64 no Git. Use External Secrets ou SOPS com chave gerenciada.",
@@ -185,11 +185,11 @@ spec:
             language: "bash",
             code: `kubectl apply -f k8s/
 kubectl get deploy,rs,pod,svc
-kubectl describe deploy printquest-api | tail -20
-kubectl get endpoints printquest-api      # vazio = selector nao casa
-kubectl logs deploy/printquest-api --tail=50
-kubectl port-forward svc/printquest-api 8080:80
-kubectl run tmp --rm -it --image=curlimages/curl -- sh -c 'curl -s printquest-api/health'`,
+kubectl describe deploy cloudshop-api | tail -20
+kubectl get endpoints cloudshop-api      # vazio = selector nao casa
+kubectl logs deploy/cloudshop-api --tail=50
+kubectl port-forward svc/cloudshop-api 8080:80
+kubectl run tmp --rm -it --image=curlimages/curl -- sh -c 'curl -s cloudshop-api/health'`,
           },
         ],
         whyItMatters: "Estes quatro objetos cobrem 80% do trabalho diário com Kubernetes.",
@@ -201,7 +201,7 @@ kubectl run tmp --rm -it --image=curlimages/curl -- sh -c 'curl -s printquest-ap
           { term: "selector", definition: "Regra de labels que define quais pods pertencem a um Service ou controller." },
           { term: "envFrom", definition: "Forma de injetar todas as chaves de um ConfigMap como variáveis de ambiente." },
         ],
-        printQuestLink: "Traduzir os serviços do Compose em Deployments e Services do PrintQuest.",
+        printQuestLink: "Traduzir os serviços do Compose em Deployments e Services do CloudShop.",
         quiz: [
           {
             question: "Service sem endpoints normalmente indica:",
@@ -222,17 +222,17 @@ kubectl run tmp --rm -it --image=curlimages/curl -- sh -c 'curl -s printquest-ap
         objectives: ["Instalar ingress controller", "Rotear por host e path", "Automatizar certificado TLS"],
         body: [
           "Ingress é regra de roteamento HTTP; quem executa é o ingress controller (NGINX, Traefik, ou o gateway do provedor). Sem controller instalado, o objeto Ingress existe e nada acontece — confusão frequente de quem está começando.",
-          "Com Ingress você concentra em um único ponto de entrada o roteamento por host e path, o TLS e políticas como redirect e rate limit. No PrintQuest, o frontend responde na raiz e a API em /api, com o mesmo certificado.",
+          "Com Ingress você concentra em um único ponto de entrada o roteamento por host e path, o TLS e políticas como redirect e rate limit. No CloudShop, o frontend responde na raiz e a API em /api, com o mesmo certificado.",
           "cert-manager automatiza emissão e renovação de certificados via ACME, transformando um risco recorrente (certificado expirado) em processo. Em produção, monitore a validade também como métrica.",
         ],
         code: [
           {
-            label: "Ingress do PrintQuest com TLS",
+            label: "Ingress do CloudShop com TLS",
             language: "yaml",
             code: `apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: printquest
+  name: cloudshop
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "15"
@@ -240,20 +240,20 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-    - hosts: [printquest.dev]
-      secretName: printquest-tls
+    - hosts: [cloudshop.dev]
+      secretName: cloudshop-tls
   rules:
-    - host: printquest.dev
+    - host: cloudshop.dev
       http:
         paths:
           - path: /api
             pathType: Prefix
             backend:
-              service: { name: printquest-api, port: { number: 80 } }
+              service: { name: cloudshop-api, port: { number: 80 } }
           - path: /
             pathType: Prefix
             backend:
-              service: { name: printquest-web, port: { number: 80 } }`,
+              service: { name: cloudshop-web, port: { number: 80 } }`,
             securityNote:
               "Force ssl-redirect e considere rate limit em rotas de login para reduzir força bruta.",
           },
@@ -264,9 +264,9 @@ spec:
 kubectl -n ingress-nginx wait --for=condition=ready pod -l app.kubernetes.io/component=controller --timeout=180s
 
 kubectl get ingress
-kubectl describe ingress printquest
+kubectl describe ingress cloudshop
 kubectl -n ingress-nginx logs deploy/ingress-nginx-controller --tail=50
-curl -H "Host: printquest.dev" http://localhost/api/health -i`,
+curl -H "Host: cloudshop.dev" http://localhost/api/health -i`,
           },
         ],
         whyItMatters: "Toda aplicação precisa ser alcançável com HTTPS; Ingress é o mecanismo padrão para isso.",
@@ -278,7 +278,7 @@ curl -H "Host: printquest.dev" http://localhost/api/health -i`,
           { term: "ingress controller", definition: "Componente que implementa as regras declaradas em objetos Ingress." },
           { term: "ClusterIssuer", definition: "Recurso do cert-manager que define a autoridade emissora de certificados." },
         ],
-        printQuestLink: "Publicar frontend e API do PrintQuest sob o mesmo domínio com HTTPS.",
+        printQuestLink: "Publicar frontend e API do CloudShop sob o mesmo domínio com HTTPS.",
         quiz: [
           {
             question: "Você criou um Ingress e nada acontece. Causa mais provável?",
@@ -324,9 +324,9 @@ curl -H "Host: printquest.dev" http://localhost/api/health -i`,
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
-metadata: { name: printquest-api }
+metadata: { name: cloudshop-api }
 spec:
-  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: printquest-api }
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: cloudshop-api }
   minReplicas: 2
   maxReplicas: 8
   metrics:
@@ -340,11 +340,11 @@ spec:
             language: "yaml",
             code: `apiVersion: v1
 kind: ServiceAccount
-metadata: { name: printquest-api }
+metadata: { name: cloudshop-api }
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
-metadata: { name: printquest-api-read }
+metadata: { name: cloudshop-api-read }
 rules:
   - apiGroups: [""]
     resources: ["configmaps"]
@@ -352,9 +352,9 @@ rules:
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
-metadata: { name: printquest-api-read }
-subjects: [{ kind: ServiceAccount, name: printquest-api }]
-roleRef: { kind: Role, name: printquest-api-read, apiGroup: rbac.authorization.k8s.io }`,
+metadata: { name: cloudshop-api-read }
+subjects: [{ kind: ServiceAccount, name: cloudshop-api }]
+roleRef: { kind: Role, name: cloudshop-api-read, apiGroup: rbac.authorization.k8s.io }`,
             securityNote:
               "Evite ClusterRoleBinding com cluster-admin para aplicações. Verifique com kubectl auth can-i --as=system:serviceaccount:ns:sa.",
           },
@@ -365,7 +365,7 @@ roleRef: { kind: Role, name: printquest-api-read, apiGroup: rbac.authorization.k
 kubectl describe pod <pod> | grep -A5 -E 'Limits|Requests|Last State'
 kubectl get pod <pod> -o jsonpath='{.status.containerStatuses[0].lastState.terminated.reason}'  # OOMKilled?
 kubectl get hpa
-kubectl auth can-i list secrets --as=system:serviceaccount:printquest:printquest-api`,
+kubectl auth can-i list secrets --as=system:serviceaccount:cloudshop:cloudshop-api`,
           },
         ],
         whyItMatters: "Probes e limites malfeitos são a causa número um de instabilidade em clusters de empresas reais.",
@@ -377,7 +377,7 @@ kubectl auth can-i list secrets --as=system:serviceaccount:printquest:printquest
           { term: "OOMKilled", definition: "Container encerrado pelo kernel por exceder o limite de memória." },
           { term: "throttling", definition: "Redução forçada de CPU quando o container excede seu limite." },
         ],
-        printQuestLink: "Ajustar probes e limites da API do PrintQuest com base no consumo medido.",
+        printQuestLink: "Ajustar probes e limites da API do CloudShop com base no consumo medido.",
         quiz: [
           {
             question: "Falha de readiness probe causa:",
@@ -403,12 +403,12 @@ kubectl auth can-i list secrets --as=system:serviceaccount:printquest:printquest
         ],
         code: [
           {
-            label: "Chart do PrintQuest",
+            label: "Chart do CloudShop",
             language: "yaml",
             code: `# Chart.yaml
 apiVersion: v2
-name: printquest
-description: Plataforma PrintQuest (web + api)
+name: cloudshop
+description: Plataforma CloudShop (web + api)
 type: application
 version: 0.3.0
 appVersion: "1.2.0"
@@ -416,7 +416,7 @@ appVersion: "1.2.0"
 # values.yaml
 replicaCount: 2
 image:
-  repository: ghcr.io/tiago/printquest/api
+  repository: ghcr.io/sua-org/cloudshop/api
   tag: ""            # obrigatorio via --set ou values de ambiente
   pullPolicy: IfNotPresent
 resources:
@@ -424,7 +424,7 @@ resources:
   limits:   { cpu: 500m, memory: 256Mi }
 ingress:
   enabled: true
-  host: printquest.dev
+  host: cloudshop.dev
 
 # templates/deployment.yaml (trecho)
 # image: "{{ .Values.image.repository }}:{{ required \\"informe image.tag\\" .Values.image.tag }}"
@@ -433,18 +433,18 @@ ingress:
           {
             label: "Ciclo de release e rollback",
             language: "bash",
-            code: `helm lint ./charts/printquest
-helm template printquest ./charts/printquest -f values-prod.yaml | kubectl apply --dry-run=client -f -
+            code: `helm lint ./charts/cloudshop
+helm template cloudshop ./charts/cloudshop -f values-prod.yaml | kubectl apply --dry-run=client -f -
 
-helm upgrade --install printquest ./charts/printquest \\
-  -n printquest --create-namespace \\
+helm upgrade --install cloudshop ./charts/cloudshop \\
+  -n cloudshop --create-namespace \\
   -f values-prod.yaml --set image.tag=v1.2.0 \\
   --atomic --wait --timeout 5m
 
-helm history printquest -n printquest
-helm rollback printquest 3 -n printquest        # volta para a revisao 3
-kubectl rollout status deploy/printquest-api -n printquest
-kubectl rollout undo deploy/printquest-api -n printquest   # alternativa sem Helm`,
+helm history cloudshop -n cloudshop
+helm rollback cloudshop 3 -n cloudshop        # volta para a revisao 3
+kubectl rollout status deploy/cloudshop-api -n cloudshop
+kubectl rollout undo deploy/cloudshop-api -n cloudshop   # alternativa sem Helm`,
             securityNote:
               "Não passe senha por --set (fica no histórico e no release do Helm). Use Secret gerenciado externamente.",
           },
@@ -457,7 +457,7 @@ kubectl rollout undo deploy/printquest-api -n printquest   # alternativa sem Hel
           { term: "chart", definition: "Pacote Helm com templates, values e metadados." },
           { term: "revisão", definition: "Versão de uma release Helm, usada para histórico e rollback." },
         ],
-        printQuestLink: "Empacotar o PrintQuest em chart e validar o rollback da versão anterior.",
+        printQuestLink: "Empacotar o CloudShop em chart e validar o rollback da versão anterior.",
         quiz: [
           {
             question: "O que faz helm upgrade --atomic?",
@@ -486,7 +486,7 @@ kubectl rollout undo deploy/printquest-api -n printquest   # alternativa sem Hel
     regionId: "portal-gitops",
     bossId: "boss-out-of-sync",
     overview:
-      "Em GitOps, o repositório é a fonte da verdade e um agente no cluster reconcilia continuamente. Isso muda a operação: deploy é merge, rollback é revert, auditoria é git log e alteração manual é detectada como drift. Você vai instalar o ArgoCD, estruturar o repositório printquest-gitops, configurar auto-sync com self-heal e resolver o boss OutOfSync.",
+      "Em GitOps, o repositório é a fonte da verdade e um agente no cluster reconcilia continuamente. Isso muda a operação: deploy é merge, rollback é revert, auditoria é git log e alteração manual é detectada como drift. Você vai instalar o ArgoCD, estruturar o repositório cloudshop-gitops, configurar auto-sync com self-heal e resolver o boss OutOfSync.",
     objectives: [
       "Explicar GitOps e seus quatro princípios na prática",
       "Instalar e operar o ArgoCD",
@@ -496,7 +496,7 @@ kubectl rollout undo deploy/printquest-api -n printquest   # alternativa sem Hel
     ],
     prerequisites: ["Módulo 8 concluído"],
     topics: ["Estado desejado", "Sync", "Auto-sync", "Drift", "Histórico", "Rollback", "Repositório GitOps"],
-    delivery: "Cluster sincronizado pelo ArgoCD a partir do repositório printquest-gitops, com rollback por revert comprovado.",
+    delivery: "Cluster sincronizado pelo ArgoCD a partir do repositório cloudshop-gitops, com rollback por revert comprovado.",
     checklist: [
       "Application do ArgoCD apontando para o repositório e caminho corretos",
       "Auto-sync com prune e selfHeal habilitados no ambiente de staging",
@@ -511,7 +511,7 @@ kubectl rollout undo deploy/printquest-api -n printquest   # alternativa sem Hel
       "Como você faz rollback em GitOps?",
       "Como gerenciar secrets em um repositório GitOps?",
     ],
-    printQuest: "Colocar o PrintQuest sob GitOps: cada merge no repositório de manifests reflete no cluster.",
+    printQuest: "Colocar o CloudShop sob GitOps: cada merge no repositório de manifests reflete no cluster.",
     lessons: [
       {
         id: "l-9-1",
@@ -529,9 +529,9 @@ kubectl rollout undo deploy/printquest-api -n printquest   # alternativa sem Hel
         ],
         code: [
           {
-            label: "Estrutura do printquest-gitops",
+            label: "Estrutura do cloudshop-gitops",
             language: "text",
-            code: `printquest-gitops/
+            code: `cloudshop-gitops/
   base/
     kustomization.yaml
     deployment-api.yaml
@@ -539,7 +539,7 @@ kubectl rollout undo deploy/printquest-api -n printquest   # alternativa sem Hel
     ingress.yaml
   overlays/
     staging/
-      kustomization.yaml      # replicas: 1, host: staging.printquest.dev
+      kustomization.yaml      # replicas: 1, host: staging.cloudshop.dev
       image-tag.yaml
     producao/
       kustomization.yaml      # replicas: 3, recursos maiores
@@ -554,16 +554,16 @@ kubectl rollout undo deploy/printquest-api -n printquest   # alternativa sem Hel
             code: `# overlays/producao/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: printquest
+namespace: cloudshop
 resources: [../../base]
 replicas:
-  - name: printquest-api
+  - name: cloudshop-api
     count: 3
 images:
-  - name: ghcr.io/tiago/printquest/api
+  - name: ghcr.io/sua-org/cloudshop/api
     newTag: v1.2.0
 patches:
-  - target: { kind: Deployment, name: printquest-api }
+  - target: { kind: Deployment, name: cloudshop-api }
     patch: |
       - op: replace
         path: /spec/template/spec/containers/0/resources/limits/memory
@@ -581,7 +581,7 @@ patches:
           { term: "overlay", definition: "Camada Kustomize que ajusta a base para um ambiente específico." },
           { term: "estado desejado", definition: "Descrição declarativa do que deve existir, versionada em Git." },
         ],
-        printQuestLink: "Criar a estrutura base/overlays do printquest-gitops.",
+        printQuestLink: "Criar a estrutura base/overlays do cloudshop-gitops.",
         quiz: [
           {
             question: "Em GitOps, como se faz um deploy?",
@@ -618,10 +618,10 @@ kubectl -n argocd port-forward svc/argocd-server 8081:443
 
 argocd login localhost:8081 --username admin --insecure
 argocd app list
-argocd app get printquest-staging
-argocd app diff printquest-staging
-argocd app sync printquest-staging
-argocd app history printquest-staging`,
+argocd app get cloudshop-staging
+argocd app diff cloudshop-staging
+argocd app sync cloudshop-staging
+argocd app history cloudshop-staging`,
             securityNote:
               "Troque a senha inicial do admin, habilite SSO quando possível e não exponha o argocd-server publicamente sem autenticação forte.",
           },
@@ -631,17 +631,17 @@ argocd app history printquest-staging`,
             code: `apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: printquest-staging
+  name: cloudshop-staging
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: git@github.com:tiago/printquest-gitops.git
+    repoURL: git@github.com:sua-org/cloudshop-gitops.git
     targetRevision: main
     path: overlays/staging
   destination:
     server: https://kubernetes.default.svc
-    namespace: printquest
+    namespace: cloudshop
   syncPolicy:
     automated:
       prune: true
@@ -662,7 +662,7 @@ spec:
           { term: "Application", definition: "Recurso do ArgoCD que liga um caminho do Git a um destino no cluster." },
           { term: "selfHeal", definition: "Reverte automaticamente alterações feitas diretamente no cluster." },
         ],
-        printQuestLink: "Criar as Applications de staging e produção do PrintQuest.",
+        printQuestLink: "Criar as Applications de staging e produção do CloudShop.",
         quiz: [
           {
             question: "Alguém editou um Deployment com kubectl. Com selfHeal ativo, o que ocorre?",
@@ -690,20 +690,20 @@ spec:
           {
             label: "Diagnóstico, ignoreDifferences e rollback",
             language: "bash",
-            code: `argocd app get printquest-producao
-argocd app diff printquest-producao
-kubectl describe deploy printquest-api -n printquest | tail -20
+            code: `argocd app get cloudshop-producao
+argocd app diff cloudshop-producao
+kubectl describe deploy cloudshop-api -n cloudshop | tail -20
 
 # rollback: reverter o commit que subiu a versao ruim
-git -C printquest-gitops log --oneline -5 -- overlays/producao
-git -C printquest-gitops revert 4c1f8ab
-git -C printquest-gitops push
-argocd app sync printquest-producao
-argocd app history printquest-producao
+git -C cloudshop-gitops log --oneline -5 -- overlays/producao
+git -C cloudshop-gitops revert 4c1f8ab
+git -C cloudshop-gitops push
+argocd app sync cloudshop-producao
+argocd app history cloudshop-producao
 
 # promocao de staging para producao
-cd printquest-gitops/overlays/producao
-kustomize edit set image ghcr.io/tiago/printquest/api=ghcr.io/tiago/printquest/api:v1.2.0
+cd cloudshop-gitops/overlays/producao
+kustomize edit set image ghcr.io/sua-org/cloudshop/api=ghcr.io/sua-org/cloudshop/api:v1.2.0
 git commit -am "chore(prod): promove api para v1.2.0" && git push`,
           },
           {
@@ -713,7 +713,7 @@ git commit -am "chore(prod): promove api para v1.2.0" && git push`,
   ignoreDifferences:
     - group: apps
       kind: Deployment
-      name: printquest-api
+      name: cloudshop-api
       jsonPointers:
         - /spec/replicas          # gerenciado pelo HPA
     - group: ""
@@ -732,7 +732,7 @@ git commit -am "chore(prod): promove api para v1.2.0" && git push`,
           { term: "OutOfSync", definition: "Estado em que o cluster difere do estado declarado no Git." },
           { term: "promoção", definition: "Levar uma versão já validada de um ambiente para o próximo." },
         ],
-        printQuestLink: "Promover a v1.2.0 do PrintQuest de staging para produção via PR.",
+        printQuestLink: "Promover a v1.2.0 do CloudShop de staging para produção via PR.",
         quiz: [
           {
             question: "Qual a forma correta de rollback em GitOps?",
@@ -774,16 +774,16 @@ spec:
 ---
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
-metadata: { name: printquest-db }
+metadata: { name: cloudshop-db }
 spec:
   refreshInterval: 1h
   secretStoreRef: { name: aws-secrets, kind: SecretStore }
-  target: { name: printquest-db, creationPolicy: Owner }
+  target: { name: cloudshop-db, creationPolicy: Owner }
   data:
     - secretKey: password
-      remoteRef: { key: printquest/db, property: password }`,
+      remoteRef: { key: cloudshop/db, property: password }`,
             securityNote:
-              "A ServiceAccount do operador deve ter permissão apenas nos segredos com prefixo printquest/.",
+              "A ServiceAccount do operador deve ter permissão apenas nos segredos com prefixo cloudshop/.",
           },
           {
             label: "SOPS com KMS",
@@ -805,7 +805,7 @@ grep -rIl "password:" overlays/ | xargs -r grep -L "ENC\\["`,
           { term: "External Secrets", definition: "Operador que sincroniza segredos de um cofre externo para Secrets do cluster." },
           { term: "SOPS", definition: "Ferramenta que encripta valores dentro de arquivos YAML/JSON usando KMS ou PGP." },
         ],
-        printQuestLink: "Migrar a senha do banco do PrintQuest para o cofre com External Secrets.",
+        printQuestLink: "Migrar a senha do banco do CloudShop para o cofre com External Secrets.",
         quiz: [
           {
             question: "Base64 em um Secret do Kubernetes oferece:",
@@ -850,13 +850,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: tiago/printquest-gitops
+          repository: sua-org/cloudshop-gitops
           token: \${{ secrets.GITOPS_PR_TOKEN }}
       - uses: imranismail/setup-kustomize@v2
       - name: Atualizar tag da imagem no overlay de staging
         run: |
           cd overlays/staging
-          kustomize edit set image ghcr.io/tiago/printquest/api=ghcr.io/tiago/printquest/api:sha-\${{ github.event.workflow_run.head_sha }}
+          kustomize edit set image ghcr.io/sua-org/cloudshop/api=ghcr.io/sua-org/cloudshop/api:sha-\${{ github.event.workflow_run.head_sha }}
       - uses: peter-evans/create-pull-request@v6
         with:
           token: \${{ secrets.GITOPS_PR_TOKEN }}
@@ -875,7 +875,7 @@ jobs:
           { term: "Image Updater", definition: "Componente que atualiza tags de imagem automaticamente a partir do registry." },
           { term: "promoção automática", definition: "Atualização automatizada de manifests após validação em CI." },
         ],
-        printQuestLink: "Automatizar a promoção do PrintQuest para staging após CI verde.",
+        printQuestLink: "Automatizar a promoção do CloudShop para staging após CI verde.",
         quiz: [
           {
             question: "Qual prática preserva a rastreabilidade do deploy em GitOps?",

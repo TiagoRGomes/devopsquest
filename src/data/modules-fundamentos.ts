@@ -38,7 +38,7 @@ export const FUNDAMENTOS_MODULES: Module[] = [
       "O que você faz no primeiro dia com acesso a uma conta de nuvem nova?",
     ],
     printQuest:
-      "Criar os repositórios printquest-app, printquest-infra e printquest-gitops, que serão usados em todos os módulos seguintes.",
+      "Criar os repositórios cloudshop-app, cloudshop-infra e cloudshop-gitops, que serão usados em todos os módulos seguintes.",
     lessons: [
       {
         id: "l-0-1",
@@ -56,7 +56,7 @@ export const FUNDAMENTOS_MODULES: Module[] = [
         body: [
           "DevOps não é um cargo mágico entre dev e infra: é a responsabilidade de encurtar o caminho entre um commit e o valor entregue em produção, com segurança e reversibilidade. Na prática o seu dia envolve manter pipelines confiáveis, empacotar aplicações, provisionar infraestrutura em código, observar o comportamento em produção, responder a incidentes e reduzir custo. Quem vem do frontend, como você, tem uma vantagem real: já entende build, dependências, variáveis de ambiente e o que a aplicação precisa para rodar.",
           "As vagas atuais convergem para um núcleo bastante estável: Linux, redes e HTTP, Git, containers, um provedor de nuvem (AWS lidera as vagas em português), CI/CD (GitHub Actions e GitLab CI dominam), Terraform, Kubernetes, observabilidade (Prometheus/Grafana/OpenTelemetry) e noções firmes de segurança e custo. O que muda entre anúncios é a ênfase: uma vaga de Platform Engineering pede Kubernetes, Helm e experiência de plataforma interna; uma de SRE pede SLO, incidentes e performance; uma de DevSecOps pede scanners, supply chain e IAM.",
-          "A forma correta de estudar é sempre a mesma: você aprende um conceito, aplica em um artefato do seu próprio projeto e escreve o que aprendeu. Nesta plataforma, esse artefato é o PrintQuest — um catálogo de produtos 3D com frontend Vue, API Node e PostgreSQL — que você vai containerizar, publicar em pipeline, provisionar na AWS via Terraform, migrar para Kubernetes, colocar sob GitOps e finalmente instrumentar com métricas, logs, traces e SLO.",
+          "A forma correta de estudar é sempre a mesma: você aprende um conceito, aplica em um artefato do seu próprio projeto e escreve o que aprendeu. Nesta plataforma, esse artefato é o CloudShop — um catálogo de produtos 3D com frontend Vue, API Node e PostgreSQL — que você vai containerizar, publicar em pipeline, provisionar na AWS via Terraform, migrar para Kubernetes, colocar sob GitOps e finalmente instrumentar com métricas, logs, traces e SLO.",
         ],
         code: [
           {
@@ -64,7 +64,7 @@ export const FUNDAMENTOS_MODULES: Module[] = [
             language: "markdown",
             code: `## 2026-09-06 — Módulo 0
 
-**O que fiz:** configurei chave SSH e criei os 3 repositórios do PrintQuest.
+**O que fiz:** configurei chave SSH e criei os 3 repositórios do CloudShop.
 **Comando que aprendi:** ssh -T git@github.com
 **Erro que enfrentei:** permission denied (publickey) — a chave não estava no agente.
 **Como resolvi:** ssh-add ~/.ssh/id_ed25519
@@ -87,7 +87,7 @@ export const FUNDAMENTOS_MODULES: Module[] = [
           { term: "SRE", definition: "Engenharia de confiabilidade: aplica práticas de engenharia para manter serviços dentro de metas mensuráveis (SLO)." },
           { term: "Platform Engineering", definition: "Construir plataforma interna e caminhos padronizados para que times de produto entreguem sozinhos com segurança." },
         ],
-        printQuestLink: "Definir o escopo do PrintQuest e escrever o primeiro registro do diário técnico.",
+        printQuestLink: "Definir o escopo do CloudShop e escrever o primeiro registro do diário técnico.",
         quiz: [
           {
             question: "Qual afirmação descreve melhor a função de DevOps nas vagas atuais?",
@@ -168,7 +168,7 @@ source ~/.bashrc`,
           { term: "WSL2", definition: "Subsistema Windows para Linux com kernel real, permitindo rodar distribuições Linux com bom desempenho." },
           { term: "LTS", definition: "Long Term Support: versão com suporte prolongado, preferida em servidores." },
         ],
-        printQuestLink: "Criar ~/projetos/printquest, onde todo o código do projeto viverá.",
+        printQuestLink: "Criar ~/projetos/cloudshop, onde todo o código do projeto viverá.",
         quiz: [
           {
             question: "Por que evitar trabalhar em /mnt/c no WSL2?",
@@ -205,14 +205,14 @@ source ~/.bashrc`,
           {
             label: "Chave SSH e configuração do Git",
             language: "bash",
-            code: `ssh-keygen -t ed25519 -C "tiago@printquest" -f ~/.ssh/id_ed25519
+            code: `ssh-keygen -t ed25519 -C "voce@exemplo.com" -f ~/.ssh/id_ed25519
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 cat ~/.ssh/id_ed25519.pub   # cole em GitHub > Settings > SSH keys
 
 ssh -T git@github.com       # deve responder com o seu usuario
 
-git config --global user.name "Tiago Gomes"
+git config --global user.name "Seu Nome"
 git config --global user.email "voce@exemplo.com"
 git config --global init.defaultBranch main
 git config --global pull.rebase true
@@ -233,7 +233,7 @@ git config --global push.default current`,
           { term: "ed25519", definition: "Algoritmo de chave pública moderno, com chaves curtas e alta segurança." },
           { term: "ssh-agent", definition: "Processo que mantém a chave privada destravada em memória durante a sessão." },
         ],
-        printQuestLink: "Criar printquest-app, printquest-infra e printquest-gitops com README inicial.",
+        printQuestLink: "Criar cloudshop-app, cloudshop-infra e cloudshop-gitops com README inicial.",
         quiz: [
           {
             question: "Qual arquivo você registra no GitHub?",
@@ -300,7 +300,7 @@ terraform -version && kubectl version --client && helm version`,
           { term: "CLI", definition: "Interface de linha de comando: forma automatizável de operar uma ferramenta." },
           { term: "nvm", definition: "Gerenciador de versões do Node, permitindo trocar de runtime por projeto." },
         ],
-        printQuestLink: "Documentar as versões usadas no PrintQuest para reproduzir builds no CI.",
+        printQuestLink: "Documentar as versões usadas no CloudShop para reproduzir builds no CI.",
         quiz: [
           {
             question: "Qual ferramenta descreve infraestrutura de forma declarativa e versionada?",
@@ -332,15 +332,15 @@ terraform -version && kubectl version --client && helm version`,
           {
             label: "Perfil, identidade e orçamento",
             language: "bash",
-            code: `aws configure --profile printquest
+            code: `aws configure --profile cloudshop
 # AWS Access Key ID / Secret / região (ex.: us-east-1) / output json
 
-export AWS_PROFILE=printquest
+export AWS_PROFILE=cloudshop
 aws sts get-caller-identity
 
 # Orçamento de 5 USD por mês com alerta em 80%
 aws budgets create-budget --account-id "$(aws sts get-caller-identity --query Account --output text)" \\
-  --budget '{"BudgetName":"estudo-printquest","BudgetLimit":{"Amount":"5","Unit":"USD"},"TimeUnit":"MONTHLY","BudgetType":"COST"}' \\
+  --budget '{"BudgetName":"estudo-cloudshop","BudgetLimit":{"Amount":"5","Unit":"USD"},"TimeUnit":"MONTHLY","BudgetType":"COST"}' \\
   --notifications-with-subscribers '[{"Notification":{"NotificationType":"ACTUAL","ComparisonOperator":"GREATER_THAN","Threshold":80,"ThresholdType":"PERCENTAGE"},"Subscribers":[{"SubscriptionType":"EMAIL","Address":"voce@exemplo.com"}]}]'`,
             securityNote:
               "~/.aws/credentials guarda chaves em texto puro. Prefira AWS IAM Identity Center (SSO) e nunca comite esse arquivo.",
@@ -412,7 +412,7 @@ aws budgets create-budget --account-id "$(aws sts get-caller-identity --query Ac
       "Explique a diferença entre load average e uso de CPU.",
       "Como você faria um serviço voltar automaticamente após falha?",
     ],
-    printQuest: "Preparar o host que hospedará a API do PrintQuest: usuário dedicado, serviço systemd e logs sob controle.",
+    printQuest: "Preparar o host que hospedará a API do CloudShop: usuário dedicado, serviço systemd e logs sob controle.",
     lessons: [
       {
         id: "l-1-1",
@@ -438,7 +438,7 @@ tree -L 2 /var 2>/dev/null || ls -R /var | head
 
 find /var/log -name "*.log" -size +50M          # logs grandes
 find /etc -name "*.conf" -mtime -2              # config alterada nas ultimas 48h
-grep -rn "DATABASE_URL" /etc/printquest/ 2>/dev/null
+grep -rn "DATABASE_URL" /etc/cloudshop/ 2>/dev/null
 
 tail -n 100 -f /var/log/syslog       # acompanhar em tempo real
 less +G /var/log/syslog              # abrir no fim sem carregar tudo
@@ -457,7 +457,7 @@ du -xh --max-depth=1 /var | sort -h  # quem ocupa espaco`,
           { term: "FHS", definition: "Filesystem Hierarchy Standard: convenção sobre o propósito de cada diretório." },
           { term: "symlink", definition: "Atalho que aponta para outro caminho, usado em estratégias de release/rollback." },
         ],
-        printQuestLink: "Definir /opt/printquest para a aplicação e /var/log/printquest para os logs.",
+        printQuestLink: "Definir /opt/cloudshop para a aplicação e /var/log/cloudshop para os logs.",
         quiz: [
           {
             question: "Onde ficam, por convenção, os arquivos de configuração do sistema?",
@@ -485,15 +485,15 @@ du -xh --max-depth=1 /var | sort -h  # quem ocupa espaco`,
           {
             label: "Usuário de serviço e permissões corretas",
             language: "bash",
-            code: `sudo useradd --system --no-create-home --shell /usr/sbin/nologin printquest
-sudo mkdir -p /opt/printquest /var/log/printquest
-sudo chown -R printquest:printquest /opt/printquest /var/log/printquest
-sudo chmod 750 /opt/printquest        # dono total, grupo entra e le
-sudo chmod 640 /etc/printquest/app.env
+            code: `sudo useradd --system --no-create-home --shell /usr/sbin/nologin cloudshop
+sudo mkdir -p /opt/cloudshop /var/log/cloudshop
+sudo chown -R cloudshop:cloudshop /opt/cloudshop /var/log/cloudshop
+sudo chmod 750 /opt/cloudshop        # dono total, grupo entra e le
+sudo chmod 640 /etc/cloudshop/app.env
 
-ls -ld /opt/printquest
-id printquest
-sudo -u printquest ls /opt/printquest  # testar como o servico enxerga
+ls -ld /opt/cloudshop
+id cloudshop
+sudo -u cloudshop ls /opt/cloudshop  # testar como o servico enxerga
 
 # auditoria rapida: arquivos com permissao perigosa
 sudo find /opt -perm -o+w -type f`,
@@ -511,7 +511,7 @@ sudo find /opt -perm -o+w -type f`,
           { term: "umask", definition: "Máscara que define as permissões padrão de arquivos recém-criados." },
           { term: "usuário de sistema", definition: "Conta sem login interativo, criada para executar serviços." },
         ],
-        printQuestLink: "Criar o usuário printquest que executará a API e será dono dos diretórios da aplicação.",
+        printQuestLink: "Criar o usuário cloudshop que executará a API e será dono dos diretórios da aplicação.",
         quiz: [
           {
             question: "O que significa 750 em um diretório?",
@@ -553,20 +553,20 @@ kill -KILL 1234                   # ultimo recurso
 pgrep -af node                    # localizar por nome`,
           },
           {
-            label: "Unit systemd da API do PrintQuest",
+            label: "Unit systemd da API do CloudShop",
             language: "ini",
-            code: `# /etc/systemd/system/printquest-api.service
+            code: `# /etc/systemd/system/cloudshop-api.service
 [Unit]
-Description=PrintQuest API
+Description=CloudShop API
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-User=printquest
-Group=printquest
-WorkingDirectory=/opt/printquest
-EnvironmentFile=/etc/printquest/app.env
-ExecStart=/usr/bin/node /opt/printquest/server.js
+User=cloudshop
+Group=cloudshop
+WorkingDirectory=/opt/cloudshop
+EnvironmentFile=/etc/cloudshop/app.env
+ExecStart=/usr/bin/node /opt/cloudshop/server.js
 Restart=on-failure
 RestartSec=3
 NoNewPrivileges=true
@@ -584,11 +584,11 @@ WantedBy=multi-user.target`,
             label: "Operar o serviço",
             language: "bash",
             code: `sudo systemctl daemon-reload
-sudo systemctl enable --now printquest-api
-systemctl status printquest-api --no-pager
-sudo systemctl restart printquest-api
-systemctl is-enabled printquest-api
-journalctl -u printquest-api -n 50 --no-pager`,
+sudo systemctl enable --now cloudshop-api
+systemctl status cloudshop-api --no-pager
+sudo systemctl restart cloudshop-api
+systemctl is-enabled cloudshop-api
+journalctl -u cloudshop-api -n 50 --no-pager`,
           },
         ],
         whyItMatters:
@@ -600,7 +600,7 @@ journalctl -u printquest-api -n 50 --no-pager`,
           { term: "unit", definition: "Arquivo de definição de um recurso gerenciado pelo systemd (serviço, timer, socket)." },
           { term: "zumbi", definition: "Processo que terminou mas cujo status ainda não foi coletado pelo processo pai." },
         ],
-        printQuestLink: "Colocar a API do PrintQuest sob systemd, com restart automático e logs no journal.",
+        printQuestLink: "Colocar a API do CloudShop sob systemd, com restart automático e logs no journal.",
         quiz: [
           {
             question: "Qual comando mostra qual processo está escutando a porta 3000?",
@@ -628,35 +628,35 @@ journalctl -u printquest-api -n 50 --no-pager`,
           {
             label: "Consultas essenciais",
             language: "bash",
-            code: `journalctl -u printquest-api -n 200 --no-pager
-journalctl -u printquest-api -p err --since "10 min ago"
+            code: `journalctl -u cloudshop-api -n 200 --no-pager
+journalctl -u cloudshop-api -p err --since "10 min ago"
 journalctl --since "2026-09-06 09:00" --until "2026-09-06 09:30"
-journalctl -u printquest-api -f              # seguir ao vivo
+journalctl -u cloudshop-api -f              # seguir ao vivo
 journalctl -k -p warning                     # mensagens do kernel
 journalctl --disk-usage
 sudo journalctl --vacuum-size=500M
 
 # logs de aplicacao fora do journal
-sudo grep -c "ERROR" /var/log/printquest/app.log
-sudo awk '/ERROR/{print $1, $2, $NF}' /var/log/printquest/app.log | tail -20`,
+sudo grep -c "ERROR" /var/log/cloudshop/app.log
+sudo awk '/ERROR/{print $1, $2, $NF}' /var/log/cloudshop/app.log | tail -20`,
             securityNote:
               "Antes de colar log em ticket ou chat, remova tokens, e-mails e IDs de clientes. Log compartilhado é vazamento frequente.",
           },
           {
             label: "Rotação de log da aplicação",
             language: "ini",
-            code: `# /etc/logrotate.d/printquest
-/var/log/printquest/*.log {
+            code: `# /etc/logrotate.d/cloudshop
+/var/log/cloudshop/*.log {
   daily
   rotate 14
   compress
   delaycompress
   missingok
   notifempty
-  create 0640 printquest printquest
+  create 0640 cloudshop cloudshop
   sharedscripts
   postrotate
-    systemctl reload printquest-api > /dev/null 2>&1 || true
+    systemctl reload cloudshop-api > /dev/null 2>&1 || true
   endscript
 }`,
           },
@@ -670,7 +670,7 @@ sudo awk '/ERROR/{print $1, $2, $NF}' /var/log/printquest/app.log | tail -20`,
           { term: "journald", definition: "Coletor de logs do systemd, com índice binário e filtros por metadados." },
           { term: "logrotate", definition: "Utilitário que rotaciona, comprime e remove logs antigos por política." },
         ],
-        printQuestLink: "Padronizar o log JSON da API do PrintQuest e configurar rotação diária.",
+        printQuestLink: "Padronizar o log JSON da API do CloudShop e configurar rotação diária.",
         quiz: [
           {
             question: "Qual comando mostra apenas erros da unidade nos últimos 10 minutos?",
@@ -704,20 +704,20 @@ sudo awk '/ERROR/{print $1, $2, $NF}' /var/log/printquest/app.log | tail -20`,
             label: "SSH confortável e seguro",
             language: "bash",
             code: `cat >> ~/.ssh/config <<'EOF'
-Host printquest-prod
+Host cloudshop-prod
   HostName 203.0.113.10
-  User printquest-ops
+  User cloudshop-ops
   IdentityFile ~/.ssh/id_ed25519
   ServerAliveInterval 30
 
-Host printquest-db
+Host cloudshop-db
   HostName 10.0.2.15
-  User printquest-ops
-  ProxyJump printquest-prod
+  User cloudshop-ops
+  ProxyJump cloudshop-prod
 EOF
 
-ssh printquest-prod
-ssh -L 5432:localhost:5432 printquest-db   # tunel para acessar o banco local`,
+ssh cloudshop-prod
+ssh -L 5432:localhost:5432 cloudshop-db   # tunel para acessar o banco local`,
             securityNote:
               "No servidor: PasswordAuthentication no, PermitRootLogin no. Aplique e teste em outra sessão antes de encerrar a atual.",
           },
@@ -744,7 +744,7 @@ ss -s                        # resumo de conexoes`,
           { term: "load average", definition: "Média de processos prontos ou esperando execução; comparar sempre com o número de núcleos." },
           { term: "ProxyJump", definition: "Recurso do SSH para acessar host interno através de um bastion." },
         ],
-        printQuestLink: "Preparar acesso seguro ao host de produção do PrintQuest via bastion.",
+        printQuestLink: "Preparar acesso seguro ao host de produção do CloudShop via bastion.",
         quiz: [
           {
             question: "Em free -h, qual coluna melhor indica memória realmente utilizável?",

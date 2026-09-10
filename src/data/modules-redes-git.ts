@@ -38,7 +38,7 @@ export const REDES_GIT_MODULES: Module[] = [
       "Como você verifica se um problema é DNS, rede ou aplicação?",
       "O que acontece no handshake TLS e por que um certificado expirado quebra tudo?",
     ],
-    printQuest: "Publicar a API do PrintQuest em api.printquest.dev atrás de Nginx com HTTPS.",
+    printQuest: "Publicar a API do CloudShop em api.cloudshop.dev atrás de Nginx com HTTPS.",
     lessons: [
       {
         id: "l-2-1",
@@ -62,9 +62,9 @@ export const REDES_GIT_MODULES: Module[] = [
 ip route                  # rota padrao (default via ...)
 ss -tulpn                 # portas em escuta
 ping -c3 1.1.1.1          # conectividade IP
-traceroute api.printquest.dev 2>/dev/null || tracepath api.printquest.dev
-nc -zv api.printquest.dev 443   # porta aberta?
-curl -sS -o /dev/null -w '%{http_code} %{time_total}s\\n' https://api.printquest.dev/health`,
+traceroute api.cloudshop.dev 2>/dev/null || tracepath api.cloudshop.dev
+nc -zv api.cloudshop.dev 443   # porta aberta?
+curl -sS -o /dev/null -w '%{http_code} %{time_total}s\\n' https://api.cloudshop.dev/health`,
           },
         ],
         whyItMatters: "Sem entender rede você não consegue desenhar VPC, depurar Kubernetes nem explicar por que o serviço interno não é alcançável.",
@@ -76,7 +76,7 @@ curl -sS -o /dev/null -w '%{http_code} %{time_total}s\\n' https://api.printquest
           { term: "CIDR", definition: "Notação que combina endereço e tamanho do prefixo de rede, como 10.0.0.0/16." },
           { term: "gateway padrão", definition: "Roteador usado para destinos fora da rede local." },
         ],
-        printQuestLink: "Planejar as faixas 10.20.0.0/16 (dev) e 10.30.0.0/16 (staging) do PrintQuest.",
+        printQuestLink: "Planejar as faixas 10.20.0.0/16 (dev) e 10.30.0.0/16 (staging) do CloudShop.",
         quiz: [
           {
             question: "Quantos endereços utilizáveis tem uma sub-rede /24?",
@@ -104,12 +104,12 @@ curl -sS -o /dev/null -w '%{http_code} %{time_total}s\\n' https://api.printquest
           {
             label: "Diagnóstico de DNS",
             language: "bash",
-            code: `dig api.printquest.dev +short
-dig api.printquest.dev A +noall +answer      # inclui TTL
-dig NS printquest.dev +short                  # servidores autoritativos
-dig @1.1.1.1 api.printquest.dev +short        # resolvedor publico
-dig +trace api.printquest.dev | tail -20
-dig TXT printquest.dev +short
+            code: `dig api.cloudshop.dev +short
+dig api.cloudshop.dev A +noall +answer      # inclui TTL
+dig NS cloudshop.dev +short                  # servidores autoritativos
+dig @1.1.1.1 api.cloudshop.dev +short        # resolvedor publico
+dig +trace api.cloudshop.dev | tail -20
+dig TXT cloudshop.dev +short
 resolvectl status | head -20                   # resolvedor local`,
           },
         ],
@@ -121,7 +121,7 @@ resolvectl status | head -20                   # resolvedor local`,
           { term: "TTL", definition: "Tempo em segundos que um registro pode ficar em cache." },
           { term: "autoritativo", definition: "Servidor que detém oficialmente os registros da zona." },
         ],
-        printQuestLink: "Criar api.printquest.dev com TTL 60 durante a fase de migração.",
+        printQuestLink: "Criar api.cloudshop.dev com TTL 60 durante a fase de migração.",
         quiz: [
           {
             question: "Você mudou o registro A mas parte dos usuários ainda vai ao IP antigo. Causa mais provável?",
@@ -149,18 +149,18 @@ resolvectl status | head -20                   # resolvedor local`,
           {
             label: "curl para diagnóstico",
             language: "bash",
-            code: `curl -I https://api.printquest.dev/health
-curl -v https://api.printquest.dev/health 2>&1 | head -25
+            code: `curl -I https://api.cloudshop.dev/health
+curl -v https://api.cloudshop.dev/health 2>&1 | head -25
 
 curl -s -o /dev/null -w 'dns:%{time_namelookup} conn:%{time_connect} tls:%{time_appconnect} ttfb:%{time_starttransfer} total:%{time_total}\\n' \\
-  https://api.printquest.dev/health
+  https://api.cloudshop.dev/health
 
-curl -X POST https://api.printquest.dev/orders \\
+curl -X POST https://api.cloudshop.dev/orders \\
   -H 'Content-Type: application/json' \\
   -H "Authorization: Bearer $TOKEN" \\
   -d '{"productId":"cube-01","qty":2}' -i
 
-curl --resolve api.printquest.dev:443:203.0.113.10 https://api.printquest.dev/health -I`,
+curl --resolve api.cloudshop.dev:443:203.0.113.10 https://api.cloudshop.dev/health -I`,
             securityNote:
               "Passe tokens por variável de ambiente, nunca literal no comando: o histórico do shell guarda tudo.",
           },
@@ -173,7 +173,7 @@ curl --resolve api.printquest.dev:443:203.0.113.10 https://api.printquest.dev/he
           { term: "TTFB", definition: "Time To First Byte: tempo até o primeiro byte de resposta, útil para separar rede de processamento." },
           { term: "X-Forwarded-For", definition: "Cabeçalho que preserva o IP original do cliente atrás de proxies." },
         ],
-        printQuestLink: "Implementar /health e /ready na API do PrintQuest.",
+        printQuestLink: "Implementar /health e /ready na API do CloudShop.",
         quiz: [
           {
             question: "Qual opção do curl mostra apenas os cabeçalhos da resposta?",
@@ -201,14 +201,14 @@ curl --resolve api.printquest.dev:443:203.0.113.10 https://api.printquest.dev/he
           {
             label: "Inspecionar certificado e renovar",
             language: "bash",
-            code: `echo | openssl s_client -connect api.printquest.dev:443 -servername api.printquest.dev 2>/dev/null \\
+            code: `echo | openssl s_client -connect api.cloudshop.dev:443 -servername api.cloudshop.dev 2>/dev/null \\
   | openssl x509 -noout -subject -issuer -dates -ext subjectAltName
 
 # validade em dias
-END=$(echo | openssl s_client -connect api.printquest.dev:443 2>/dev/null | openssl x509 -noout -enddate | cut -d= -f2)
+END=$(echo | openssl s_client -connect api.cloudshop.dev:443 2>/dev/null | openssl x509 -noout -enddate | cut -d= -f2)
 echo "expira em: $END"
 
-sudo certbot --nginx -d api.printquest.dev --agree-tos -m voce@exemplo.com --non-interactive
+sudo certbot --nginx -d api.cloudshop.dev --agree-tos -m voce@exemplo.com --non-interactive
 sudo certbot renew --dry-run`,
             securityNote:
               "A chave privada do certificado deve ter permissão 600 e dono root. Nunca versione /etc/letsencrypt.",
@@ -223,7 +223,7 @@ sudo certbot renew --dry-run`,
           { term: "SAN", definition: "Subject Alternative Name: lista de domínios cobertos pelo certificado." },
           { term: "HSTS", definition: "Cabeçalho que obriga o navegador a usar HTTPS no domínio por um período." },
         ],
-        printQuestLink: "Emitir e renovar automaticamente o certificado de api.printquest.dev.",
+        printQuestLink: "Emitir e renovar automaticamente o certificado de api.cloudshop.dev.",
         quiz: [
           {
             question: "Erro de TLS só em clientes não-navegador geralmente indica:",
@@ -249,9 +249,9 @@ sudo certbot renew --dry-run`,
         ],
         code: [
           {
-            label: "Nginx como reverse proxy do PrintQuest",
+            label: "Nginx como reverse proxy do CloudShop",
             language: "nginx",
-            code: `upstream printquest_api {
+            code: `upstream cloudshop_api {
   server 127.0.0.1:3000 max_fails=3 fail_timeout=10s;
   keepalive 32;
 }
@@ -259,22 +259,22 @@ sudo certbot renew --dry-run`,
 server {
   listen 443 ssl;
   http2 on;
-  server_name api.printquest.dev;
+  server_name api.cloudshop.dev;
 
-  ssl_certificate     /etc/letsencrypt/live/api.printquest.dev/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/api.printquest.dev/privkey.pem;
+  ssl_certificate     /etc/letsencrypt/live/api.cloudshop.dev/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/api.cloudshop.dev/privkey.pem;
   ssl_protocols TLSv1.2 TLSv1.3;
 
-  access_log /var/log/nginx/printquest.access.log;
-  error_log  /var/log/nginx/printquest.error.log warn;
+  access_log /var/log/nginx/cloudshop.access.log;
+  error_log  /var/log/nginx/cloudshop.error.log warn;
 
   location /health {
-    proxy_pass http://printquest_api;
+    proxy_pass http://cloudshop_api;
     access_log off;
   }
 
   location / {
-    proxy_pass http://printquest_api;
+    proxy_pass http://cloudshop_api;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -288,7 +288,7 @@ server {
 
 server {
   listen 80;
-  server_name api.printquest.dev;
+  server_name api.cloudshop.dev;
   return 301 https://$host$request_uri;
 }`,
             securityNote:
@@ -298,18 +298,18 @@ server {
             label: "Diagnóstico de 5xx",
             language: "bash",
             code: `sudo nginx -t && sudo systemctl reload nginx
-sudo tail -50 /var/log/nginx/printquest.error.log
+sudo tail -50 /var/log/nginx/cloudshop.error.log
 
 # 502: o upstream aceita conexao?
 curl -sS -o /dev/null -w '%{http_code}\\n' http://127.0.0.1:3000/health
 ss -tulpn | grep :3000
-systemctl status printquest-api --no-pager
+systemctl status cloudshop-api --no-pager
 
 # 504: quanto tempo a rota realmente leva?
 curl -s -o /dev/null -w 'ttfb:%{time_starttransfer} total:%{time_total}\\n' http://127.0.0.1:3000/orders
 
 # taxa de erro por status no access log
-awk '{print $9}' /var/log/nginx/printquest.access.log | sort | uniq -c | sort -rn | head`,
+awk '{print $9}' /var/log/nginx/cloudshop.access.log | sort | uniq -c | sort -rn | head`,
           },
         ],
         whyItMatters: "Saber diferenciar 502, 503 e 504 sob pressão é literalmente uma pergunta de entrevista e uma tarefa de plantão.",
@@ -321,7 +321,7 @@ awk '{print $9}' /var/log/nginx/printquest.access.log | sort | uniq -c | sort -r
           { term: "upstream", definition: "Conjunto de servidores backend para onde o proxy encaminha requisições." },
           { term: "keepalive", definition: "Reuso de conexões TCP com o upstream, reduzindo latência." },
         ],
-        printQuestLink: "Colocar o Nginx na frente da API e do frontend do PrintQuest com TLS e timeouts definidos.",
+        printQuestLink: "Colocar o Nginx na frente da API e do frontend do CloudShop com TLS e timeouts definidos.",
         quiz: [
           {
             question: "O upstream aceitou a conexão mas demorou 40s. Qual status o Nginx retorna com read_timeout de 15s?",
@@ -370,7 +370,7 @@ awk '{print $9}' /var/log/nginx/printquest.access.log | sort | uniq -c | sort -r
       "Como reverter algo já publicado sem reescrever histórico?",
       "O que faz set -euo pipefail e por que é obrigatório em script de automação?",
     ],
-    printQuest: "Proteger o repositório printquest-app e automatizar verificação e backup no host.",
+    printQuest: "Proteger o repositório cloudshop-app e automatizar verificação e backup no host.",
     lessons: [
       {
         id: "l-3-1",
@@ -411,7 +411,7 @@ git log --oneline --graph --decorate -10`,
           { term: "trunk-based", definition: "Estratégia com branches curtas integradas frequentemente na main." },
           { term: "squash merge", definition: "Merge que condensa todos os commits do PR em um único commit." },
         ],
-        printQuestLink: "Abrir o PR do endpoint /health no printquest-app com CI obrigatório.",
+        printQuestLink: "Abrir o PR do endpoint /health no cloudshop-app com CI obrigatório.",
         quiz: [
           {
             question: "Qual prática reduz conflitos de merge?",
@@ -464,7 +464,7 @@ git diff origin/main...HEAD      # o que a minha branch muda`,
           { term: "reflog", definition: "Registro local de todas as posições de HEAD, permitindo recuperar commits 'perdidos'." },
           { term: "force-with-lease", definition: "Push forçado que falha se o remoto tiver commits que você não viu." },
         ],
-        printQuestLink: "Reverter uma mudança de configuração que quebrou o build do PrintQuest.",
+        printQuestLink: "Reverter uma mudança de configuração que quebrou o build do CloudShop.",
         quiz: [
           {
             question: "Qual comando desfaz um commit já publicado sem reescrever a história?",
@@ -490,7 +490,7 @@ git diff origin/main...HEAD      # o que a minha branch muda`,
         ],
         code: [
           {
-            label: "Release do PrintQuest",
+            label: "Release do CloudShop",
             language: "bash",
             code: `git tag -a v1.2.0 -m "feat: catalogo com filtro por material"
 git push origin v1.2.0
@@ -500,8 +500,8 @@ gh release create v1.2.0 --generate-notes
 git describe --tags --abbrev=0        # ultima tag alcancavel
 git log v1.1.0..v1.2.0 --oneline      # o que entrou na versao
 
-docker build -t ghcr.io/tiago/printquest-api:v1.2.0 .
-docker push ghcr.io/tiago/printquest-api:v1.2.0`,
+docker build -t ghcr.io/sua-org/cloudshop-api:v1.2.0 .
+docker push ghcr.io/sua-org/cloudshop-api:v1.2.0`,
           },
         ],
         whyItMatters: "Sem versão imutável não existe rollback confiável nem auditoria do que está rodando.",
@@ -512,7 +512,7 @@ docker push ghcr.io/tiago/printquest-api:v1.2.0`,
           { term: "SemVer", definition: "Convenção de versionamento MAJOR.MINOR.PATCH com significado definido." },
           { term: "digest", definition: "Hash sha256 que identifica de forma imutável o conteúdo de uma imagem." },
         ],
-        printQuestLink: "Publicar a v1.0.0 do PrintQuest com notas de release geradas do histórico.",
+        printQuestLink: "Publicar a v1.0.0 do CloudShop com notas de release geradas do histórico.",
         quiz: [
           {
             question: "Correção de bug sem quebra de contrato incrementa qual número?",
@@ -538,13 +538,13 @@ docker push ghcr.io/tiago/printquest-api:v1.2.0`,
         ],
         code: [
           {
-            label: "Health-check do PrintQuest em Bash",
+            label: "Health-check do CloudShop em Bash",
             language: "bash",
             code: `#!/usr/bin/env bash
 set -euo pipefail
 IFS=$'\\n\\t'
 
-URL="\${1:-https://api.printquest.dev/health}"
+URL="\${1:-https://api.cloudshop.dev/health}"
 TIMEOUT="\${TIMEOUT:-5}"
 RETRIES=3
 
@@ -612,8 +612,8 @@ exit 3`,
             code: `#!/usr/bin/env bash
 set -euo pipefail
 
-SRC="/var/log/printquest"
-DEST="/var/backups/printquest"
+SRC="/var/log/cloudshop"
+DEST="/var/backups/cloudshop"
 KEEP_DAYS=14
 STAMP="$(date +%F-%H%M)"
 FILE="$DEST/logs-$STAMP.tar.gz"
@@ -630,15 +630,15 @@ echo "backup ok: $FILE ($(du -h "$FILE" | cut -f1))"`,
           {
             label: "Agendamento com systemd timer",
             language: "ini",
-            code: `# /etc/systemd/system/printquest-backup.service
+            code: `# /etc/systemd/system/cloudshop-backup.service
 [Unit]
-Description=Backup dos logs do PrintQuest
+Description=Backup dos logs do CloudShop
 
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/backup-logs.sh
 
-# /etc/systemd/system/printquest-backup.timer
+# /etc/systemd/system/cloudshop-backup.timer
 [Unit]
 Description=Executa backup diario 03:15
 
@@ -649,8 +649,8 @@ Persistent=true
 [Install]
 WantedBy=timers.target
 
-# sudo systemctl enable --now printquest-backup.timer
-# systemctl list-timers | grep printquest`,
+# sudo systemctl enable --now cloudshop-backup.timer
+# systemctl list-timers | grep cloudshop`,
           },
         ],
         whyItMatters: "Automatizar o repetitivo libera tempo para engenharia e reduz erro humano em madrugada de plantão.",
@@ -662,7 +662,7 @@ WantedBy=timers.target
           { term: "idempotente", definition: "Operação cujo resultado é o mesmo ao ser executada mais de uma vez." },
           { term: "Persistent", definition: "Opção de timer que executa a tarefa perdida após o host voltar." },
         ],
-        printQuestLink: "Agendar backup diário dos logs do PrintQuest com retenção de 14 dias.",
+        printQuestLink: "Agendar backup diário dos logs do CloudShop com retenção de 14 dias.",
         quiz: [
           {
             question: "O que valida que o backup gerado é utilizável?",

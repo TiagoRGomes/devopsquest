@@ -17,7 +17,7 @@ export const Route = createFileRoute("/dashboard")({
       {
         name: "description",
         content:
-          "Seu painel de progresso na jornada DevOps: XP, nível, próxima aula, laboratórios e projeto PrintQuest.",
+          "Seu painel de progresso na jornada DevOps: XP, nível, próxima aula, laboratórios e projeto CloudShop.",
       },
       { property: "og:title", content: "Painel — Jornada DevOps" },
       { property: "og:description", content: "Acompanhe XP, nível, streak e a próxima etapa da sua trilha DevOps." },
@@ -182,7 +182,7 @@ function Dashboard() {
           </Panel>
 
           <Panel>
-            <SectionTitle eyebrow={t("dash.portfolioEyebrow")} title="PrintQuest" />
+            <SectionTitle eyebrow={t("dash.portfolioEyebrow")} title="CloudShop" />
             <p className="mt-3 text-sm text-muted-foreground">
               {t("dash.portfolioStepsDone", { done: progress.completedProjectSteps.length, total: PROJECT_STEPS.length })}
             </p>

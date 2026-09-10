@@ -70,8 +70,8 @@ echo "falhas: $falhas"; exit $(( falhas > 0 ))`,
     commands: {
       label: "Perfil e orçamento",
       language: "bash",
-      code: `aws configure --profile printquest
-export AWS_PROFILE=printquest
+      code: `aws configure --profile cloudshop
+export AWS_PROFILE=cloudshop
 aws sts get-caller-identity
 
 ACC=$(aws sts get-caller-identity --query Account --output text)
@@ -134,15 +134,15 @@ du -xh --max-depth=1 /var | sort -h | tail`,
     id: "lab-1-2",
     moduleId: "mod-1",
     title: "Serviço systemd resiliente a reboot e falha",
-    goal: "Colocar a API do PrintQuest sob systemd com usuário dedicado, restart automático e logs no journal.",
+    goal: "Colocar a API do CloudShop sob systemd com usuário dedicado, restart automático e logs no journal.",
     professionalContext: "Todo serviço em VM precisa subir no boot e voltar após falha, sem intervenção humana.",
     minutes: 50,
     difficulty: "Intermediário",
     prerequisites: ["Aula 1.3"],
     environment: "Linux com systemd (WSL2 com systemd habilitado ou VM)",
     steps: [
-      "Criar usuário de sistema printquest sem shell",
-      "Criar /opt/printquest com dono correto e um server.js mínimo",
+      "Criar usuário de sistema cloudshop sem shell",
+      "Criar /opt/cloudshop com dono correto e um server.js mínimo",
       "Escrever a unit com EnvironmentFile e Restart=on-failure",
       "Habilitar, iniciar e validar com status e curl",
       "Matar o processo e confirmar que ele volta sozinho",
@@ -150,23 +150,23 @@ du -xh --max-depth=1 /var | sort -h | tail`,
     commands: {
       label: "Criar e testar o serviço",
       language: "bash",
-      code: `sudo useradd --system --no-create-home --shell /usr/sbin/nologin printquest
-sudo mkdir -p /opt/printquest /etc/printquest
-sudo tee /opt/printquest/server.js >/dev/null <<'EOF'
+      code: `sudo useradd --system --no-create-home --shell /usr/sbin/nologin cloudshop
+sudo mkdir -p /opt/cloudshop /etc/cloudshop
+sudo tee /opt/cloudshop/server.js >/dev/null <<'EOF'
 const http = require("http");
 http.createServer((req,res)=>{res.writeHead(200,{"Content-Type":"application/json"});res.end('{"status":"ok"}')})
   .listen(process.env.PORT || 3000, () => console.log("ouvindo"));
 EOF
-echo 'PORT=3000' | sudo tee /etc/printquest/app.env
-sudo chmod 640 /etc/printquest/app.env
-sudo chown -R printquest:printquest /opt/printquest /etc/printquest
+echo 'PORT=3000' | sudo tee /etc/cloudshop/app.env
+sudo chmod 640 /etc/cloudshop/app.env
+sudo chown -R cloudshop:cloudshop /opt/cloudshop /etc/cloudshop
 
 sudo systemctl daemon-reload
-sudo systemctl enable --now printquest-api
+sudo systemctl enable --now cloudshop-api
 curl -s localhost:3000 && echo
-sudo pkill -f 'node /opt/printquest/server.js'
-sleep 4 && systemctl status printquest-api --no-pager | head -5
-journalctl -u printquest-api -n 20 --no-pager`,
+sudo pkill -f 'node /opt/cloudshop/server.js'
+sleep 4 && systemctl status cloudshop-api --no-pager | head -5
+journalctl -u cloudshop-api -n 20 --no-pager`,
       securityNote: "app.env com 640 e dono do serviço: variáveis de ambiente não devem ser legíveis por qualquer usuário.",
     },
     validation: [
@@ -234,7 +234,7 @@ df -h /var`,
     prerequisites: ["Aulas 2.3 a 2.5", "API rodando na 3000"],
     environment: "Linux com Nginx e certbot (ou certificado autoassinado local)",
     steps: [
-      "Instalar Nginx e criar o site do PrintQuest",
+      "Instalar Nginx e criar o site do CloudShop",
       "Configurar upstream, proxy_set_header e timeouts",
       "Emitir certificado (certbot ou autoassinado para laboratório)",
       "Redirecionar HTTP para HTTPS",
@@ -325,7 +325,7 @@ dig TXT exemplo.com +short`,
       label: "Medição repetida",
       language: "bash",
       code: `FMT='dns:%{time_namelookup} conn:%{time_connect} tls:%{time_appconnect} ttfb:%{time_starttransfer} total:%{time_total}\\n'
-for i in $(seq 1 20); do curl -s -o /dev/null -w "$FMT" https://api.printquest.dev/health; done | tee /tmp/lat.txt
+for i in $(seq 1 20); do curl -s -o /dev/null -w "$FMT" https://api.cloudshop.dev/health; done | tee /tmp/lat.txt
 
 awk -F'total:' '{print $2}' /tmp/lat.txt | sort -n | awk '{a[NR]=$1} END{print "mediana:",a[int(NR/2)],"max:",a[NR]}'`,
     },
@@ -401,9 +401,9 @@ git log --oneline --graph -5`,
       label: "Testar o script",
       language: "bash",
       code: `shellcheck scripts/health-check.sh
-./scripts/health-check.sh https://api.printquest.dev/health; echo "exit=$?"
+./scripts/health-check.sh https://api.cloudshop.dev/health; echo "exit=$?"
 ./scripts/health-check.sh https://localhost:9999/health; echo "exit=$?"
-TIMEOUT=1 ./scripts/health-check.sh https://api.printquest.dev/health; echo "exit=$?"`,
+TIMEOUT=1 ./scripts/health-check.sh https://api.cloudshop.dev/health; echo "exit=$?"`,
     },
     validation: ["exit 0 no caminho felizardo", "exit 3 quando o serviço não responde", "shellcheck sem avisos"],
     commonErrors: [
@@ -435,13 +435,13 @@ TIMEOUT=1 ./scripts/health-check.sh https://api.printquest.dev/health; echo "exi
       label: "Backup, agendamento e restauração",
       language: "bash",
       code: `sudo install -m 0755 scripts/backup-logs.sh /usr/local/bin/backup-logs.sh
-sudo systemctl enable --now printquest-backup.timer
-systemctl list-timers | grep printquest
-sudo systemctl start printquest-backup.service
-journalctl -u printquest-backup -n 20 --no-pager
+sudo systemctl enable --now cloudshop-backup.timer
+systemctl list-timers | grep cloudshop
+sudo systemctl start cloudshop-backup.service
+journalctl -u cloudshop-backup -n 20 --no-pager
 
 # restauracao de teste
-mkdir -p /tmp/restore && tar -xzf /var/backups/printquest/$(ls -t /var/backups/printquest | head -1) -C /tmp/restore
+mkdir -p /tmp/restore && tar -xzf /var/backups/cloudshop/$(ls -t /var/backups/cloudshop | head -1) -C /tmp/restore
 ls -la /tmp/restore | head`,
       securityNote: "Diretório de backup com permissão 700: logs podem conter dado pessoal.",
     },
@@ -458,7 +458,7 @@ ls -la /tmp/restore | head`,
   lab({
     id: "lab-4-1",
     moduleId: "mod-4",
-    title: "Stack PrintQuest completo com Docker Compose",
+    title: "Stack CloudShop completo com Docker Compose",
     goal: "Subir Vue + API Node + PostgreSQL com healthchecks e persistência em um comando.",
     professionalContext: "Ambiente de desenvolvimento reproduzível é entrega padrão de quem cuida de plataforma.",
     minutes: 75,
@@ -479,12 +479,12 @@ ls -la /tmp/restore | head`,
 docker compose up -d --build
 docker compose ps
 docker compose exec api sh -c 'getent hosts db && wget -qO- http://127.0.0.1:3000/health'
-docker compose exec db psql -U printquest -d printquest -c 'select 1;'
+docker compose exec db psql -U cloudshop -d cloudshop -c 'select 1;'
 
 # persistencia
-docker compose exec db psql -U printquest -d printquest -c "create table if not exists t(id int); insert into t values (1);"
+docker compose exec db psql -U cloudshop -d cloudshop -c "create table if not exists t(id int); insert into t values (1);"
 docker compose down && docker compose up -d
-docker compose exec db psql -U printquest -d printquest -c "select count(*) from t;"`,
+docker compose exec db psql -U cloudshop -d cloudshop -c "select count(*) from t;"`,
     },
     validation: ["Três serviços healthy", "API resolve o banco pelo nome do serviço", "Dados sobrevivem a down/up"],
     commonErrors: [
@@ -515,16 +515,16 @@ docker compose exec db psql -U printquest -d printquest -c "select count(*) from
     commands: {
       label: "Medir e otimizar",
       language: "bash",
-      code: `docker images printquest-api --format '{{.Tag}}\\t{{.Size}}'
-docker history printquest-api:antes --human --format '{{.Size}}\\t{{.CreatedBy}}' | head -10
+      code: `docker images cloudshop-api --format '{{.Tag}}\\t{{.Size}}'
+docker history cloudshop-api:antes --human --format '{{.Size}}\\t{{.CreatedBy}}' | head -10
 
-DOCKER_BUILDKIT=1 docker build -t printquest-api:depois ./api
-docker images | grep printquest-api
+DOCKER_BUILDKIT=1 docker build -t cloudshop-api:depois ./api
+docker images | grep cloudshop-api
 
 # validar que continua funcionando
-docker run --rm -d --name t -p 3001:3000 printquest-api:depois
+docker run --rm -d --name t -p 3001:3000 cloudshop-api:depois
 sleep 2 && curl -s localhost:3001/health && docker rm -f t
-trivy image --severity HIGH,CRITICAL printquest-api:depois | tail -5`,
+trivy image --severity HIGH,CRITICAL cloudshop-api:depois | tail -5`,
     },
     validation: ["Imagem final abaixo de 200 MB", "Aplicação continua respondendo", "Nenhuma vulnerabilidade crítica com correção disponível"],
     commonErrors: [
@@ -558,7 +558,7 @@ trivy image --severity HIGH,CRITICAL printquest-api:depois | tail -5`,
       code: `docker run -d --name api-hard \\
   --user 10001:10001 --read-only --tmpfs /tmp \\
   --cap-drop ALL --security-opt no-new-privileges \\
-  --memory 256m --cpus 0.5 -p 3002:3000 printquest-api:depois
+  --memory 256m --cpus 0.5 -p 3002:3000 cloudshop-api:depois
 
 docker exec api-hard id
 docker exec api-hard sh -c 'touch /app/teste' || echo "filesystem read-only confirmado"
@@ -634,9 +634,9 @@ gh api repos/:owner/:repo/branches/main/protection --jq '.required_status_checks
       code: `git tag -a v0.1.0 -m "primeira imagem" && git push origin v0.1.0
 gh run watch
 
-docker pull ghcr.io/tiago/printquest/api:0.1.0
-docker inspect --format '{{index .RepoDigests 0}}' ghcr.io/tiago/printquest/api:0.1.0
-docker run --rm -d -p 3003:3000 ghcr.io/tiago/printquest/api@sha256:<digest>
+docker pull ghcr.io/sua-org/cloudshop/api:0.1.0
+docker inspect --format '{{index .RepoDigests 0}}' ghcr.io/sua-org/cloudshop/api:0.1.0
+docker run --rm -d -p 3003:3000 ghcr.io/sua-org/cloudshop/api@sha256:<digest>
 curl -s localhost:3003/health`,
     },
     validation: ["Tag semântica e tag por SHA publicadas", "Digest registrado no repositório", "Imagem roda a partir do digest"],
@@ -674,7 +674,7 @@ gh run watch
 # versao intencionalmente quebrada
 gh workflow run deploy-e-rollback.yml -f versao=v0.0.0-broken -f acao=deploy
 gh run view --log | grep -E "rollback|health"
-curl -s -o /dev/null -w '%{http_code}\\n' https://api.printquest.dev/health`,
+curl -s -o /dev/null -w '%{http_code}\\n' https://api.cloudshop.dev/health`,
     },
     validation: ["Deploy ruim é revertido automaticamente", "Serviço volta a responder 200", "Tempo de restauração registrado"],
     commonErrors: [
@@ -689,7 +689,7 @@ curl -s -o /dev/null -w '%{http_code}\\n' https://api.printquest.dev/health`,
   lab({
     id: "lab-6-1",
     moduleId: "mod-6",
-    title: "VPC do PrintQuest com subnets pública e privada",
+    title: "VPC do CloudShop com subnets pública e privada",
     goal: "Construir a rede completa e provar que a subnet privada não é alcançável de fora.",
     professionalContext: "Base de qualquer ambiente de nuvem auditável.",
     minutes: 70,
@@ -752,8 +752,8 @@ aws ec2 delete-vpc --vpc-id "$VPC_ID"`,
       label: "Publicar e validar",
       language: "bash",
       code: `npm run build
-aws s3 sync ./dist s3://printquest-web-dev --delete
-aws s3api get-public-access-block --bucket printquest-web-dev
+aws s3 sync ./dist s3://cloudshop-web-dev --delete
+aws s3api get-public-access-block --bucket cloudshop-web-dev
 
 curl -I https://d111111abcdef8.cloudfront.net
 aws cloudfront create-invalidation --distribution-id E123456 --paths "/*"
@@ -788,16 +788,16 @@ curl -s -o /dev/null -w '%{http_code} %{time_total}\\n' https://d111111abcdef8.c
     commands: {
       label: "Criar, testar e restaurar",
       language: "bash",
-      code: `aws rds describe-db-instances --db-instance-identifier printquest-dev \\
+      code: `aws rds describe-db-instances --db-instance-identifier cloudshop-dev \\
   --query 'DBInstances[0].{Publico:PubliclyAccessible,Backup:BackupRetentionPeriod,Cripto:StorageEncrypted}'
 
 aws secretsmanager get-secret-value --secret-id "$SECRET_ARN" --query SecretString --output text | jq -r .password | head -c0
 
-ssh -L 5432:printquest-dev.xxxx.us-east-1.rds.amazonaws.com:5432 bastion
-psql -h localhost -U printquest -d printquest -c "create table pedido(id serial); insert into pedido default values;"
+ssh -L 5432:cloudshop-dev.xxxx.us-east-1.rds.amazonaws.com:5432 bastion
+psql -h localhost -U cloudshop -d cloudshop -c "create table pedido(id serial); insert into pedido default values;"
 
-aws rds create-db-snapshot --db-instance-identifier printquest-dev --db-snapshot-identifier pq-teste
-aws rds restore-db-instance-from-db-snapshot --db-instance-identifier printquest-restore --db-snapshot-identifier pq-teste`,
+aws rds create-db-snapshot --db-instance-identifier cloudshop-dev --db-snapshot-identifier pq-teste
+aws rds restore-db-instance-from-db-snapshot --db-instance-identifier cloudshop-restore --db-snapshot-identifier pq-teste`,
       securityNote: "Nunca imprima a senha do banco no terminal ou em log de pipeline.",
     },
     validation: ["PubliclyAccessible = false", "Backup com retenção maior que zero", "Dado presente na instância restaurada"],
@@ -830,8 +830,8 @@ aws rds restore-db-instance-from-db-snapshot --db-instance-identifier printquest
     commands: {
       label: "Fluxo dos dois ambientes",
       language: "bash",
-      code: `aws s3api create-bucket --bucket printquest-tfstate
-aws s3api put-bucket-versioning --bucket printquest-tfstate --versioning-configuration Status=Enabled
+      code: `aws s3api create-bucket --bucket cloudshop-tfstate
+aws s3api put-bucket-versioning --bucket cloudshop-tfstate --versioning-configuration Status=Enabled
 
 cd infra/envs/dev && terraform init && terraform plan -out=p && terraform apply p
 terraform plan -detailed-exitcode; echo "exit=$?"     # esperado 0
@@ -932,7 +932,7 @@ ansible-playbook -i inventory.ini site.yml | grep -E 'changed=[0-9]+'   # deve s
   lab({
     id: "lab-8-1",
     moduleId: "mod-8",
-    title: "PrintQuest no Kubernetes (Kind) de ponta a ponta",
+    title: "CloudShop no Kubernetes (Kind) de ponta a ponta",
     goal: "Rodar web, API e banco no cluster com Service, Ingress e Secret.",
     professionalContext: "Migração de Compose para Kubernetes é tarefa recorrente em empresas em transição.",
     minutes: 90,
@@ -949,16 +949,16 @@ ansible-playbook -i inventory.ini site.yml | grep -E 'changed=[0-9]+'   # deve s
     commands: {
       label: "Subir e validar",
       language: "bash",
-      code: `kind create cluster --name printquest --config kind.yaml
+      code: `kind create cluster --name cloudshop --config kind.yaml
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 kubectl -n ingress-nginx wait --for=condition=ready pod -l app.kubernetes.io/component=controller --timeout=180s
 
-kubectl create namespace printquest
-kubectl -n printquest create secret generic printquest-db --from-literal=password="$(openssl rand -base64 24)"
-kubectl -n printquest apply -f k8s/
-kubectl -n printquest get pods,svc,ingress
-kubectl -n printquest get endpoints
-curl -H "Host: printquest.dev" http://localhost/api/health`,
+kubectl create namespace cloudshop
+kubectl -n cloudshop create secret generic cloudshop-db --from-literal=password="$(openssl rand -base64 24)"
+kubectl -n cloudshop apply -f k8s/
+kubectl -n cloudshop get pods,svc,ingress
+kubectl -n cloudshop get endpoints
+curl -H "Host: cloudshop.dev" http://localhost/api/health`,
       securityNote: "Secret criado por comando não fica no Git — no módulo 9 ele passa a vir do cofre.",
     },
     validation: ["Todos os pods Running e Ready", "Endpoints preenchidos em cada Service", "curl pelo Ingress retorna 200"],
@@ -990,14 +990,14 @@ curl -H "Host: printquest.dev" http://localhost/api/health`,
     commands: {
       label: "Provocar e diagnosticar",
       language: "bash",
-      code: `kubectl -n printquest set resources deploy/printquest-api --limits=memory=32Mi
-kubectl -n printquest get pods -w | head -10
-kubectl -n printquest describe pod -l component=api | grep -A6 'Last State'
-kubectl -n printquest get pod -l component=api -o jsonpath='{.items[0].status.containerStatuses[0].lastState.terminated.reason}'
+      code: `kubectl -n cloudshop set resources deploy/cloudshop-api --limits=memory=32Mi
+kubectl -n cloudshop get pods -w | head -10
+kubectl -n cloudshop describe pod -l component=api | grep -A6 'Last State'
+kubectl -n cloudshop get pod -l component=api -o jsonpath='{.items[0].status.containerStatuses[0].lastState.terminated.reason}'
 
-kubectl top pods -n printquest
-kubectl -n printquest set resources deploy/printquest-api --requests=memory=128Mi --limits=memory=256Mi
-kubectl -n printquest rollout status deploy/printquest-api`,
+kubectl top pods -n cloudshop
+kubectl -n cloudshop set resources deploy/cloudshop-api --requests=memory=128Mi --limits=memory=256Mi
+kubectl -n cloudshop rollout status deploy/cloudshop-api`,
     },
     validation: ["OOMKilled reproduzido e explicado", "Limite ajustado com base em kubectl top", "Sem tráfego antes de Ready"],
     commonErrors: [
@@ -1012,7 +1012,7 @@ kubectl -n printquest rollout status deploy/printquest-api`,
     id: "lab-8-3",
     moduleId: "mod-8",
     title: "Chart Helm com rollback comprovado",
-    goal: "Empacotar o PrintQuest, implantar duas versões e reverter.",
+    goal: "Empacotar o CloudShop, implantar duas versões e reverter.",
     professionalContext: "Rollback treinado é o que dá coragem para implantar com frequência.",
     minutes: 70,
     difficulty: "Avançado",
@@ -1028,17 +1028,17 @@ kubectl -n printquest rollout status deploy/printquest-api`,
     commands: {
       label: "Ciclo completo",
       language: "bash",
-      code: `helm lint charts/printquest
-helm upgrade --install printquest charts/printquest -n printquest \\
+      code: `helm lint charts/cloudshop
+helm upgrade --install cloudshop charts/cloudshop -n cloudshop \\
   --set image.tag=v0.1.0 --atomic --wait --timeout 3m
 
-helm history printquest -n printquest
-helm upgrade printquest charts/printquest -n printquest --set image.tag=nao-existe --wait --timeout 90s || echo "upgrade falhou"
-kubectl -n printquest get pods
+helm history cloudshop -n cloudshop
+helm upgrade cloudshop charts/cloudshop -n cloudshop --set image.tag=nao-existe --wait --timeout 90s || echo "upgrade falhou"
+kubectl -n cloudshop get pods
 
-time helm rollback printquest 1 -n printquest
-kubectl -n printquest rollout status deploy/printquest-api
-curl -H "Host: printquest.dev" -s -o /dev/null -w '%{http_code}\\n' http://localhost/api/health`,
+time helm rollback cloudshop 1 -n cloudshop
+kubectl -n cloudshop rollout status deploy/cloudshop-api
+curl -H "Host: cloudshop.dev" -s -o /dev/null -w '%{http_code}\\n' http://localhost/api/health`,
     },
     validation: ["Histórico com múltiplas revisões", "Rollback restaura o serviço", "Tempo de rollback medido"],
     commonErrors: [
@@ -1053,7 +1053,7 @@ curl -H "Host: printquest.dev" -s -o /dev/null -w '%{http_code}\\n' http://local
   lab({
     id: "lab-9-1",
     moduleId: "mod-9",
-    title: "ArgoCD sincronizando o PrintQuest",
+    title: "ArgoCD sincronizando o CloudShop",
     goal: "Colocar o cluster sob GitOps e provar o self-heal.",
     professionalContext: "Modelo de entrega padrão em plataformas Kubernetes modernas.",
     minutes: 75,
@@ -1062,7 +1062,7 @@ curl -H "Host: printquest.dev" -s -o /dev/null -w '%{http_code}\\n' http://local
     environment: "Kind + ArgoCD + repositório GitOps",
     steps: [
       "Instalar o ArgoCD e acessar a interface",
-      "Criar o repositório printquest-gitops com base e overlays",
+      "Criar o repositório cloudshop-gitops com base e overlays",
       "Declarar a Application de staging com auto-sync e selfHeal",
       "Alterar manualmente um Deployment e observar a reversão",
       "Alterar o Git e observar o sync automático",
@@ -1070,14 +1070,14 @@ curl -H "Host: printquest.dev" -s -o /dev/null -w '%{http_code}\\n' http://local
     commands: {
       label: "Provar o self-heal",
       language: "bash",
-      code: `argocd app get printquest-staging
-kubectl -n printquest scale deploy/printquest-api --replicas=5
-sleep 20 && kubectl -n printquest get deploy printquest-api -o jsonpath='{.spec.replicas}{"\\n"}'   # volta ao valor do Git
+      code: `argocd app get cloudshop-staging
+kubectl -n cloudshop scale deploy/cloudshop-api --replicas=5
+sleep 20 && kubectl -n cloudshop get deploy cloudshop-api -o jsonpath='{.spec.replicas}{"\\n"}'   # volta ao valor do Git
 
-cd printquest-gitops/overlays/staging
-kustomize edit set image ghcr.io/tiago/printquest/api=ghcr.io/tiago/printquest/api:v0.2.0
+cd cloudshop-gitops/overlays/staging
+kustomize edit set image ghcr.io/sua-org/cloudshop/api=ghcr.io/sua-org/cloudshop/api:v0.2.0
 git commit -am "chore: api v0.2.0" && git push
-argocd app wait printquest-staging --health --timeout 180`,
+argocd app wait cloudshop-staging --health --timeout 180`,
       securityNote: "Use deploy key com permissão de leitura para o ArgoCD acessar o repositório privado.",
     },
     validation: ["Application Synced e Healthy", "Alteração manual revertida automaticamente", "Commit no Git reflete no cluster"],
@@ -1109,12 +1109,12 @@ argocd app wait printquest-staging --health --timeout 180`,
     commands: {
       label: "Reverter e validar",
       language: "bash",
-      code: `git -C printquest-gitops log --oneline -3 -- overlays/producao
-git -C printquest-gitops revert --no-edit <sha-da-promocao>
-git -C printquest-gitops push
-argocd app sync printquest-producao && argocd app wait printquest-producao --health
-kubectl -n printquest get pods -l component=api
-argocd app history printquest-producao | tail -5`,
+      code: `git -C cloudshop-gitops log --oneline -3 -- overlays/producao
+git -C cloudshop-gitops revert --no-edit <sha-da-promocao>
+git -C cloudshop-gitops push
+argocd app sync cloudshop-producao && argocd app wait cloudshop-producao --health
+kubectl -n cloudshop get pods -l component=api
+argocd app history cloudshop-producao | tail -5`,
     },
     validation: ["Serviço saudável após o revert", "Histórico do ArgoCD registra a reversão", "Linha do tempo documentada"],
     commonErrors: [
@@ -1148,10 +1148,10 @@ argocd app history printquest-producao | tail -5`,
       code: `helm repo add external-secrets https://charts.external-secrets.io
 helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace
 
-kubectl -n printquest apply -f gitops/external-secret-db.yaml
-kubectl -n printquest get externalsecret printquest-db
-kubectl -n printquest get secret printquest-db -o jsonpath='{.data.password}' | base64 -d | wc -c
-grep -ri "password:" printquest-gitops/ || echo "nenhum segredo em texto no repositorio"`,
+kubectl -n cloudshop apply -f gitops/external-secret-db.yaml
+kubectl -n cloudshop get externalsecret cloudshop-db
+kubectl -n cloudshop get secret cloudshop-db -o jsonpath='{.data.password}' | base64 -d | wc -c
+grep -ri "password:" cloudshop-gitops/ || echo "nenhum segredo em texto no repositorio"`,
       securityNote: "Nunca imprima o valor do segredo; conte caracteres ou verifique apenas a existência.",
     },
     validation: ["Secret criado no cluster a partir do cofre", "Repositório sem valores sensíveis", "Rotação refletida no cluster"],
@@ -1167,7 +1167,7 @@ grep -ri "password:" printquest-gitops/ || echo "nenhum segredo em texto no repo
   lab({
     id: "lab-10-1",
     moduleId: "mod-10",
-    title: "Stack de observabilidade e dashboard do PrintQuest",
+    title: "Stack de observabilidade e dashboard do CloudShop",
     goal: "Subir Prometheus, Grafana e Loki e construir o dashboard que responde 'está tudo bem?'.",
     professionalContext: "Sem observabilidade, você descobre incidente pelo cliente.",
     minutes: 90,
@@ -1187,9 +1187,9 @@ grep -ri "password:" printquest-gitops/ || echo "nenhum segredo em texto no repo
       code: `helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm install kps prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
 
-kubectl -n printquest apply -f k8s/servicemonitor.yaml
+kubectl -n cloudshop apply -f k8s/servicemonitor.yaml
 kubectl -n monitoring port-forward svc/kps-kube-prometheus-stack-prometheus 9090:9090 &
-curl -s 'localhost:9090/api/v1/targets' | jq '.data.activeTargets[] | select(.labels.job|test("printquest")) | .health'
+curl -s 'localhost:9090/api/v1/targets' | jq '.data.activeTargets[] | select(.labels.job|test("cloudshop")) | .health'
 
 curl -sG 'localhost:9090/api/v1/query' --data-urlencode \\
   'query=sum(rate(http_request_duration_seconds_count[5m])) by (route)' | jq '.data.result | length'`,
@@ -1227,7 +1227,7 @@ curl -sG 'localhost:9090/api/v1/query' --data-urlencode \\
 kubectl -n monitoring exec deploy/kps-kube-prometheus-stack-operator -- true
 
 # gerar erros 5xx
-for i in $(seq 1 200); do curl -s -o /dev/null -H "Host: printquest.dev" http://localhost/api/erro-proposital; done
+for i in $(seq 1 200); do curl -s -o /dev/null -H "Host: cloudshop.dev" http://localhost/api/erro-proposital; done
 
 curl -s localhost:9090/api/v1/alerts | jq '.data.alerts[] | {nome:.labels.alertname, estado:.state}'
 kubectl -n monitoring port-forward svc/kps-kube-prometheus-stack-alertmanager 9093:9093 &
@@ -1263,13 +1263,13 @@ curl -s localhost:9093/api/v2/alerts | jq '.[].labels.alertname'`,
       label: "Gerar e inspecionar traces",
       language: "bash",
       code: `kubectl -n monitoring apply -f k8s/otel-collector.yaml
-kubectl -n printquest set env deploy/printquest-api \\
+kubectl -n cloudshop set env deploy/cloudshop-api \\
   OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector.monitoring:4318 OTEL_SAMPLE_RATIO=1
 
-for i in $(seq 1 30); do curl -s -o /dev/null -H "Host: printquest.dev" http://localhost/api/orders; done
+for i in $(seq 1 30); do curl -s -o /dev/null -H "Host: cloudshop.dev" http://localhost/api/orders; done
 kubectl -n monitoring logs deploy/otel-collector --tail=20
 kubectl -n monitoring port-forward svc/tempo 3200:3200 &
-curl -s 'localhost:3200/api/search?tags=service.name%3Dprintquest-api&limit=5' | jq '.traces[].durationMs'`,
+curl -s 'localhost:3200/api/search?tags=service.name%3Dcloudshop-api&limit=5' | jq '.traces[].durationMs'`,
       securityNote: "Confirme no Collector que headers de autorização estão sendo removidos antes da exportação.",
     },
     validation: ["Trace completo com spans de HTTP e banco", "Span dominante identificado", "Nenhum dado sensível nos atributos"],
@@ -1285,7 +1285,7 @@ curl -s 'localhost:3200/api/search?tags=service.name%3Dprintquest-api&limit=5' |
     id: "lab-10-4",
     moduleId: "mod-10",
     title: "SLO, error budget e postmortem",
-    goal: "Definir o SLO do PrintQuest, medir o budget e escrever um postmortem real.",
+    goal: "Definir o SLO do CloudShop, medir o budget e escrever um postmortem real.",
     professionalContext: "É o vocabulário que define maturidade de SRE em qualquer entrevista.",
     minutes: 70,
     difficulty: "Avançado",
@@ -1306,9 +1306,9 @@ curl -sG localhost:9090/api/v1/query --data-urlencode \\
  'query=sum(rate(http_request_duration_seconds_count{status!~"5.."}[30d]))/sum(rate(http_request_duration_seconds_count[30d]))' | jq -r '.data.result[0].value[1]'
 
 # incidente controlado
-kubectl -n printquest set image deploy/printquest-api api=ghcr.io/tiago/printquest/api:versao-ruim
+kubectl -n cloudshop set image deploy/cloudshop-api api=ghcr.io/sua-org/cloudshop/api:versao-ruim
 date -u +%FT%TZ   # inicio
-kubectl -n printquest rollout undo deploy/printquest-api
+kubectl -n cloudshop rollout undo deploy/cloudshop-api
 date -u +%FT%TZ   # fim`,
     },
     validation: ["SLO documentado com consulta e budget", "Impacto medido em minutos e em budget", "Postmortem publicado com ações"],
@@ -1341,7 +1341,7 @@ date -u +%FT%TZ   # fim`,
     commands: {
       label: "Varrer e prevenir",
       language: "bash",
-      code: `for repo in printquest-app printquest-infra printquest-gitops; do
+      code: `for repo in cloudshop-app cloudshop-infra cloudshop-gitops; do
   docker run --rm -v "$PWD/$repo:/repo" zricethezav/gitleaks:latest detect --source=/repo --redact --no-banner \\
     && echo "$repo: limpo" || echo "$repo: ACHADOS"
 done
@@ -1380,11 +1380,11 @@ gh workflow view seguranca.yml`,
       label: "Testar a política",
       language: "bash",
       code: `npm audit --audit-level=high || echo "bloqueado por dependencia"
-trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 printquest-api:ci
+trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 cloudshop-api:ci
 trivy config infra/
-syft printquest-api:ci -o spdx-json > sbom.json 2>/dev/null || docker sbom printquest-api:ci > sbom.txt
+syft cloudshop-api:ci -o spdx-json > sbom.json 2>/dev/null || docker sbom cloudshop-api:ci > sbom.txt
 cosign verify --certificate-oidc-issuer https://token.actions.githubusercontent.com \\
-  --certificate-identity-regexp ".*" ghcr.io/tiago/printquest/api:latest`,
+  --certificate-identity-regexp ".*" ghcr.io/sua-org/cloudshop/api:latest`,
     },
     validation: ["Build falha com vulnerabilidade crítica corrigível", "SBOM gerado", "Imagem verificável por assinatura"],
     commonErrors: [
@@ -1421,7 +1421,7 @@ cosign verify --certificate-oidc-issuer https://token.actions.githubusercontent.
 
 aws ec2 describe-addresses --query 'Addresses[?AssociationId==null].AllocationId'
 aws ec2 describe-volumes --filters Name=status,Values=available --query 'Volumes[].VolumeId'
-kubectl top pods -n printquest`,
+kubectl top pods -n cloudshop`,
       securityNote: "Automação de desligamento deve filtrar por tag env=dev; sem filtro, o risco é derrubar produção.",
     },
     validation: ["Redução de custo medida em percentual", "SLI mantido dentro da meta", "Otimizações documentadas"],
@@ -1437,12 +1437,12 @@ kubectl top pods -n printquest`,
     id: "lab-11-4",
     moduleId: "mod-11",
     title: "Portfólio final: README, ADRs e diagrama",
-    goal: "Deixar o PrintQuest pronto para ser avaliado por um recrutador técnico.",
+    goal: "Deixar o CloudShop pronto para ser avaliado por um recrutador técnico.",
     professionalContext: "É o artefato que converte estudo em entrevista.",
     minutes: 75,
     difficulty: "Intermediário",
     prerequisites: ["Aulas 11.4 e 11.5"],
-    environment: "Repositórios do PrintQuest",
+    environment: "Repositórios do CloudShop",
     steps: [
       "Escrever o README com arquitetura, deploy, observabilidade, rollback e custo",
       "Criar três ADRs das decisões principais",
@@ -1465,7 +1465,7 @@ flowchart LR
   API -.metrics.-> PROM[Prometheus]
   PROM --> GRAF[Grafana]
   GH[GitHub Actions] -->|imagem| GHCR[(GHCR)]
-  GH -->|PR de versao| GITOPS[(printquest-gitops)]
+  GH -->|PR de versao| GITOPS[(cloudshop-gitops)]
   ARGO[ArgoCD] --> ING
   GITOPS --> ARGO
 \`\`\``,
