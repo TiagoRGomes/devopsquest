@@ -161,7 +161,7 @@ export const CHALLENGES: Challenge[] = [
     xp: 250,
     tools: ["Kubernetes", "Helm"],
     brief:
-      "Rode o PrintQuest no cluster com Ingress, probes corretas, limites dimensionados por medição e rollback executado com tempo registrado.",
+      "Rode o CloudShop no cluster com Ingress, probes corretas, limites dimensionados por medição e rollback executado com tempo registrado.",
     acceptance: [
       "Probes separando liveness (sem dependências) de readiness (com dependências)",
       "requests/limits justificados por kubectl top, não por chute",
@@ -195,7 +195,7 @@ export const CHALLENGES: Challenge[] = [
     xp: 250,
     tools: ["Prometheus", "Grafana", "OpenTelemetry"],
     brief:
-      "Defina os SLOs do PrintQuest, conduza um incidente controlado e publique o postmortem sem culpa com ações, donos e prazos.",
+      "Defina os SLOs do CloudShop, conduza um incidente controlado e publique o postmortem sem culpa com ações, donos e prazos.",
     acceptance: [
       "Dois SLIs com consulta PromQL e metas justificadas",
       "Alertas por sintoma e por burn rate, com runbook vinculado",
@@ -220,10 +220,10 @@ export const BOSSES: BossBattle[] = [
       "journalctl registra reinícios sucessivos",
     ],
     investigation: [
-      { step: "Ver o estado da unidade e o erro exato", command: "systemctl status printquest-api --no-pager -l" },
+      { step: "Ver o estado da unidade e o erro exato", command: "systemctl status cloudshop-api --no-pager -l" },
       { step: "Descobrir quem ocupa a porta", command: "ss -tulpn | grep :3000" },
       { step: "Mapear a árvore de processos e os zumbis", command: "ps -eo pid,ppid,stat,etime,cmd | awk '$3 ~ /Z/ || /node/'" },
-      { step: "Ler o primeiro erro da unidade", command: "journalctl -u printquest-api -p err --since '20 min ago' --no-pager" },
+      { step: "Ler o primeiro erro da unidade", command: "journalctl -u cloudshop-api -p err --since '20 min ago' --no-pager" },
       { step: "Confirmar arquivos e sockets abertos", command: "sudo lsof -i :3000" },
     ],
     rootCause:
@@ -250,11 +250,11 @@ export const BOSSES: BossBattle[] = [
       "Uso de memória do host cresce até o momento das rajadas",
     ],
     investigation: [
-      { step: "Ler a mensagem exata do proxy", command: "sudo tail -100 /var/log/nginx/printquest.error.log" },
+      { step: "Ler a mensagem exata do proxy", command: "sudo tail -100 /var/log/nginx/cloudshop.error.log" },
       { step: "Testar o upstream diretamente", command: "curl -s -o /dev/null -w '%{http_code}\\n' http://127.0.0.1:3000/health" },
       { step: "Confirmar quem escuta a porta", command: "ss -tulpn | grep :3000" },
-      { step: "Ver reinícios e OOM na unidade", command: "journalctl -u printquest-api --since '1 hour ago' | grep -iE 'oom|killed|restart'" },
-      { step: "Correlacionar horário dos 502 com os reinícios", command: "awk '$9==502 {print $4}' /var/log/nginx/printquest.access.log | tail -20" },
+      { step: "Ver reinícios e OOM na unidade", command: "journalctl -u cloudshop-api --since '1 hour ago' | grep -iE 'oom|killed|restart'" },
+      { step: "Correlacionar horário dos 502 com os reinícios", command: "awk '$9==502 {print $4}' /var/log/nginx/cloudshop.access.log | tail -20" },
     ],
     rootCause:
       "A API era encerrada pelo OOM killer por vazamento de memória e reiniciada pelo systemd. Durante os segundos de reinício, o Nginx não conseguia conectar ao upstream e devolvia 502 — daí o padrão em rajadas.",
@@ -311,10 +311,10 @@ export const BOSSES: BossBattle[] = [
     ],
     investigation: [
       { step: "Ver o erro real da aplicação", command: "docker compose logs --tail=50 api" },
-      { step: "Confirmar a saúde do banco", command: "docker compose ps && docker compose exec db pg_isready -U printquest" },
+      { step: "Confirmar a saúde do banco", command: "docker compose ps && docker compose exec db pg_isready -U cloudshop" },
       { step: "Testar a resolução de nome dentro do container", command: "docker compose exec api getent hosts db" },
       { step: "Inspecionar as variáveis efetivas", command: "docker compose exec api env | grep -i database" },
-      { step: "Verificar o entrypoint e o comando", command: "docker inspect printquest-api --format '{{.Config.Entrypoint}} {{.Config.Cmd}}'" },
+      { step: "Verificar o entrypoint e o comando", command: "docker inspect cloudshop-api --format '{{.Config.Entrypoint}} {{.Config.Cmd}}'" },
     ],
     rootCause:
       "A aplicação conectava em 127.0.0.1, que dentro do container é o próprio container, e não o serviço do banco. Somado a isso, faltava healthcheck com depends_on condicionado, então a API subia antes de o banco aceitar conexões.",
@@ -372,7 +372,7 @@ export const BOSSES: BossBattle[] = [
     investigation: [
       { step: "Listar SGs com regras abertas ao mundo", command: "aws ec2 describe-security-groups --query 'SecurityGroups[?IpPermissions[?IpRanges[?CidrIp==`0.0.0.0/0`]]].{ID:GroupId,Nome:GroupName}'" },
       { step: "Confirmar se o banco é publicamente acessível", command: "aws rds describe-db-instances --query 'DBInstances[].{ID:DBInstanceIdentifier,Publico:PubliclyAccessible}'" },
-      { step: "Descobrir quem realmente precisa acessar", command: "aws ec2 describe-instances --filters Name=tag:project,Values=printquest --query 'Reservations[].Instances[].{ID:InstanceId,SGs:SecurityGroups[].GroupId}'" },
+      { step: "Descobrir quem realmente precisa acessar", command: "aws ec2 describe-instances --filters Name=tag:project,Values=cloudshop --query 'Reservations[].Instances[].{ID:InstanceId,SGs:SecurityGroups[].GroupId}'" },
       { step: "Auditar tentativas de acesso", command: "aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=ConsoleLogin --max-results 10" },
       { step: "Validar a nova regra antes de remover a antiga", command: "nc -zv $DB_ENDPOINT 5432" },
     ],
@@ -430,11 +430,11 @@ export const BOSSES: BossBattle[] = [
       "Logs do container terminam durante a inicialização",
     ],
     investigation: [
-      { step: "Ver estado e restarts", command: "kubectl -n printquest get pods -l component=api -o wide" },
-      { step: "Ler eventos e o motivo do término", command: "kubectl -n printquest describe pod <pod> | tail -30" },
-      { step: "Ler o log da execução anterior", command: "kubectl -n printquest logs <pod> --previous --tail=80" },
-      { step: "Confirmar OOMKilled", command: "kubectl -n printquest get pod <pod> -o jsonpath='{.status.containerStatuses[0].lastState.terminated.reason}'" },
-      { step: "Medir consumo real da versão saudável", command: "kubectl top pods -n printquest" },
+      { step: "Ver estado e restarts", command: "kubectl -n cloudshop get pods -l component=api -o wide" },
+      { step: "Ler eventos e o motivo do término", command: "kubectl -n cloudshop describe pod <pod> | tail -30" },
+      { step: "Ler o log da execução anterior", command: "kubectl -n cloudshop logs <pod> --previous --tail=80" },
+      { step: "Confirmar OOMKilled", command: "kubectl -n cloudshop get pod <pod> -o jsonpath='{.status.containerStatuses[0].lastState.terminated.reason}'" },
+      { step: "Medir consumo real da versão saudável", command: "kubectl top pods -n cloudshop" },
     ],
     rootCause:
       "A nova versão aumentou o consumo de memória na inicialização e excedeu o limite de 256Mi (OOMKilled). Em paralelo, a liveness probe com initialDelay curto matava o container antes de terminar a inicialização, criando o laço.",
@@ -460,11 +460,11 @@ export const BOSSES: BossBattle[] = [
       "Latência sobe durante as oscilações",
     ],
     investigation: [
-      { step: "Ver o status e a última sincronização", command: "argocd app get printquest-producao" },
-      { step: "Descobrir exatamente qual campo difere", command: "argocd app diff printquest-producao" },
-      { step: "Confirmar que o HPA está atuando", command: "kubectl -n printquest get hpa printquest-api" },
-      { step: "Ver o histórico de sync", command: "argocd app history printquest-producao" },
-      { step: "Verificar se alguém editou o cluster à mão", command: "kubectl -n printquest get deploy printquest-api -o jsonpath='{.metadata.annotations}'" },
+      { step: "Ver o status e a última sincronização", command: "argocd app get cloudshop-producao" },
+      { step: "Descobrir exatamente qual campo difere", command: "argocd app diff cloudshop-producao" },
+      { step: "Confirmar que o HPA está atuando", command: "kubectl -n cloudshop get hpa cloudshop-api" },
+      { step: "Ver o histórico de sync", command: "argocd app history cloudshop-producao" },
+      { step: "Verificar se alguém editou o cluster à mão", command: "kubectl -n cloudshop get deploy cloudshop-api -o jsonpath='{.metadata.annotations}'" },
     ],
     rootCause:
       "Conflito entre duas fontes de verdade para o mesmo campo: o Git declara replicas e o HPA também os gerencia. O self-heal revertia o autoscaling, e o HPA voltava a escalar — um cabo de guerra em produção.",
@@ -491,10 +491,10 @@ export const BOSSES: BossBattle[] = [
     ],
     investigation: [
       { step: "Confirmar impacto e escopo no dashboard", command: "curl -sG localhost:9090/api/v1/query --data-urlencode 'query=sum(rate(http_request_duration_seconds_count{status=~\"5..\"}[5m]))/sum(rate(http_request_duration_seconds_count[5m]))'" },
-      { step: "Verificar o que mudou nos últimos 30 minutos", command: "argocd app history printquest-producao | tail -3" },
-      { step: "Localizar o gargalo no trace", command: "curl -s 'localhost:3200/api/search?tags=service.name%3Dprintquest-api&minDuration=2s&limit=5'" },
-      { step: "Confirmar a hipótese nos logs do banco", command: "kubectl -n printquest logs deploy/printquest-db --tail=50 | grep -i 'too many connections'" },
-      { step: "Após mitigar, validar recuperação", command: "kubectl -n printquest rollout status deploy/printquest-api" },
+      { step: "Verificar o que mudou nos últimos 30 minutos", command: "argocd app history cloudshop-producao | tail -3" },
+      { step: "Localizar o gargalo no trace", command: "curl -s 'localhost:3200/api/search?tags=service.name%3Dcloudshop-api&minDuration=2s&limit=5'" },
+      { step: "Confirmar a hipótese nos logs do banco", command: "kubectl -n cloudshop logs deploy/cloudshop-db --tail=50 | grep -i 'too many connections'" },
+      { step: "Após mitigar, validar recuperação", command: "kubectl -n cloudshop rollout status deploy/cloudshop-api" },
     ],
     rootCause:
       "A v1.4.0 abria uma conexão por requisição sem devolvê-la ao pool. Sob tráfego normal, o limite de conexões do banco foi atingido em dois minutos, causando falha generalizada. O teste de carga não cobria a nova rota.",

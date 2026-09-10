@@ -234,7 +234,7 @@ function ModuloDetail() {
           <InsightBox label={t("mod.troubleWhenBreaks")} tone="mistake">
             {mod.troubleshooting}
           </InsightBox>
-          <InsightBox label={t("mod.troublePrintQuest")} tone="tip">
+          <InsightBox label={t("mod.troubleCloudShop")} tone="tip">
             {mod.printQuest}
           </InsightBox>
         </Panel>

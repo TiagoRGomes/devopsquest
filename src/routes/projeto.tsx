@@ -8,12 +8,12 @@ import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
 export const Route = createFileRoute("/projeto")({
   head: () => ({
     meta: [
-      { title: "Projeto PrintQuest — DevOps Quest RPG" },
+      { title: "Projeto CloudShop — DevOps Quest RPG" },
       {
         name: "description",
-        content: "Construa a PrintQuest Platform em 24 etapas: containers, CI/CD, AWS, Terraform, Kubernetes, GitOps e observabilidade.",
+        content: "Construa a CloudShop Platform em 24 etapas: containers, CI/CD, AWS, Terraform, Kubernetes, GitOps e observabilidade.",
       },
-      { property: "og:title", content: "Projeto PrintQuest — DevOps Quest RPG" },
+      { property: "og:title", content: "Projeto CloudShop — DevOps Quest RPG" },
       { property: "og:description", content: "O projeto de portfólio que prova sua competência em DevOps." },
     ],
   }),

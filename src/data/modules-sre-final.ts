@@ -13,12 +13,12 @@ export const SRE_FINAL_MODULES: Module[] = [
     regionId: "torre-confiabilidade",
     bossId: "boss-queda-producao",
     overview:
-      "Observabilidade não é instalar Grafana: é conseguir responder perguntas novas sobre o sistema sem novo deploy. Você vai instrumentar o PrintQuest com métricas Prometheus, centralizar logs com Loki, distribuir traces com OpenTelemetry, construir dashboards que respondem 'está tudo bem?' em cinco segundos, definir SLI/SLO com error budget e conduzir um incidente até o postmortem sem culpa.",
+      "Observabilidade não é instalar Grafana: é conseguir responder perguntas novas sobre o sistema sem novo deploy. Você vai instrumentar o CloudShop com métricas Prometheus, centralizar logs com Loki, distribuir traces com OpenTelemetry, construir dashboards que respondem 'está tudo bem?' em cinco segundos, definir SLI/SLO com error budget e conduzir um incidente até o postmortem sem culpa.",
     objectives: [
       "Diferenciar logs, métricas e traces e saber quando usar cada um",
       "Escrever consultas PromQL úteis e regras de alerta acionáveis",
       "Montar dashboards guiados por RED e USE",
-      "Definir SLI, SLO e error budget para o PrintQuest",
+      "Definir SLI, SLO e error budget para o CloudShop",
       "Conduzir incidente e escrever postmortem sem culpa",
     ],
     prerequisites: ["Módulo 8 concluído"],
@@ -38,7 +38,7 @@ export const SRE_FINAL_MODULES: Module[] = [
       "O que é error budget e como ele muda decisões de produto?",
       "Como você evitaria fadiga de alertas em um time de plantão?",
     ],
-    printQuest: "Instrumentar o PrintQuest com métricas, logs, traces, SLO e alertas úteis.",
+    printQuest: "Instrumentar o CloudShop com métricas, logs, traces, SLO e alertas úteis.",
     lessons: [
       {
         id: "l-10-1",
@@ -56,7 +56,7 @@ export const SRE_FINAL_MODULES: Module[] = [
         ],
         code: [
           {
-            label: "Instrumentar a API do PrintQuest",
+            label: "Instrumentar a API do CloudShop",
             language: "javascript",
             code: `import express from "express";
 import client from "prom-client";
@@ -99,7 +99,7 @@ app.get("/metrics", async (_req, res) => {
           { term: "RED", definition: "Rate, Errors, Duration: método de monitoramento orientado a serviço." },
           { term: "cardinalidade", definition: "Número de séries distintas geradas pelas combinações de labels." },
         ],
-        printQuestLink: "Expor /metrics na API do PrintQuest com histograma de latência por rota.",
+        printQuestLink: "Expor /metrics na API do CloudShop com histograma de latência por rota.",
         quiz: [
           {
             question: "Qual label é inadequado em uma métrica Prometheus?",
@@ -125,7 +125,7 @@ app.get("/metrics", async (_req, res) => {
         ],
         code: [
           {
-            label: "PromQL essencial para o PrintQuest",
+            label: "PromQL essencial para o CloudShop",
             language: "promql",
             code: `# Requisicoes por segundo por rota
 sum(rate(http_request_duration_seconds_count[5m])) by (route)
@@ -139,8 +139,8 @@ histogram_quantile(0.95,
   sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route))
 
 # Saturacao de memoria do pod contra o limite
-sum(container_memory_working_set_bytes{pod=~"printquest-api.*"}) by (pod)
-  / sum(kube_pod_container_resource_limits{resource="memory",pod=~"printquest-api.*"}) by (pod)
+sum(container_memory_working_set_bytes{pod=~"cloudshop-api.*"}) by (pod)
+  / sum(kube_pod_container_resource_limits{resource="memory",pod=~"cloudshop-api.*"}) by (pod)
 
 # Consumo do error budget de 30 dias (SLO 99.9%)
 1 - (sum(rate(http_request_duration_seconds_count{status!~"5.."}[30d]))
@@ -150,7 +150,7 @@ sum(container_memory_working_set_bytes{pod=~"printquest-api.*"}) by (pod)
             label: "Regras de alerta por sintoma",
             language: "yaml",
             code: `groups:
-  - name: printquest-api
+  - name: cloudshop-api
     rules:
       - alert: TaxaDeErroAlta
         expr: |
@@ -191,7 +191,7 @@ sum(container_memory_working_set_bytes{pod=~"printquest-api.*"}) by (pod)
           { term: "rate", definition: "Função PromQL que calcula taxa por segundo de um contador." },
           { term: "burn rate", definition: "Velocidade de consumo do error budget em relação ao permitido." },
         ],
-        printQuestLink: "Criar as regras de alerta do PrintQuest com runbook vinculado.",
+        printQuestLink: "Criar as regras de alerta do CloudShop com runbook vinculado.",
         quiz: [
           {
             question: "Qual alerta é mais acionável?",
@@ -219,18 +219,18 @@ sum(container_memory_working_set_bytes{pod=~"printquest-api.*"}) by (pod)
           {
             label: "Consultas LogQL",
             language: "logql",
-            code: `{app="printquest", component="api"} |= "ERROR"
+            code: `{app="cloudshop", component="api"} |= "ERROR"
 
-{app="printquest"} | json | status >= 500 | line_format "{{.route}} {{.message}}"
+{app="cloudshop"} | json | status >= 500 | line_format "{{.route}} {{.message}}"
 
 # taxa de erro derivada de log
-sum(rate({app="printquest"} | json | status >= 500 [5m]))
+sum(rate({app="cloudshop"} | json | status >= 500 [5m]))
 
 # rastrear uma requisicao especifica
-{app="printquest"} | json | requestId = "7f3c1a"
+{app="cloudshop"} | json | requestId = "7f3c1a"
 
 # duracao acima de 1s
-{app="printquest"} | json | duration_ms > 1000`,
+{app="cloudshop"} | json | duration_ms > 1000`,
           },
           {
             label: "Log estruturado na aplicação",
@@ -239,7 +239,7 @@ sum(rate({app="printquest"} | json | status >= 500 [5m]))
   process.stdout.write(JSON.stringify({
     ts: new Date().toISOString(),
     level,
-    service: "printquest-api",
+    service: "cloudshop-api",
     message,
     ...extra,           // requestId, route, status, duration_ms, traceId
   }) + "\\n");
@@ -260,7 +260,7 @@ log("info", "pedido criado", { requestId, route: "/orders", status: 201, duratio
           { term: "LogQL", definition: "Linguagem de consulta do Loki, inspirada em PromQL." },
           { term: "log estruturado", definition: "Log emitido como objeto (JSON) com campos consultáveis." },
         ],
-        printQuestLink: "Criar o dashboard principal do PrintQuest com SLO, RED e link para logs.",
+        printQuestLink: "Criar o dashboard principal do CloudShop com SLO, RED e link para logs.",
         quiz: [
           {
             question: "Qual campo é essencial para correlacionar log com trace?",
@@ -295,7 +295,7 @@ import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { TraceIdRatioBasedSampler } from "@opentelemetry/sdk-trace-base";
 
 const sdk = new NodeSDK({
-  serviceName: "printquest-api",
+  serviceName: "cloudshop-api",
   traceExporter: new OTLPTraceExporter({ url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT }),
   sampler: new TraceIdRatioBasedSampler(Number(process.env.OTEL_SAMPLE_RATIO ?? 0.1)),
   instrumentations: [getNodeAutoInstrumentations()],
@@ -350,7 +350,7 @@ service:
           { term: "span", definition: "Unidade de trabalho dentro de um trace, com início, fim e atributos." },
           { term: "Collector", definition: "Processo que recebe, transforma e exporta telemetria para backends." },
         ],
-        printQuestLink: "Rastrear a jornada de criação de pedido do PrintQuest do frontend ao banco.",
+        printQuestLink: "Rastrear a jornada de criação de pedido do CloudShop do frontend ao banco.",
         quiz: [
           {
             question: "Qual sinal indica melhor onde o tempo de uma requisição foi gasto?",
@@ -368,7 +368,7 @@ service:
         difficulty: "Avançado",
         tools: ["SRE", "Grafana", "Runbooks"],
         xp: 25,
-        objectives: ["Definir SLI e SLO do PrintQuest", "Calcular e usar error budget", "Conduzir incidente e escrever postmortem"],
+        objectives: ["Definir SLI e SLO do CloudShop", "Calcular e usar error budget", "Conduzir incidente e escrever postmortem"],
         body: [
           "SLI é a medida da experiência (proporção de requisições bem-sucedidas abaixo de 500 ms, por exemplo). SLO é a meta interna sobre esse indicador. SLA é o compromisso contratual, geralmente mais frouxo que o SLO. Confiabilidade deixa de ser opinião quando existe número.",
           "Error budget é o complemento do SLO: com meta de 99,9% em 30 dias, você tem cerca de 43 minutos de falha permitida. Esse número orienta decisão: budget sobrando permite acelerar entregas; budget estourado obriga a priorizar estabilidade. É a ferramenta que encerra a discussão entre 'entregar rápido' e 'ficar estável'.",
@@ -376,9 +376,9 @@ service:
         ],
         code: [
           {
-            label: "SLO do PrintQuest documentado",
+            label: "SLO do CloudShop documentado",
             language: "yaml",
-            code: `servico: printquest-api
+            code: `servico: cloudshop-api
 janela: 30d
 slis:
   - nome: disponibilidade
@@ -441,7 +441,7 @@ politica:
           { term: "error budget", definition: "Quantidade de falha permitida pelo SLO em uma janela de tempo." },
           { term: "postmortem sem culpa", definition: "Análise focada em falhas de sistema e processo, não em pessoas." },
         ],
-        printQuestLink: "Publicar o SLO do PrintQuest e o postmortem do incidente do módulo.",
+        printQuestLink: "Publicar o SLO do CloudShop e o postmortem do incidente do módulo.",
         quiz: [
           {
             question: "SLO de 99,9% em 30 dias permite aproximadamente quanto de indisponibilidade?",
@@ -464,7 +464,7 @@ politica:
     badge: "devops-professional",
     regionId: "torre-confiabilidade",
     overview:
-      "O último módulo transforma o que você construiu em um projeto defensável em entrevista. Segurança entra no pipeline (secrets, dependências, imagens, supply chain), custo passa a ser métrica de engenharia e a documentação amarra tudo: diagramas, decisões registradas, runbooks e a narrativa de cada decisão técnica. É aqui que o PrintQuest deixa de ser exercício e passa a ser evidência de competência.",
+      "O último módulo transforma o que você construiu em um projeto defensável em entrevista. Segurança entra no pipeline (secrets, dependências, imagens, supply chain), custo passa a ser métrica de engenharia e a documentação amarra tudo: diagramas, decisões registradas, runbooks e a narrativa de cada decisão técnica. É aqui que o CloudShop deixa de ser exercício e passa a ser evidência de competência.",
     objectives: [
       "Gerenciar secrets com rotação e escopo mínimo",
       "Adicionar scans de dependências, imagens e IaC no pipeline",
@@ -474,7 +474,7 @@ politica:
     ],
     prerequisites: ["Todos os módulos anteriores"],
     topics: ["Secrets", "SCA", "Scan de imagem", "Supply chain", "Backups", "IAM", "Orçamento", "Otimização", "Documentação"],
-    delivery: "Projeto final PrintQuest completo, seguro, documentado e apresentável em entrevista.",
+    delivery: "Projeto final CloudShop completo, seguro, documentado e apresentável em entrevista.",
     checklist: [
       "Nenhum segredo no histórico do Git (verificado por scanner)",
       "Pipeline falha em vulnerabilidade crítica com correção disponível",
@@ -489,7 +489,7 @@ politica:
       "O que é SBOM e por que empresas passaram a exigir?",
       "Como reduziria 30% do custo de um ambiente sem afetar o SLO?",
     ],
-    printQuest: "Fechar o PrintQuest: segurança no pipeline, custo documentado e apresentação de portfólio.",
+    printQuest: "Fechar o CloudShop: segurança no pipeline, custo documentado e apresentação de portfólio.",
     lessons: [
       {
         id: "l-11-1",
@@ -521,8 +521,8 @@ EOF
 chmod +x .git/hooks/pre-commit
 
 # rotacao no Secrets Manager
-aws secretsmanager rotate-secret --secret-id printquest/db --rotation-rules AutomaticallyAfterDays=30
-aws secretsmanager describe-secret --secret-id printquest/db --query '{Rotacao:RotationEnabled,Ultima:LastRotatedDate}'`,
+aws secretsmanager rotate-secret --secret-id cloudshop/db --rotation-rules AutomaticallyAfterDays=30
+aws secretsmanager describe-secret --secret-id cloudshop/db --query '{Rotacao:RotationEnabled,Ultima:LastRotatedDate}'`,
             securityNote:
               "Ao encontrar um segredo no histórico, considere-o comprometido: rotacione antes de qualquer limpeza.",
           },
@@ -536,7 +536,7 @@ aws secretsmanager describe-secret --secret-id printquest/db --query '{Rotacao:R
           { term: "rotação", definition: "Substituição periódica de credencial, idealmente automatizada." },
           { term: "gitleaks", definition: "Scanner que detecta padrões de segredo em código e histórico." },
         ],
-        printQuestLink: "Varrer o histórico dos repositórios do PrintQuest e ativar rotação do segredo do banco.",
+        printQuestLink: "Varrer o histórico dos repositórios do CloudShop e ativar rotação do segredo do banco.",
         quiz: [
           {
             question: "Ao encontrar uma chave de acesso commitada, a primeira ação é:",
@@ -585,10 +585,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t printquest-api:ci ./api
+      - run: docker build -t cloudshop-api:ci ./api
       - uses: aquasecurity/trivy-action@master
         with:
-          image-ref: printquest-api:ci
+          image-ref: cloudshop-api:ci
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: "1"
@@ -610,10 +610,10 @@ jobs:
     steps:
       - uses: sigstore/cosign-installer@v3
       - run: |
-          cosign sign --yes ghcr.io/tiago/printquest/api@\${{ needs.imagem.outputs.digest }}
+          cosign sign --yes ghcr.io/tiago/cloudshop/api@\${{ needs.imagem.outputs.digest }}
           cosign verify --certificate-identity-regexp ".*" \\
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \\
-            ghcr.io/tiago/printquest/api@\${{ needs.imagem.outputs.digest }}`,
+            ghcr.io/tiago/cloudshop/api@\${{ needs.imagem.outputs.digest }}`,
             securityNote:
               "ignore-unfixed evita bloquear por vulnerabilidade sem correção, mas registre-as e revise semanalmente.",
           },
@@ -627,7 +627,7 @@ jobs:
           { term: "SCA", definition: "Software Composition Analysis: análise de dependências e suas vulnerabilidades." },
           { term: "cosign", definition: "Ferramenta do projeto Sigstore para assinar e verificar artefatos." },
         ],
-        printQuestLink: "Adicionar scans e assinatura à pipeline do PrintQuest.",
+        printQuestLink: "Adicionar scans e assinatura à pipeline do CloudShop.",
         quiz: [
           {
             question: "Para que serve um SBOM?",
@@ -687,7 +687,7 @@ kubectl top pods --all-namespaces | sort -k3 -h | tail -20`,
           { term: "right-sizing", definition: "Ajustar o tamanho do recurso ao consumo real observado." },
           { term: "spot", definition: "Capacidade com grande desconto que pode ser interrompida pelo provedor." },
         ],
-        printQuestLink: "Documentar o custo mensal do PrintQuest e aplicar duas otimizações medidas.",
+        printQuestLink: "Documentar o custo mensal do CloudShop e aplicar duas otimizações medidas.",
         quiz: [
           {
             question: "Qual é o pré-requisito para atribuir custo por ambiente?",
@@ -709,13 +709,13 @@ kubectl top pods --all-namespaces | sort -k3 -h | tail -20`,
         body: [
           "Projeto sem documentação não conta como experiência, porque ninguém consegue avaliar. O README precisa responder em dois minutos: o que é, qual a arquitetura, como rodar, como implantar, como observar, como reverter, quanto custa e quais decisões foram tomadas — com o porquê.",
           "ADR (Architecture Decision Record) é um documento curto por decisão: contexto, opções consideradas, escolha e consequências. Ele demonstra exatamente o que entrevista técnica procura: capacidade de comparar alternativas e assumir trade-off consciente.",
-          "Para a entrevista, prepare três histórias de dois minutos: um incidente que você diagnosticou (com evidência), uma automação que reduziu tempo ou risco (com número) e uma decisão de arquitetura com trade-off. Com o PrintQuest, você tem material real para as três.",
+          "Para a entrevista, prepare três histórias de dois minutos: um incidente que você diagnosticou (com evidência), uma automação que reduziu tempo ou risco (com número) e uma decisão de arquitetura com trade-off. Com o CloudShop, você tem material real para as três.",
         ],
         code: [
           {
-            label: "Estrutura do README do PrintQuest",
+            label: "Estrutura do README do CloudShop",
             language: "markdown",
-            code: `# PrintQuest Platform
+            code: `# CloudShop Platform
 
 Catalogo e pedidos de produtos 3D. Projeto de engenharia de plataforma end-to-end.
 
@@ -728,11 +728,11 @@ docker compose up -d      # http://localhost:8080
 
 ## Como implantar
 Merge na main -> CI (lint, testes, build, scans) -> imagem no GHCR ->
-PR automatico no printquest-gitops -> ArgoCD sincroniza staging.
+PR automatico no cloudshop-gitops -> ArgoCD sincroniza staging.
 Producao: PR de promocao com aprovacao.
 
 ## Observabilidade
-- Dashboard: grafana/printquest-overview
+- Dashboard: grafana/cloudshop-overview
 - SLO: 99,9% disponibilidade / 95% abaixo de 500ms (janela 30 dias)
 - Runbooks: docs/runbooks/
 
@@ -773,7 +773,7 @@ right-sizing do RDS, VPC endpoint para S3 (reduziu NAT).
           { term: "ADR", definition: "Registro curto de uma decisão de arquitetura, com contexto e consequências." },
           { term: "RTO", definition: "Recovery Time Objective: tempo alvo para restaurar o serviço." },
         ],
-        printQuestLink: "Escrever o README final e os três ADRs principais do PrintQuest.",
+        printQuestLink: "Escrever o README final e os três ADRs principais do CloudShop.",
         quiz: [
           {
             question: "O que um ADR registra?",
@@ -800,7 +800,7 @@ right-sizing do RDS, VPC endpoint para S3 (reduziu NAT).
         body: [
           "Portfólio de DevOps não é lista de tecnologias: é evidência de operação. Repositórios organizados, README com diagrama, pipeline visível e verde, dashboards com captura de tela, um postmortem real e ADRs. Isso vale mais que dez certificados sem prática.",
           "No currículo, cada linha deve ter verbo, escopo e resultado medido: 'reduzi o tempo de build de 22 para 4 minutos com cache de dependências e multi-stage' comunica competência; 'conhecimento em Docker' não comunica nada. Números vindos do seu próprio projeto são legítimos e verificáveis.",
-          "Na entrevista, o roteiro é previsível: um problema de Linux/rede, um de container/Kubernetes, um de pipeline, um de nuvem/segurança e um comportamental sobre incidente. Ensaie em voz alta com o PrintQuest como referência, sempre em três partes: situação, o que você fez, resultado medido.",
+          "Na entrevista, o roteiro é previsível: um problema de Linux/rede, um de container/Kubernetes, um de pipeline, um de nuvem/segurança e um comportamental sobre incidente. Ensaie em voz alta com o CloudShop como referência, sempre em três partes: situação, o que você fez, resultado medido.",
         ],
         code: [
           {
@@ -834,7 +834,7 @@ right-sizing do RDS, VPC endpoint para S3 (reduziu NAT).
           { term: "portfólio", definition: "Conjunto de evidências verificáveis do que você sabe operar." },
           { term: "STAR", definition: "Estrutura de resposta: situação, tarefa, ação e resultado." },
         ],
-        printQuestLink: "Publicar o PrintQuest como projeto principal do portfólio.",
+        printQuestLink: "Publicar o CloudShop como projeto principal do portfólio.",
         quiz: [
           {
             question: "Qual linha de currículo é mais forte?",
