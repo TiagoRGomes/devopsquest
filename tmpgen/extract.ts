@@ -103,6 +103,9 @@ put("project", "name", PROJECT.name);
 for (const [k, v] of Object.entries(PROJECT as Record<string, unknown>)) {
   if (typeof v === "string" && k !== "name") put("project", k, v);
 }
+for (const r of (PROJECT as unknown as { repos: { name: string; purpose: string }[] }).repos) {
+  put(`repo.${r.name}`, "purpose", r.purpose);
+}
 for (const s of PROJECT_STEPS) {
   put(s.id, "title", s.title);
   put(s.id, "phase", s.phase);
