@@ -77,7 +77,7 @@ function SkillsPage() {
                     </p>
                     {skill.requires.length > 0 && (
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {t("skills.requires", { list: skill.requires.map((r) => SKILLS.find((s) => s.id === r)?.name ?? r).join(", ") })}
+                        {t("skills.requires", { list: skill.requires.map((r) => SKILLS.find((s) => s.id === r)? contentText(lang, r, "name", SKILLS.find((s) => s.id === r)!.name) : r).join(", ") })}
                       </p>
                     )}
                     <div className="mt-3 flex flex-wrap gap-1.5">
