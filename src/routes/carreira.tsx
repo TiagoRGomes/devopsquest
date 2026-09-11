@@ -4,6 +4,7 @@ import { Briefcase, Check, FileText, MessageSquare } from "lucide-react";
 import { CAREER_TRACKS, FIRST_JOB_CHECKLIST, INTERVIEW_BANK, RESUME_LINES } from "@/data/career";
 import { Chip, Panel, SectionTitle } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
+import { tCareerField, tCareerList } from "@/lib/content-translate";
 
 export const Route = createFileRoute("/carreira")({
   head: () => ({
@@ -22,7 +23,25 @@ export const Route = createFileRoute("/carreira")({
 
 function CarreiraPage() {
   const [openQ, setOpenQ] = useState<string | null>(null);
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const tracks = CAREER_TRACKS.map((tr) => ({
+    ...tr,
+    name: tCareerField(lang, tr.id, "name", tr.name),
+    focus: tCareerField(lang, tr.id, "focus", tr.focus),
+    dayToDay: tCareerList(lang, tr.id, "dayToDay", tr.dayToDay),
+    niceToHave: tCareerList(lang, tr.id, "niceToHave", tr.niceToHave),
+    salaryNote: tCareerField(lang, tr.id, "salaryNote", tr.salaryNote),
+    fitFor: tCareerField(lang, tr.id, "fitFor", tr.fitFor),
+  }));
+  const checklist = tCareerList(lang, "career", "firstJobChecklist", FIRST_JOB_CHECKLIST as unknown as string[]);
+  const resumeLines = tCareerList(lang, "career", "resumeLines", RESUME_LINES as unknown as string[]);
+  const interviews = INTERVIEW_BANK.map((q, i) => ({
+    ...q,
+    question: tCareerField(lang, `interview.${i}`, "question", q.question),
+    area: tCareerField(lang, `interview.${i}`, "area", q.area),
+    whatTheyEvaluate: tCareerField(lang, `interview.${i}`, "whatTheyEvaluate", q.whatTheyEvaluate),
+    strongAnswer: tCareerField(lang, `interview.${i}`, "strongAnswer", q.strongAnswer),
+  }));
 
   return (
     <div className="space-y-6">
