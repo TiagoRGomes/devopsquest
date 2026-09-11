@@ -52,7 +52,7 @@ function CarreiraPage() {
       />
 
       <ul className="grid gap-4 lg:grid-cols-2">
-        {CAREER_TRACKS.map((track) => (
+        {tracks.map((track) => (
           <Panel as="li" key={track.id}>
             <p className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
               <Briefcase className="size-4 text-primary" /> {track.name}
@@ -90,7 +90,7 @@ function CarreiraPage() {
             <Check className="size-4 text-success" /> {t("career.checklistTitle")}
           </h2>
           <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
-            {FIRST_JOB_CHECKLIST.map((c) => (
+            {checklist.map((c) => (
               <li key={c}>☐ {c}</li>
             ))}
           </ul>
@@ -100,7 +100,7 @@ function CarreiraPage() {
             <FileText className="size-4 text-accent" /> {t("career.resumeTitle")}
           </h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            {RESUME_LINES.map((r) => (
+            {resumeLines.map((r) => (
               <li key={r} className="rounded-lg border border-border bg-surface-2 px-3 py-2">
                 {r}
               </li>
@@ -117,7 +117,7 @@ function CarreiraPage() {
           description={t("career.interviewsDescription")}
         />
         <ul className="mt-4 space-y-2.5">
-          {INTERVIEW_BANK.map((q) => (
+          {interviews.map((q) => (
             <li key={q.id} className="rounded-xl border border-border bg-surface-2 px-4 py-3">
               <button
                 type="button"
