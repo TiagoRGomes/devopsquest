@@ -38,9 +38,10 @@ export const Route = createFileRoute("/modulos/$slug")({
 
 function ModuloDetail() {
   const { slug } = Route.useParams();
-  const mod = getModule(slug);
   const { progress, moduleProgress, completeLab, isModuleUnlocked, examResult, attemptsLeftToday } = useProgress();
   const { t, lang } = useI18n();
+  const rawMod = getModule(slug);
+  const mod = rawMod ? tModule(lang, rawMod) : undefined;
 
   if (!mod) {
     return <EmptyState title={t("mod.notFoundTitle")} description={t("mod.notFoundDescPick")} />;
