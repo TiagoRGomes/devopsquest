@@ -38,7 +38,7 @@ function BossPage() {
       />
 
       <ul className="space-y-4">
-        {BOSSES.map((boss) => {
+        {bosses.map((boss) => {
           const defeated = progress.defeatedBosses.includes(boss.id);
           const unlocked = level.level >= boss.requiredLevel;
           const open = revealed === boss.id;

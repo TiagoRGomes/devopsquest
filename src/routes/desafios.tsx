@@ -35,7 +35,7 @@ function DesafiosPage() {
       />
 
       <ul className="grid gap-4 lg:grid-cols-2">
-        {CHALLENGES.map((c) => {
+        {challenges.map((c) => {
           const done = progress.completedChallenges.includes(c.id);
           return (
             <Panel as="li" key={c.id}>
