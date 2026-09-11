@@ -4,6 +4,7 @@ import { ExternalLink } from "lucide-react";
 import { RESOURCES, RESOURCE_CATEGORIES } from "@/data/resources";
 import { Chip, Panel, SectionTitle } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
+import { contentText } from "@/lib/content-i18n";
 
 export const Route = createFileRoute("/recursos")({
   head: () => ({
@@ -21,10 +22,15 @@ export const Route = createFileRoute("/recursos")({
 });
 
 function RecursosPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const ALL = t("res.all");
   const [cat, setCat] = useState(ALL);
-  const list = cat === ALL ? RESOURCES : RESOURCES.filter((r) => r.category === cat);
+  const translated = RESOURCES.map((r, i) => ({
+    ...r,
+    title: contentText(lang, `res.${i}`, "title", r.title),
+    description: contentText(lang, `res.${i}`, "description", r.description),
+  }));
+  const list = cat === ALL ? translated : translated.filter((r) => r.category === cat);
 
   return (
     <div className="space-y-6">

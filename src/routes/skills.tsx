@@ -6,6 +6,7 @@ import { getLesson } from "@/data/curriculum";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
 import { contentText } from "@/lib/content-i18n";
+import { tSkill } from "@/lib/content-translate";
 
 export const Route = createFileRoute("/skills")({
   head: () => ({
@@ -50,7 +51,8 @@ function SkillsPage() {
           <section key={tree}>
             <h3 className="mb-3 font-display text-lg font-semibold text-foreground">{tree}</h3>
             <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {SKILLS.filter((s) => s.tree === tree).map((skill) => {
+              {SKILLS.filter((s) => s.tree === tree).map((rawSkill) => {
+                const skill = tSkill(lang, rawSkill);
                 const state = skillState(skill.id);
                 return (
                   <Panel as="li" key={skill.id} className={state.unlocked ? "" : "opacity-70"}>
