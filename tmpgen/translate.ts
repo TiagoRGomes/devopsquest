@@ -1,7 +1,7 @@
 // Traduz o conteúdo PT para ES/EN via Lovable AI Gateway, com cache resumível.
-const pt: Record<string, string> = await Bun.file("/tmp/tr/pt.json").json();
+const pt: Record<string, string> = await Bun.file("tmpgen/pt.json").json();
 const lang = process.argv[2] as "es" | "en";
-const cachePath = `/tmp/tr/${lang}.json`;
+const cachePath = `tmpgen/${lang}.json`;
 const done: Record<string, string> = (await Bun.file(cachePath).exists())
   ? await Bun.file(cachePath).json()
   : {};

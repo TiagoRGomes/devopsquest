@@ -148,5 +148,5 @@ for (const ex of MODULE_EXAMS) {
   });
 }
 
-await Bun.write("/tmp/tr/pt.json", JSON.stringify(out, null, 1));
+await Bun.write("tmpgen/pt.json", JSON.stringify(out, null, 1));
 console.log("keys", Object.keys(out).length, "chars", JSON.stringify(out).length);
