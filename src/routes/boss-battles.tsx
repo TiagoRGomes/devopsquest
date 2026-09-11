@@ -6,6 +6,7 @@ import { useProgress } from "@/lib/progress";
 import { BOSSES } from "@/data/challenges";
 import { Chip, Panel, SectionTitle } from "@/components/ui-bits";
 import { CodeBlock } from "@/components/CodeBlock";
+import { tBoss } from "@/lib/content-translate";
 
 export const Route = createFileRoute("/boss-battles")({
   head: () => ({
@@ -23,9 +24,10 @@ export const Route = createFileRoute("/boss-battles")({
 });
 
 function BossPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { progress, level, defeatBoss } = useProgress();
   const [revealed, setRevealed] = useState<string | null>(null);
+  const bosses = BOSSES.map((b) => tBoss(lang, b));
 
   return (
     <div className="space-y-6">

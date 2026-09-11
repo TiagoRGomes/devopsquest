@@ -4,6 +4,7 @@ import { Check, Target } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { CHALLENGES } from "@/data/challenges";
 import { Chip, DifficultyChip, Panel, SectionTitle } from "@/components/ui-bits";
+import { tChallenge } from "@/lib/content-translate";
 
 export const Route = createFileRoute("/desafios")({
   head: () => ({
@@ -21,8 +22,9 @@ export const Route = createFileRoute("/desafios")({
 });
 
 function DesafiosPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { progress, completeChallenge } = useProgress();
+  const challenges = CHALLENGES.map((c) => tChallenge(lang, c));
 
   return (
     <div className="space-y-6">
