@@ -4,6 +4,8 @@ import { Check, GitBranch } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { MATURITY_AXES, PROJECT, PROJECT_STEPS, maturityScore } from "@/data/project";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
+import { tAxis, tProjectField, tProjectStep } from "@/lib/content-translate";
+import { contentText } from "@/lib/content-i18n";
 
 export const Route = createFileRoute("/projeto")({
   head: () => ({
@@ -21,17 +23,23 @@ export const Route = createFileRoute("/projeto")({
 });
 
 function ProjetoPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { progress, toggleProjectStep } = useProgress();
   const maturity = maturityScore(progress.completedProjectSteps);
   const phases = Array.from(new Set(PROJECT_STEPS.map((s) => s.phase)));
+  const projectPitch = tProjectField(lang, "pitch", PROJECT.pitch);
+  const repos = PROJECT.repos.map((r) => ({
+    ...r,
+    purpose: contentText(lang, `repo.${r.name}`, "purpose", r.purpose),
+  }));
+  const steps = PROJECT_STEPS.map((s) => ({ ...tProjectStep(lang, s), origPhase: s.phase }));
 
   return (
     <div className="space-y-6">
       <Panel className="bg-hero">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{t("proj.eyebrow")}</p>
         <h1 className="mt-1.5 font-display text-2xl font-semibold text-foreground sm:text-3xl">{PROJECT.name}</h1>
-        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{PROJECT.pitch}</p>
+        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{projectPitch}</p>
         <div className="mt-4 flex flex-wrap gap-1.5">
           {PROJECT.stack.map((s) => (
             <Chip key={s} tone="accent">
@@ -49,7 +57,7 @@ function ProjetoPage() {
       </Panel>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        {PROJECT.repos.map((r) => (
+        {repos.map((r) => (
           <Panel key={r.name}>
             <p className="flex items-center gap-2 font-mono text-sm text-foreground">
               <GitBranch className="size-4 text-primary" /> {r.name}
@@ -63,11 +71,12 @@ function ProjetoPage() {
         <SectionTitle eyebrow={t("proj.evaluationEyebrow")} title={t("proj.axesTitle")} />
         <ul className="mt-4 space-y-3">
           {maturity.perAxis.map((a) => {
-            const axis = MATURITY_AXES.find((m) => m.axis === a.axis);
+            const found = MATURITY_AXES.find((m) => m.axis === a.axis);
+            const axis = found ? tAxis(lang, found) : undefined;
             return (
               <li key={a.axis}>
                 <div className="flex items-baseline justify-between text-sm">
-                  <span className="text-foreground">{a.axis}</span>
+                  <span className="text-foreground">{axis?.axis ?? a.axis}</span>
                   <span className="font-mono text-xs text-accent">{a.score}%</span>
                 </div>
                 <XpBar percent={a.score} className="mt-1.5 h-1.5" />
@@ -80,9 +89,11 @@ function ProjetoPage() {
 
       {phases.map((phase) => (
         <Panel key={phase}>
-          <h2 className="font-display text-lg font-semibold text-foreground">{phase}</h2>
+          <h2 className="font-display text-lg font-semibold text-foreground">
+            {steps.find((s) => s.origPhase === phase)?.phase ?? phase}
+          </h2>
           <ul className="mt-4 space-y-2.5">
-            {PROJECT_STEPS.filter((s) => s.phase === phase).map((step) => {
+            {steps.filter((s) => s.origPhase === phase).map((step) => {
               const done = progress.completedProjectSteps.includes(step.id);
               return (
                 <li key={step.id} className="rounded-xl border border-border bg-surface-2 px-4 py-3">

@@ -7,6 +7,7 @@ import { Chip, DifficultyChip, EmptyState, InsightBox, Panel } from "@/component
 import { useI18n } from "@/lib/i18n";
 import { contentText, contentList } from "@/lib/content-i18n";
 import { CodeBlock } from "@/components/CodeBlock";
+import { tLesson } from "@/lib/content-translate";
 
 export const Route = createFileRoute("/aulas/$lessonId")({
   loader: ({ params }) => {
@@ -36,8 +37,9 @@ export const Route = createFileRoute("/aulas/$lessonId")({
 
 function LessonPage() {
   const { lessonId } = Route.useParams();
-  const lesson = getLesson(lessonId);
   const { t, lang } = useI18n();
+  const rawLesson = getLesson(lessonId);
+  const lesson = rawLesson ? tLesson(lang, rawLesson) : undefined;
   const { progress, completeLesson, passQuiz, saveNote, setCurrentLesson } = useProgress();
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [checked, setChecked] = useState(false);

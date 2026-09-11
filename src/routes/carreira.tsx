@@ -4,6 +4,7 @@ import { Briefcase, Check, FileText, MessageSquare } from "lucide-react";
 import { CAREER_TRACKS, FIRST_JOB_CHECKLIST, INTERVIEW_BANK, RESUME_LINES } from "@/data/career";
 import { Chip, Panel, SectionTitle } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
+import { tCareerField, tCareerList } from "@/lib/content-translate";
 
 export const Route = createFileRoute("/carreira")({
   head: () => ({
@@ -22,7 +23,25 @@ export const Route = createFileRoute("/carreira")({
 
 function CarreiraPage() {
   const [openQ, setOpenQ] = useState<string | null>(null);
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const tracks = CAREER_TRACKS.map((tr) => ({
+    ...tr,
+    name: tCareerField(lang, tr.id, "name", tr.name),
+    focus: tCareerField(lang, tr.id, "focus", tr.focus),
+    dayToDay: tCareerList(lang, tr.id, "dayToDay", tr.dayToDay),
+    niceToHave: tCareerList(lang, tr.id, "niceToHave", tr.niceToHave),
+    salaryNote: tCareerField(lang, tr.id, "salaryNote", tr.salaryNote),
+    fitFor: tCareerField(lang, tr.id, "fitFor", tr.fitFor),
+  }));
+  const checklist = tCareerList(lang, "career", "firstJobChecklist", FIRST_JOB_CHECKLIST as unknown as string[]);
+  const resumeLines = tCareerList(lang, "career", "resumeLines", RESUME_LINES as unknown as string[]);
+  const interviews = INTERVIEW_BANK.map((q, i) => ({
+    ...q,
+    question: tCareerField(lang, `interview.${i}`, "question", q.question),
+    area: tCareerField(lang, `interview.${i}`, "area", q.area),
+    whatTheyEvaluate: tCareerField(lang, `interview.${i}`, "whatTheyEvaluate", q.whatTheyEvaluate),
+    strongAnswer: tCareerField(lang, `interview.${i}`, "strongAnswer", q.strongAnswer),
+  }));
 
   return (
     <div className="space-y-6">
@@ -33,7 +52,7 @@ function CarreiraPage() {
       />
 
       <ul className="grid gap-4 lg:grid-cols-2">
-        {CAREER_TRACKS.map((track) => (
+        {tracks.map((track) => (
           <Panel as="li" key={track.id}>
             <p className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
               <Briefcase className="size-4 text-primary" /> {track.name}
@@ -71,7 +90,7 @@ function CarreiraPage() {
             <Check className="size-4 text-success" /> {t("career.checklistTitle")}
           </h2>
           <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
-            {FIRST_JOB_CHECKLIST.map((c) => (
+            {checklist.map((c) => (
               <li key={c}>☐ {c}</li>
             ))}
           </ul>
@@ -81,7 +100,7 @@ function CarreiraPage() {
             <FileText className="size-4 text-accent" /> {t("career.resumeTitle")}
           </h2>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            {RESUME_LINES.map((r) => (
+            {resumeLines.map((r) => (
               <li key={r} className="rounded-lg border border-border bg-surface-2 px-3 py-2">
                 {r}
               </li>
@@ -98,7 +117,7 @@ function CarreiraPage() {
           description={t("career.interviewsDescription")}
         />
         <ul className="mt-4 space-y-2.5">
-          {INTERVIEW_BANK.map((q) => (
+          {interviews.map((q) => (
             <li key={q.id} className="rounded-xl border border-border bg-surface-2 px-4 py-3">
               <button
                 type="button"

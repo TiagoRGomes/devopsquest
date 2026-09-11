@@ -8,6 +8,7 @@ import { getModule } from "@/data/curriculum";
 import { DAILY_ATTEMPTS, PASS_SCORE, getExam } from "@/data/exams";
 import { Chip, EmptyState, Panel, XpBar } from "@/components/ui-bits";
 import type { ExamLevel } from "@/lib/types";
+import { tExam, tModule } from "@/lib/content-translate";
 
 export const Route = createFileRoute("/exame/$slug")({
   loader: ({ params }) => {
@@ -50,13 +51,15 @@ function NotFoundExam() {
 
 function ExamePage() {
   const { slug } = Route.useParams();
-  const { t } = useI18n();
-  const mod = getModule(slug);
+  const { t, lang } = useI18n();
+  const rawMod = getModule(slug);
+  const mod = rawMod ? tModule(lang, rawMod) : undefined;
   const { examResult, attemptsLeftToday, submitExam, isModuleUnlocked } = useProgress();
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [result, setResult] = useState<{ score: number; passed: boolean } | null>(null);
 
-  const exam = mod ? getExam(mod.id) : undefined;
+  const rawExam = mod ? getExam(mod.id) : undefined;
+  const exam = rawExam ? tExam(lang, rawExam) : undefined;
   const questions = useMemo(() => exam?.questions ?? [], [exam]);
 
   if (!mod || !exam) {

@@ -7,6 +7,7 @@ import { LABS } from "@/data/labs";
 import { MODULES, getModuleById } from "@/data/curriculum";
 import { Chip, DifficultyChip, Panel, SectionTitle } from "@/components/ui-bits";
 import { CodeBlock } from "@/components/CodeBlock";
+import { tLab } from "@/lib/content-translate";
 
 export const Route = createFileRoute("/laboratorios")({
   head: () => ({
@@ -24,13 +25,15 @@ export const Route = createFileRoute("/laboratorios")({
 });
 
 function LabsPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { progress, completeLab } = useProgress();
   const [filter, setFilter] = useState<string>("todos");
   const [openId, setOpenId] = useState<string | null>(null);
   const [showSolution, setShowSolution] = useState<string | null>(null);
 
-  const labs = filter === "todos" ? LABS : LABS.filter((l) => l.moduleId === filter);
+  const labs = (filter === "todos" ? LABS : LABS.filter((l) => l.moduleId === filter)).map((l) =>
+    tLab(lang, l),
+  );
 
   return (
     <div className="space-y-6">
