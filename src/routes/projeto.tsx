@@ -4,6 +4,8 @@ import { Check, GitBranch } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { MATURITY_AXES, PROJECT, PROJECT_STEPS, maturityScore } from "@/data/project";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
+import { tAxis, tProjectField, tProjectStep } from "@/lib/content-translate";
+import { contentText } from "@/lib/content-i18n";
 
 export const Route = createFileRoute("/projeto")({
   head: () => ({
@@ -21,10 +23,16 @@ export const Route = createFileRoute("/projeto")({
 });
 
 function ProjetoPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { progress, toggleProjectStep } = useProgress();
   const maturity = maturityScore(progress.completedProjectSteps);
   const phases = Array.from(new Set(PROJECT_STEPS.map((s) => s.phase)));
+  const projectPitch = tProjectField(lang, "pitch", PROJECT.pitch);
+  const repos = PROJECT.repos.map((r) => ({
+    ...r,
+    purpose: contentText(lang, `repo.${r.name}`, "purpose", r.purpose),
+  }));
+  const steps = PROJECT_STEPS.map((s) => tProjectStep(lang, s));
 
   return (
     <div className="space-y-6">
