@@ -1,16 +1,18 @@
-// Camada de tradução do conteúdo estruturado (títulos, resumos, objetivos).
+// Camada de tradução do conteúdo estruturado (títulos, resumos, objetivos, corpo das aulas…).
 // As chaves seguem o padrão `${id}.${field}` e apontam para o texto no idioma.
 import type { Lang } from "@/lib/i18n";
 import { CONTENT_ES_A, CONTENT_EN_A } from "@/lib/content-i18n/a";
 import { CONTENT_ES_B, CONTENT_EN_B } from "@/lib/content-i18n/b";
 import { CONTENT_ES_C, CONTENT_EN_C } from "@/lib/content-i18n/c";
+import { CONTENT_GEN_ES } from "@/lib/content-i18n/gen-es";
+import { CONTENT_GEN_EN } from "@/lib/content-i18n/gen-en";
 
 export type ContentDict = Record<string, string>;
 
 const DICTS: Record<Lang, ContentDict> = {
   pt: {},
-  es: { ...CONTENT_ES_A, ...CONTENT_ES_B, ...CONTENT_ES_C },
-  en: { ...CONTENT_EN_A, ...CONTENT_EN_B, ...CONTENT_EN_C },
+  es: { ...CONTENT_GEN_ES, ...CONTENT_ES_A, ...CONTENT_ES_B, ...CONTENT_ES_C },
+  en: { ...CONTENT_GEN_EN, ...CONTENT_EN_A, ...CONTENT_EN_B, ...CONTENT_EN_C },
 };
 
 /** Retorna o texto traduzido do conteúdo ou o original em português. */
@@ -22,7 +24,8 @@ export function contentText(lang: Lang, id: string, field: string, fallback: str
 export function contentList(lang: Lang, id: string, field: string, fallback: string[]): string[] {
   const joined = DICTS[lang][`${id}.${field}`];
   if (!joined) return fallback;
-  return joined.split("|").map((s) => s.trim());
+  const parts = joined.split(" | ").map((s) => s.trim());
+  return parts.length === fallback.length ? parts : fallback;
 }
 
 /** Converte o nome da classe de nível em uma chave estável. */
