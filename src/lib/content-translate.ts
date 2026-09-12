@@ -49,9 +49,9 @@ export function tLesson(lang: Lang, l: Lesson): Lesson {
     code: l.code.map((c, i) => ({
       ...c,
       label: labels[i] ?? c.label,
-      securityNote: c.securityNote
-        ? contentText(lang, l.id, `codeNote${i}`, c.securityNote)
-        : c.securityNote,
+      ...(c.securityNote
+        ? { securityNote: contentText(lang, l.id, `codeNote${i}`, c.securityNote) }
+        : {}),
     })),
     printQuestLink: contentText(lang, l.id, "capstone", l.printQuestLink),
     quiz: quiz(lang, l.id, l.quiz),
@@ -91,9 +91,9 @@ export function tLab(lang: Lang, lab: Lab): Lab {
     commands: {
       ...lab.commands,
       label: contentText(lang, lab.id, "commandsLabel", lab.commands.label),
-      securityNote: lab.commands.securityNote
-        ? contentText(lang, lab.id, "commandsNote", lab.commands.securityNote)
-        : lab.commands.securityNote,
+      ...(lab.commands.securityNote
+        ? { securityNote: contentText(lang, lab.id, "commandsNote", lab.commands.securityNote) }
+        : {}),
     },
     validation: contentList(lang, lab.id, "validation", lab.validation),
     commonErrors: lab.commonErrors.map((e, i) => ({
