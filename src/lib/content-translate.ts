@@ -30,8 +30,10 @@ export function tLesson(lang: Lang, l: Lesson): Lesson {
   const terms = contentList(lang, l.id, "glossaryTerms", l.glossary.map((g) => g.term));
   const defs = contentList(lang, l.id, "glossaryDefs", l.glossary.map((g) => g.definition));
   const labels = contentList(lang, l.id, "codeLabels", l.code.map((c) => c.label));
+  const { securityAlert: _drop, ...base } = l;
+  void _drop;
   return {
-    ...l,
+    ...base,
     title: contentText(lang, l.id, "title", l.title),
     objectives: contentList(lang, l.id, "objectives", l.objectives),
     body: contentList(lang, l.id, "body", l.body),
