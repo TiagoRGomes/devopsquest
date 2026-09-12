@@ -48,10 +48,12 @@ function ModuloDetail() {
     return <EmptyState title={t("mod.notFoundTitle")} description={t("mod.notFoundDescPick")} />;
   }
 
-  const labs = labsByModule(mod.id);
+  const labs = labsByModule(mod.id).map((l) => tLab(lang, l));
   const p = moduleProgress(mod.id);
-  const boss = mod.bossId ? getBoss(mod.bossId) : undefined;
-  const badge = BADGES.find((b) => b.id === mod.badge);
+  const rawBoss = mod.bossId ? getBoss(mod.bossId) : undefined;
+  const boss = rawBoss ? tBoss(lang, rawBoss) : undefined;
+  const rawBadge = BADGES.find((b) => b.id === mod.badge);
+  const badge = rawBadge ? tBadge(lang, rawBadge) : undefined;
   const unlocked = isModuleUnlocked(mod.id);
   const exam = getExam(mod.id);
   const examStatus = examResult(mod.id);
