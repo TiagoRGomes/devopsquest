@@ -3,6 +3,7 @@ import { Award, BookOpen, Check, FlaskConical, GraduationCap, Lock, Skull } from
 import { useProgress } from "@/lib/progress";
 import { useI18n } from "@/lib/i18n";
 import { contentText, contentList } from "@/lib/content-i18n";
+import { tBadge, tBoss, tLab, tModule } from "@/lib/content-translate";
 import { PASS_SCORE, getExam } from "@/data/exams";
 import { getModule } from "@/data/curriculum";
 import { labsByModule } from "@/data/labs";
