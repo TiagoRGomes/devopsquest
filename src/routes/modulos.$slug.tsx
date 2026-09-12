@@ -3,6 +3,7 @@ import { Award, BookOpen, Check, FlaskConical, GraduationCap, Lock, Skull } from
 import { useProgress } from "@/lib/progress";
 import { useI18n } from "@/lib/i18n";
 import { contentText, contentList } from "@/lib/content-i18n";
+import { tBadge, tBoss, tLab, tModule } from "@/lib/content-translate";
 import { PASS_SCORE, getExam } from "@/data/exams";
 import { getModule } from "@/data/curriculum";
 import { labsByModule } from "@/data/labs";
@@ -47,10 +48,12 @@ function ModuloDetail() {
     return <EmptyState title={t("mod.notFoundTitle")} description={t("mod.notFoundDescPick")} />;
   }
 
-  const labs = labsByModule(mod.id);
+  const labs = labsByModule(mod.id).map((l) => tLab(lang, l));
   const p = moduleProgress(mod.id);
-  const boss = mod.bossId ? getBoss(mod.bossId) : undefined;
-  const badge = BADGES.find((b) => b.id === mod.badge);
+  const rawBoss = mod.bossId ? getBoss(mod.bossId) : undefined;
+  const boss = rawBoss ? tBoss(lang, rawBoss) : undefined;
+  const rawBadge = BADGES.find((b) => b.id === mod.badge);
+  const badge = rawBadge ? tBadge(lang, rawBadge) : undefined;
   const unlocked = isModuleUnlocked(mod.id);
   const exam = getExam(mod.id);
   const examStatus = examResult(mod.id);

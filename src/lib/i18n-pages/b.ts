@@ -2,6 +2,14 @@
 type Dict = Record<string, string>;
 
 export const ptB: Dict = {
+  "diff.Iniciante": "Iniciante",
+  "diff.Intermediário": "Intermediário",
+  "diff.Avançado": "Avançado",
+  "diff.Ninja": "Ninja",
+  "rar.Comum": "Comum",
+  "rar.Raro": "Raro",
+  "rar.Épico": "Épico",
+  "rar.Lendário": "Lendário",
   "labs.eyebrow": "Laboratórios",
   "labs.title": "{count} laboratórios com validação",
   "labs.description": "Cada lab tem contexto profissional, passos, comandos, checagens de validação e os erros que mais aparecem no dia a dia.",
@@ -64,6 +72,14 @@ export const ptB: Dict = {
 };
 
 export const esB: Dict = {
+  "diff.Iniciante": "Principiante",
+  "diff.Intermediário": "Intermedio",
+  "diff.Avançado": "Avanzado",
+  "diff.Ninja": "Ninja",
+  "rar.Comum": "Común",
+  "rar.Raro": "Raro",
+  "rar.Épico": "Épico",
+  "rar.Lendário": "Legendario",
   "labs.eyebrow": "Laboratorios",
   "labs.title": "{count} laboratorios con validación",
   "labs.description": "Cada lab tiene contexto profesional, pasos, comandos, comprobaciones de validación y los errores que más aparecen en el día a día.",
@@ -126,6 +142,14 @@ export const esB: Dict = {
 };
 
 export const enB: Dict = {
+  "diff.Iniciante": "Beginner",
+  "diff.Intermediário": "Intermediate",
+  "diff.Avançado": "Advanced",
+  "diff.Ninja": "Ninja",
+  "rar.Comum": "Common",
+  "rar.Raro": "Rare",
+  "rar.Épico": "Epic",
+  "rar.Lendário": "Legendary",
   "labs.eyebrow": "Labs",
   "labs.title": "{count} labs with validation",
   "labs.description": "Each lab has professional context, steps, commands, validation checks and the errors that show up most often in the day to day.",

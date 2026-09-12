@@ -90,23 +90,25 @@ export function Chip({
 }
 
 export function DifficultyChip({ level }: { level: Difficulty }) {
+  const { t } = useI18n();
   const tone = {
     Iniciante: "success",
     Intermediário: "primary",
     Avançado: "warning",
     Ninja: "epic",
   } as const;
-  return <Chip tone={tone[level]}>{level}</Chip>;
+  return <Chip tone={tone[level]}>{t(`diff.${level}`)}</Chip>;
 }
 
 export function RarityChip({ rarity }: { rarity: Rarity }) {
+  const { t } = useI18n();
   const tone = {
     Comum: "muted",
     Raro: "primary",
     Épico: "epic",
     Lendário: "legendary",
   } as const;
-  return <Chip tone={tone[rarity]}>{rarity}</Chip>;
+  return <Chip tone={tone[rarity]}>{t(`rar.${rarity}`)}</Chip>;
 }
 
 export function InsightBox({

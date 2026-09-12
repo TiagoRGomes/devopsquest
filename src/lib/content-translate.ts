@@ -30,28 +30,31 @@ export function tLesson(lang: Lang, l: Lesson): Lesson {
   const terms = contentList(lang, l.id, "glossaryTerms", l.glossary.map((g) => g.term));
   const defs = contentList(lang, l.id, "glossaryDefs", l.glossary.map((g) => g.definition));
   const labels = contentList(lang, l.id, "codeLabels", l.code.map((c) => c.label));
+  const { securityAlert: _drop, ...base } = l;
+  void _drop;
   return {
-    ...l,
+    ...base,
     title: contentText(lang, l.id, "title", l.title),
     objectives: contentList(lang, l.id, "objectives", l.objectives),
     body: contentList(lang, l.id, "body", l.body),
     whyItMatters: contentText(lang, l.id, "whyItMatters", l.whyItMatters),
     commonMistake: contentText(lang, l.id, "commonMistake", l.commonMistake),
     productionTip: contentText(lang, l.id, "productionTip", l.productionTip),
-    securityAlert: l.securityAlert
-      ? contentText(lang, l.id, "securityAlert", l.securityAlert)
-      : l.securityAlert,
+    ...(l.securityAlert
+      ? { securityAlert: contentText(lang, l.id, "securityAlert", l.securityAlert) }
+      : {}),
     interviewQuestion: contentText(lang, l.id, "interviewQuestion", l.interviewQuestion),
     glossary: l.glossary.map((g, i) => ({
       term: terms[i] ?? g.term,
       definition: defs[i] ?? g.definition,
     })),
     code: l.code.map((c, i) => ({
-      ...c,
+      language: c.language,
+      code: c.code,
       label: labels[i] ?? c.label,
-      securityNote: c.securityNote
-        ? contentText(lang, l.id, `codeNote${i}`, c.securityNote)
-        : c.securityNote,
+      ...(c.securityNote
+        ? { securityNote: contentText(lang, l.id, `codeNote${i}`, c.securityNote) }
+        : {}),
     })),
     printQuestLink: contentText(lang, l.id, "capstone", l.printQuestLink),
     quiz: quiz(lang, l.id, l.quiz),
@@ -89,11 +92,12 @@ export function tLab(lang: Lang, lab: Lab): Lab {
     environment: contentText(lang, lab.id, "environment", lab.environment),
     steps: contentList(lang, lab.id, "steps", lab.steps),
     commands: {
-      ...lab.commands,
+      language: lab.commands.language,
+      code: lab.commands.code,
       label: contentText(lang, lab.id, "commandsLabel", lab.commands.label),
-      securityNote: lab.commands.securityNote
-        ? contentText(lang, lab.id, "commandsNote", lab.commands.securityNote)
-        : lab.commands.securityNote,
+      ...(lab.commands.securityNote
+        ? { securityNote: contentText(lang, lab.id, "commandsNote", lab.commands.securityNote) }
+        : {}),
     },
     validation: contentList(lang, lab.id, "validation", lab.validation),
     commonErrors: lab.commonErrors.map((e, i) => ({
