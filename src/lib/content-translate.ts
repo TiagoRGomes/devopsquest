@@ -47,7 +47,8 @@ export function tLesson(lang: Lang, l: Lesson): Lesson {
       definition: defs[i] ?? g.definition,
     })),
     code: l.code.map((c, i) => ({
-      ...c,
+      language: c.language,
+      code: c.code,
       label: labels[i] ?? c.label,
       ...(c.securityNote
         ? { securityNote: contentText(lang, l.id, `codeNote${i}`, c.securityNote) }
