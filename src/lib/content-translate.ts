@@ -90,7 +90,8 @@ export function tLab(lang: Lang, lab: Lab): Lab {
     environment: contentText(lang, lab.id, "environment", lab.environment),
     steps: contentList(lang, lab.id, "steps", lab.steps),
     commands: {
-      ...lab.commands,
+      language: lab.commands.language,
+      code: lab.commands.code,
       label: contentText(lang, lab.id, "commandsLabel", lab.commands.label),
       ...(lab.commands.securityNote
         ? { securityNote: contentText(lang, lab.id, "commandsNote", lab.commands.securityNote) }
