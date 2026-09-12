@@ -38,9 +38,9 @@ export function tLesson(lang: Lang, l: Lesson): Lesson {
     whyItMatters: contentText(lang, l.id, "whyItMatters", l.whyItMatters),
     commonMistake: contentText(lang, l.id, "commonMistake", l.commonMistake),
     productionTip: contentText(lang, l.id, "productionTip", l.productionTip),
-    securityAlert: l.securityAlert
-      ? contentText(lang, l.id, "securityAlert", l.securityAlert)
-      : l.securityAlert,
+    ...(l.securityAlert
+      ? { securityAlert: contentText(lang, l.id, "securityAlert", l.securityAlert) }
+      : {}),
     interviewQuestion: contentText(lang, l.id, "interviewQuestion", l.interviewQuestion),
     glossary: l.glossary.map((g, i) => ({
       term: terms[i] ?? g.term,
