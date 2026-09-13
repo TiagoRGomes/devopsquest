@@ -26,7 +26,6 @@ function quiz<T extends QuizQuestion>(lang: Lang, id: string, questions: T[]): T
 }
 
 export function tLesson(lang: Lang, l: Lesson): Lesson {
-  if (lang === "pt") return l;
   const terms = contentList(lang, l.id, "glossaryTerms", l.glossary.map((g) => g.term));
   const defs = contentList(lang, l.id, "glossaryDefs", l.glossary.map((g) => g.definition));
   const labels = contentList(lang, l.id, "codeLabels", l.code.map((c) => c.label));
@@ -62,7 +61,6 @@ export function tLesson(lang: Lang, l: Lesson): Lesson {
 }
 
 export function tModule(lang: Lang, m: Module): Module {
-  if (lang === "pt") return m;
   return {
     ...m,
     title: contentText(lang, m.id, "title", m.title),
@@ -185,7 +183,6 @@ export function tAxis(lang: Lang, a: MaturityAxis): MaturityAxis {
 }
 
 export function tExam(lang: Lang, ex: ModuleExam): ModuleExam {
-  if (lang === "pt") return ex;
   return {
     ...ex,
     questions: quiz(lang, `exam.${ex.moduleId}`, ex.questions as ExamQuestion[]),
