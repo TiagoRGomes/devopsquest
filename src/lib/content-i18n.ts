@@ -6,6 +6,7 @@ import { CONTENT_ES_B, CONTENT_EN_B } from "@/lib/content-i18n/b";
 import { CONTENT_ES_C, CONTENT_EN_C } from "@/lib/content-i18n/c";
 import { CONTENT_GEN_ES } from "@/lib/content-i18n/gen-es";
 import { CONTENT_GEN_EN } from "@/lib/content-i18n/gen-en";
+import { overrideList, overrideText } from "@/lib/content-overrides";
 
 export type ContentDict = Record<string, string>;
 
@@ -15,13 +16,15 @@ const DICTS: Record<Lang, ContentDict> = {
   en: { ...CONTENT_GEN_EN, ...CONTENT_EN_A, ...CONTENT_EN_B, ...CONTENT_EN_C },
 };
 
-/** Retorna o texto traduzido do conteúdo ou o original em português. */
+/** Retorna o texto editado na administração, o traduzido, ou o original em português. */
 export function contentText(lang: Lang, id: string, field: string, fallback: string): string {
-  return DICTS[lang][`${id}.${field}`] ?? fallback;
+  return overrideText(lang, id, field) ?? DICTS[lang][`${id}.${field}`] ?? fallback;
 }
 
 /** Traduz uma lista de textos curtos (passos, critérios) quando houver tradução. */
 export function contentList(lang: Lang, id: string, field: string, fallback: string[]): string[] {
+  const edited = overrideList(lang, id, field);
+  if (edited && edited.length > 0) return edited;
   const joined = DICTS[lang][`${id}.${field}`];
   if (!joined) return fallback;
   const parts = joined.split(" | ").map((s) => s.trim());
