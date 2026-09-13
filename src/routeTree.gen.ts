@@ -19,6 +19,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DesafiosRouteImport } from './routes/desafios'
 import { Route as LaboratoriosRouteImport } from './routes/laboratorios'
 import { Route as MapaRouteImport } from './routes/mapa'
+import { Route as MinhaTrilhaRouteImport } from './routes/minha-trilha'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as ProjetoRouteImport } from './routes/projeto'
 import { Route as RecursosRouteImport } from './routes/recursos'
@@ -78,6 +79,11 @@ const MapaRoute = MapaRouteImport.update({
   path: '/mapa',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MinhaTrilhaRoute = MinhaTrilhaRouteImport.update({
+  id: '/minha-trilha',
+  path: '/minha-trilha',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PerfilRoute = PerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/desafios': typeof DesafiosRoute
   '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
+  '/minha-trilha': typeof MinhaTrilhaRoute
   '/perfil': typeof PerfilRoute
   '/projeto': typeof ProjetoRoute
   '/recursos': typeof RecursosRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/desafios': typeof DesafiosRoute
   '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
+  '/minha-trilha': typeof MinhaTrilhaRoute
   '/perfil': typeof PerfilRoute
   '/projeto': typeof ProjetoRoute
   '/recursos': typeof RecursosRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/desafios': typeof DesafiosRoute
   '/laboratorios': typeof LaboratoriosRoute
   '/mapa': typeof MapaRoute
+  '/minha-trilha': typeof MinhaTrilhaRoute
   '/perfil': typeof PerfilRoute
   '/projeto': typeof ProjetoRoute
   '/recursos': typeof RecursosRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/desafios'
     | '/laboratorios'
     | '/mapa'
+    | '/minha-trilha'
     | '/perfil'
     | '/projeto'
     | '/recursos'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/desafios'
     | '/laboratorios'
     | '/mapa'
+    | '/minha-trilha'
     | '/perfil'
     | '/projeto'
     | '/recursos'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/desafios'
     | '/laboratorios'
     | '/mapa'
+    | '/minha-trilha'
     | '/perfil'
     | '/projeto'
     | '/recursos'
@@ -254,6 +266,7 @@ export interface RootRouteChildren {
   DesafiosRoute: typeof DesafiosRoute
   LaboratoriosRoute: typeof LaboratoriosRoute
   MapaRoute: typeof MapaRoute
+  MinhaTrilhaRoute: typeof MinhaTrilhaRoute
   PerfilRoute: typeof PerfilRoute
   ProjetoRoute: typeof ProjetoRoute
   RecursosRoute: typeof RecursosRoute
@@ -336,6 +349,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MapaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/minha-trilha': {
+      id: '/minha-trilha'
+      path: '/minha-trilha'
+      fullPath: '/minha-trilha'
+      preLoaderRoute: typeof MinhaTrilhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/perfil': {
       id: '/perfil'
       path: '/perfil'
@@ -406,6 +426,7 @@ const rootRouteChildren: RootRouteChildren = {
   DesafiosRoute: DesafiosRoute,
   LaboratoriosRoute: LaboratoriosRoute,
   MapaRoute: MapaRoute,
+  MinhaTrilhaRoute: MinhaTrilhaRoute,
   PerfilRoute: PerfilRoute,
   ProjetoRoute: ProjetoRoute,
   RecursosRoute: RecursosRoute,
