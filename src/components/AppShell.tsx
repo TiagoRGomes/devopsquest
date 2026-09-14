@@ -32,6 +32,7 @@ import { XpBar } from "@/components/ui-bits";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { contentText, slugifyClassName } from "@/lib/content-i18n";
+import { useIsAdmin } from "@/lib/admin";
 
 const NAV = [
   { to: "/dashboard", key: "nav.dashboard", icon: Gauge },
@@ -57,10 +58,11 @@ const BARE_ROUTES = ["/", "/auth"];
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { t , lang } = useI18n();
+  const { isAdmin } = useIsAdmin();
 
   return (
     <nav className="space-y-1" aria-label={t("nav.aria")}>
-      {NAV.map(({ to, key, icon: Icon }) => {
+      {NAV.filter((item) => item.to !== "/admin" || isAdmin).map(({ to, key, icon: Icon }) => {
         const active = pathname.startsWith(to);
         return (
           <Link
