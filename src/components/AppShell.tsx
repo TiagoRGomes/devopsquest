@@ -6,6 +6,7 @@ import {
   BookOpen,
   Boxes,
   Briefcase,
+  CalendarRange,
   Flame,
   FlaskConical,
   Gauge,
@@ -19,6 +20,7 @@ import {
   Target,
   Terminal,
   UserCog,
+  Wand2,
   X,
   Zap,
 } from "lucide-react";
@@ -30,9 +32,11 @@ import { XpBar } from "@/components/ui-bits";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { contentText, slugifyClassName } from "@/lib/content-i18n";
+import { useIsAdmin } from "@/lib/admin";
 
 const NAV = [
   { to: "/dashboard", key: "nav.dashboard", icon: Gauge },
+  { to: "/minha-trilha", key: "nav.path", icon: CalendarRange },
   { to: "/mapa", key: "nav.map", icon: Map },
   { to: "/skills", key: "nav.skills", icon: Activity },
   { to: "/modulos", key: "nav.modules", icon: BookOpen },
@@ -45,6 +49,7 @@ const NAV = [
   { to: "/certificados", key: "exam.nav", icon: ScrollText },
   { to: "/recursos", key: "nav.resources", icon: Library },
   { to: "/perfil", key: "nav.profile", icon: UserCog },
+  { to: "/admin", key: "nav.admin", icon: Wand2 },
 ] as const;
 
 /** Rotas que têm layout próprio (tela inicial e acesso). */
@@ -53,10 +58,11 @@ const BARE_ROUTES = ["/", "/auth"];
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { t , lang } = useI18n();
+  const { isAdmin } = useIsAdmin();
 
   return (
     <nav className="space-y-1" aria-label={t("nav.aria")}>
-      {NAV.map(({ to, key, icon: Icon }) => {
+      {NAV.filter((item) => item.to !== "/admin" || isAdmin).map(({ to, key, icon: Icon }) => {
         const active = pathname.startsWith(to);
         return (
           <Link
