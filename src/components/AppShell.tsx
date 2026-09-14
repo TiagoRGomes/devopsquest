@@ -6,6 +6,7 @@ import {
   BookOpen,
   Boxes,
   Briefcase,
+  CalendarRange,
   Flame,
   FlaskConical,
   Gauge,
@@ -19,6 +20,7 @@ import {
   Target,
   Terminal,
   UserCog,
+  Wand2,
   X,
   Zap,
 } from "lucide-react";
