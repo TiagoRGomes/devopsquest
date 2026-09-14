@@ -33,6 +33,7 @@ import { contentText, slugifyClassName } from "@/lib/content-i18n";
 
 const NAV = [
   { to: "/dashboard", key: "nav.dashboard", icon: Gauge },
+  { to: "/minha-trilha", key: "nav.path", icon: CalendarRange },
   { to: "/mapa", key: "nav.map", icon: Map },
   { to: "/skills", key: "nav.skills", icon: Activity },
   { to: "/modulos", key: "nav.modules", icon: BookOpen },
@@ -45,6 +46,7 @@ const NAV = [
   { to: "/certificados", key: "exam.nav", icon: ScrollText },
   { to: "/recursos", key: "nav.resources", icon: Library },
   { to: "/perfil", key: "nav.profile", icon: UserCog },
+  { to: "/admin", key: "nav.admin", icon: Wand2 },
 ] as const;
 
 /** Rotas que têm layout próprio (tela inicial e acesso). */
