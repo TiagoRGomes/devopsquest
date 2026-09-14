@@ -15,6 +15,7 @@ import { ProgressProvider } from "@/lib/progress";
 import { AuthProvider } from "@/lib/auth";
 import { I18nProvider } from "@/lib/i18n";
 import { AppShell } from "@/components/AppShell";
+import { ContentOverridesProvider } from "@/lib/content-overrides";
 import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
@@ -133,11 +134,13 @@ function RootComponent() {
       <I18nProvider>
         <AuthProvider>
           <ProgressProvider>
-            <AppShell>
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-              <Outlet />
-            </AppShell>
-            <Toaster position="bottom-right" />
+            <ContentOverridesProvider>
+              <AppShell>
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+                <Outlet />
+              </AppShell>
+              <Toaster position="bottom-right" />
+            </ContentOverridesProvider>
           </ProgressProvider>
         </AuthProvider>
       </I18nProvider>
