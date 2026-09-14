@@ -157,7 +157,7 @@ function MinhaTrilhaPage() {
             <Panel
               as="li"
               key={w.index}
-              className={isCurrent ? "border-primary/50 shadow-[0_0_0_1px_var(--primary)]" : undefined}
+              className={isCurrent ? "border-primary/50 shadow-[0_0_0_1px_var(--primary)]" : ""}
             >
               <div className="flex flex-wrap items-center gap-2">
                 <span className="grid size-8 place-items-center rounded-lg bg-level font-mono text-xs font-semibold text-primary-foreground">
