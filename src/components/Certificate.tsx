@@ -1,5 +1,6 @@
-import { Printer, ShieldCheck } from "lucide-react";
+import { Download, Printer, ShieldCheck } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { downloadCertificatePdf } from "@/lib/certificate-pdf";
 
 export interface CertificateData {
   kind: "module" | "final";
@@ -86,13 +87,37 @@ export function Certificate({ data }: { data: CertificateData }) {
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={() => window.print()}
-        className="no-print inline-flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-      >
-        <Printer className="size-4" /> {t("cert.print")}
-      </button>
+      <div className="no-print flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            downloadCertificatePdf(data, {
+              brand: t("brand.name"),
+              heading: isFinal ? t("cert.final") : t("cert.module"),
+              certifies: t("cert.certifies"),
+              line: isFinal
+                ? t("cert.finalLine", { lessons: data.lessons ?? 0, labs: data.labs ?? 0 })
+                : t("cert.moduleLine", { module: data.moduleTitle ?? "", score: data.score ?? 0 }),
+              hoursLabel: isFinal ? t("cert.hours") : t("cert.hoursModule"),
+              issuedLabel: t("cert.issued"),
+              codeLabel: t("cert.code"),
+              signature: t("cert.signature"),
+              hoursValue: `${data.hours}h`,
+              issuedValue: formatDate(data.issuedAt, lang),
+            });
+          }}
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+        >
+          <Download className="size-4" /> {t("cert.download")}
+        </button>
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3.5 py-2 text-sm font-semibold text-foreground hover:border-primary/50"
+        >
+          <Printer className="size-4" /> {t("cert.print")}
+        </button>
+      </div>
     </div>
   );
 }
