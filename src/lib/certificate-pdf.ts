@@ -98,7 +98,7 @@ export function buildCertificatePdf(data: CertificateData, labels: CertificateLa
     const cx = W / 4 + (i * (W / 2)) / 2;
     doc.setFontSize(9);
     doc.setTextColor(130, 136, 148);
-    doc.text(col.label.toUpperCase(), cx, boxY, { align: "center", charSpace: 1.2 });
+    doc.text(col.label.toUpperCase(), cx, boxY, { align: "center" });
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
