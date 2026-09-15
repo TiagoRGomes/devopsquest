@@ -88,7 +88,7 @@ export function buildCertificatePdf(data: CertificateData, labels: CertificateLa
   const lines = doc.splitTextToSize(labels.line, W - 220);
   doc.text(lines, W / 2, 286, { align: "center" });
 
-  const boxY = H - 150;
+  const boxY = 380;
   const cols = [
     { label: labels.hoursLabel, value: labels.hoursValue },
     { label: labels.issuedLabel, value: labels.issuedValue },
