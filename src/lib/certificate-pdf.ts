@@ -88,7 +88,7 @@ export function buildCertificatePdf(data: CertificateData, labels: CertificateLa
   const lines = doc.splitTextToSize(labels.line, W - 220);
   doc.text(lines, W / 2, 286, { align: "center" });
 
-  const boxY = H - 150;
+  const boxY = 380;
   const cols = [
     { label: labels.hoursLabel, value: labels.hoursValue },
     { label: labels.issuedLabel, value: labels.issuedValue },
@@ -98,7 +98,7 @@ export function buildCertificatePdf(data: CertificateData, labels: CertificateLa
     const cx = W / 4 + (i * (W / 2)) / 2;
     doc.setFontSize(9);
     doc.setTextColor(130, 136, 148);
-    doc.text(col.label.toUpperCase(), cx, boxY, { align: "center", charSpace: 1.2 });
+    doc.text(col.label.toUpperCase(), cx, boxY, { align: "center" });
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);

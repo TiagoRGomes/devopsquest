@@ -4,6 +4,7 @@ import { Award, Lock, ScrollText } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
+import { contentText } from "@/lib/content-i18n";
 import { ALL_LESSONS, MODULES } from "@/data/curriculum";
 import { LABS } from "@/data/labs";
 import { Chip, EmptyState, Panel, SectionTitle } from "@/components/ui-bits";
@@ -47,7 +48,7 @@ function code(prefix: string, seed: string) {
 }
 
 function CertificadosPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { progress, moduleCertificates, courseComplete } = useProgress();
   const { profile, user } = useAuth();
   const [selected, setSelected] = useState<string>("final");
@@ -64,7 +65,7 @@ function CertificadosPage() {
     ? {
         kind: "module",
         studentName,
-        moduleTitle: activeModule.title,
+        moduleTitle: contentText(lang, activeModule.id, "title", activeModule.title),
         score: progress.moduleExams[activeModule.id]?.best ?? 0,
         hours: moduleHours(activeModule.id),
         issuedAt: progress.moduleExams[activeModule.id]?.passedAt ?? new Date().toISOString().slice(0, 10),
@@ -127,7 +128,7 @@ function CertificadosPage() {
                 }`}
               >
                 <Award className="size-4 text-success" />
-                <span className="min-w-0 flex-1 truncate">{m.title}</span>
+                <span className="min-w-0 flex-1 truncate">{contentText(lang, m.id, "title", m.title)}</span>
                 <Chip tone="success">{progress.moduleExams[m.id]?.best ?? 0}%</Chip>
               </button>
             ))}
