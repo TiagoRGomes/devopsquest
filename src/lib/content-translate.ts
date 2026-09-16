@@ -190,7 +190,7 @@ export function tAxis(lang: Lang, a: MaturityAxis): MaturityAxis {
 export function tExam(lang: Lang, ex: ModuleExam): ModuleExam {
   return {
     ...ex,
-    questions: quiz(lang, `exam.${ex.moduleId}`, ex.questions as ExamQuestion[]),
+    questions: quiz(lang, `exam.${ex.moduleId}`, ex.questions as ExamQuestion[], "questionsJson"),
   };
 }
 
