@@ -14,10 +14,14 @@ import type {
   Skill,
 } from "@/lib/types";
 import type { ExamQuestion, ModuleExam, QuizQuestion } from "@/lib/types";
-import { contentList, contentText, slugifyClassName } from "@/lib/content-i18n";
+import { contentList, contentObjects, contentText, slugifyClassName } from "@/lib/content-i18n";
+import { overrideText } from "@/lib/content-overrides";
+import type { CodeBlock } from "@/lib/types";
 
-function quiz<T extends QuizQuestion>(lang: Lang, id: string, questions: T[]): T[] {
-  return questions.map((q, i) => ({
+function quiz<T extends QuizQuestion>(lang: Lang, id: string, questions: T[], field = "quizJson"): T[] {
+  const edited = contentObjects<T>(lang, id, field, []);
+  const base = edited.length > 0 ? edited : questions;
+  return base.map((q, i) => ({
     ...q,
     question: contentText(lang, id, `q${i}`, q.question),
     options: contentList(lang, id, `q${i}opts`, q.options),
@@ -26,9 +30,12 @@ function quiz<T extends QuizQuestion>(lang: Lang, id: string, questions: T[]): T
 }
 
 export function tLesson(lang: Lang, l: Lesson): Lesson {
-  const terms = contentList(lang, l.id, "glossaryTerms", l.glossary.map((g) => g.term));
-  const defs = contentList(lang, l.id, "glossaryDefs", l.glossary.map((g) => g.definition));
-  const labels = contentList(lang, l.id, "codeLabels", l.code.map((c) => c.label));
+  const glossary = contentObjects(lang, l.id, "glossaryJson", l.glossary);
+  const terms = contentList(lang, l.id, "glossaryTerms", glossary.map((g) => g.term));
+  const defs = contentList(lang, l.id, "glossaryDefs", glossary.map((g) => g.definition));
+  const code = contentObjects<CodeBlock>(lang, l.id, "codeJson", l.code);
+  const labels = contentList(lang, l.id, "codeLabels", code.map((c) => c.label));
+  const securityAlert = overrideText(lang, l.id, "securityAlert") ?? l.securityAlert;
   const { securityAlert: _drop, ...base } = l;
   void _drop;
   return {
@@ -39,15 +46,13 @@ export function tLesson(lang: Lang, l: Lesson): Lesson {
     whyItMatters: contentText(lang, l.id, "whyItMatters", l.whyItMatters),
     commonMistake: contentText(lang, l.id, "commonMistake", l.commonMistake),
     productionTip: contentText(lang, l.id, "productionTip", l.productionTip),
-    ...(l.securityAlert
-      ? { securityAlert: contentText(lang, l.id, "securityAlert", l.securityAlert) }
-      : {}),
+    ...(securityAlert ? { securityAlert } : {}),
     interviewQuestion: contentText(lang, l.id, "interviewQuestion", l.interviewQuestion),
-    glossary: l.glossary.map((g, i) => ({
+    glossary: glossary.map((g, i) => ({
       term: terms[i] ?? g.term,
       definition: defs[i] ?? g.definition,
     })),
-    code: l.code.map((c, i) => ({
+    code: code.map((c, i) => ({
       language: c.language,
       code: c.code,
       label: labels[i] ?? c.label,
@@ -185,7 +190,7 @@ export function tAxis(lang: Lang, a: MaturityAxis): MaturityAxis {
 export function tExam(lang: Lang, ex: ModuleExam): ModuleExam {
   return {
     ...ex,
-    questions: quiz(lang, `exam.${ex.moduleId}`, ex.questions as ExamQuestion[]),
+    questions: quiz(lang, `exam.${ex.moduleId}`, ex.questions as ExamQuestion[], "questionsJson"),
   };
 }
 
