@@ -6,7 +6,7 @@ import { CONTENT_ES_B, CONTENT_EN_B } from "@/lib/content-i18n/b";
 import { CONTENT_ES_C, CONTENT_EN_C } from "@/lib/content-i18n/c";
 import { CONTENT_GEN_ES } from "@/lib/content-i18n/gen-es";
 import { CONTENT_GEN_EN } from "@/lib/content-i18n/gen-en";
-import { overrideList, overrideText } from "@/lib/content-overrides";
+import { overrideList, overrideObjects, overrideText } from "@/lib/content-overrides";
 
 export type ContentDict = Record<string, string>;
 
@@ -29,6 +29,22 @@ export function contentList(lang: Lang, id: string, field: string, fallback: str
   if (!joined) return fallback;
   const parts = joined.split(" | ").map((s) => s.trim());
   return parts.length === fallback.length ? parts : fallback;
+}
+
+/** Estruturas completas editadas na administração (quiz, glossário, códigos…). */
+export function contentObjects<T>(lang: Lang, id: string, field: string, fallback: T[]): T[] {
+  return overrideObjects<T>(lang, id, field) ?? fallback;
+}
+
+export interface ContentLink {
+  label: string;
+  url: string;
+}
+
+/** Links extras adicionados na administração para um módulo ou aula. */
+export function contentLinks(lang: Lang, id: string): ContentLink[] {
+  const list = overrideObjects<ContentLink>(lang, id, "linksJson") ?? [];
+  return list.filter((l) => Boolean(l?.url));
 }
 
 /** Converte o nome da classe de nível em uma chave estável. */
