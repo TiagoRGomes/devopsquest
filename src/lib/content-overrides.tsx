@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { supabase } from "@/integrations/supabase/client";
 import type { Lang } from "@/lib/i18n";
 
-export type OverrideValue = string | string[];
+export type OverrideValue = string | string[] | Record<string, unknown>[];
 export type OverrideData = Record<string, OverrideValue>;
 
 export interface OverrideRow {
@@ -14,7 +14,7 @@ export interface OverrideRow {
   data: OverrideData;
 }
 
-/** Mapa `${lang}:${entityId}.${field}` → texto ou lista. */
+/** Mapa `${lang}:${entityId}.${field}` → texto, lista ou estrutura. */
 let REGISTRY: Record<string, OverrideValue> = {};
 
 export function setOverrideRegistry(rows: OverrideRow[]) {
@@ -35,8 +35,15 @@ export function overrideText(lang: Lang, id: string, field: string): string | un
 
 export function overrideList(lang: Lang, id: string, field: string): string[] | undefined {
   const v = REGISTRY[`${lang}:${id}.${field}`];
-  if (Array.isArray(v)) return v;
+  if (Array.isArray(v) && v.every((i) => typeof i === "string")) return v as string[];
   if (typeof v === "string" && v.includes(" | ")) return v.split(" | ").map((s) => s.trim());
+  return undefined;
+}
+
+/** Estruturas completas gravadas na administração (quiz, glossário, códigos, links). */
+export function overrideObjects<T>(lang: Lang, id: string, field: string): T[] | undefined {
+  const v = REGISTRY[`${lang}:${id}.${field}`];
+  if (Array.isArray(v) && v.every((i) => typeof i === "object" && i !== null)) return v as T[];
   return undefined;
 }
 
