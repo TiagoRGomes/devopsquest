@@ -46,15 +46,13 @@ export function tLesson(lang: Lang, l: Lesson): Lesson {
     whyItMatters: contentText(lang, l.id, "whyItMatters", l.whyItMatters),
     commonMistake: contentText(lang, l.id, "commonMistake", l.commonMistake),
     productionTip: contentText(lang, l.id, "productionTip", l.productionTip),
-    ...(l.securityAlert
-      ? { securityAlert: contentText(lang, l.id, "securityAlert", l.securityAlert) }
-      : {}),
+    ...(securityAlert ? { securityAlert } : {}),
     interviewQuestion: contentText(lang, l.id, "interviewQuestion", l.interviewQuestion),
-    glossary: l.glossary.map((g, i) => ({
+    glossary: glossary.map((g, i) => ({
       term: terms[i] ?? g.term,
       definition: defs[i] ?? g.definition,
     })),
-    code: l.code.map((c, i) => ({
+    code: code.map((c, i) => ({
       language: c.language,
       code: c.code,
       label: labels[i] ?? c.label,
