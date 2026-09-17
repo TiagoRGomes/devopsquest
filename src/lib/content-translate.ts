@@ -73,6 +73,7 @@ export function tModule(lang: Lang, m: Module): Module {
     overview: contentText(lang, m.id, "overview", m.overview),
     objectives: contentList(lang, m.id, "objectives", m.objectives),
     prerequisites: contentList(lang, m.id, "prerequisites", m.prerequisites),
+    topics: contentList(lang, m.id, "topics", m.topics),
     delivery: contentText(lang, m.id, "delivery", m.delivery),
     checklist: contentList(lang, m.id, "checklist", m.checklist),
     troubleshooting: contentText(lang, m.id, "troubleshooting", m.troubleshooting),
