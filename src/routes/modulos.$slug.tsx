@@ -2,7 +2,8 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Award, BookOpen, Check, FlaskConical, GraduationCap, Lock, Skull } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { useI18n } from "@/lib/i18n";
-import { contentText, contentList } from "@/lib/content-i18n";
+import { contentText, contentList, contentLinks } from "@/lib/content-i18n";
+import { RichText } from "@/lib/rich-text";
 import { tBadge, tBoss, tLab, tModule } from "@/lib/content-translate";
 import { PASS_SCORE, getExam } from "@/data/exams";
 import { getModule } from "@/data/curriculum";
@@ -62,13 +63,14 @@ function ModuloDetail() {
   const modOverview = contentText(lang, mod.id, "overview", mod.overview);
   const modObjectives = contentList(lang, mod.id, "objectives", mod.objectives);
   const badgeName = badge ? contentText(lang, badge.id, "name", badge.name) : undefined;
+  const modLinks = contentLinks(lang, mod.id);
 
   return (
     <div className="space-y-6">
       <Panel className="bg-hero">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{t("mod.moduleIndex", { index: mod.index })}</p>
         <h1 className="mt-1.5 font-display text-2xl font-semibold text-foreground sm:text-3xl">{modTitle}</h1>
-        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{modOverview}</p>
+        <RichText value={modOverview} className="mt-2 max-w-3xl text-sm text-muted-foreground" />
         <div className="mt-4 flex flex-wrap gap-1.5">
           <Chip tone="primary">{t("mod.weeks", { n: mod.weeks })}</Chip>
           <Chip tone="accent">{mod.xp} XP</Chip>
@@ -108,7 +110,7 @@ function ModuloDetail() {
         </Panel>
         <Panel>
           <h2 className="font-display font-semibold text-foreground">{t("mod.delivery")}</h2>
-          <p className="mt-3 text-sm text-muted-foreground">{mod.delivery}</p>
+          <RichText value={mod.delivery} className="mt-3 text-sm text-muted-foreground" />
           <h3 className="mt-4 font-medium text-foreground">{t("mod.checklist")}</h3>
           <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
             {mod.checklist.map((c) => (
@@ -236,11 +238,25 @@ function ModuloDetail() {
         <Panel className="space-y-3">
           <h2 className="font-display font-semibold text-foreground">{t("mod.troubleshootingTitle")}</h2>
           <InsightBox label={t("mod.troubleWhenBreaks")} tone="mistake">
-            {mod.troubleshooting}
+            <RichText value={mod.troubleshooting} />
           </InsightBox>
           <InsightBox label={t("mod.troubleCloudShop")} tone="tip">
-            {mod.printQuest}
+            <RichText value={mod.printQuest} />
           </InsightBox>
+          {modLinks.length > 0 && (
+            <div>
+              <h3 className="mt-2 font-medium text-foreground">{t("mod.links")}</h3>
+              <ul className="mt-2 space-y-1.5 text-sm">
+                {modLinks.map((l) => (
+                  <li key={l.url}>
+                    <a href={l.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </Panel>
         <Panel>
           <h2 className="font-display font-semibold text-foreground">{t("mod.interviewTitle")}</h2>
