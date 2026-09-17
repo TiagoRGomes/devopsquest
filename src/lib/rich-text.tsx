@@ -110,10 +110,20 @@ const PROSE = [
   "[&_iframe]:my-3 [&_iframe]:aspect-video [&_iframe]:w-full [&_iframe]:rounded-xl [&_iframe]:border [&_iframe]:border-border",
 ].join(" ");
 
-export function RichText({ value, className = "" }: { value: string; className?: string }) {
-  return (
-    <div className={`${PROSE} ${className}`} dangerouslySetInnerHTML={{ __html: toHtml(value) }} />
-  );
+export function RichText({
+  value,
+  className = "",
+  inline = false,
+}: {
+  value: string;
+  className?: string;
+  inline?: boolean;
+}) {
+  const html = { __html: toHtml(value) };
+  if (inline) {
+    return <span className={`${PROSE} block ${className}`} dangerouslySetInnerHTML={html} />;
+  }
+  return <div className={`${PROSE} ${className}`} dangerouslySetInnerHTML={html} />;
 }
 
 /** Converte um link de vídeo (YouTube, Vimeo, arquivo) no HTML de incorporação. */
