@@ -5,7 +5,8 @@ import { useProgress } from "@/lib/progress";
 import { getLesson, getLessonNeighbors, getModuleById } from "@/data/curriculum";
 import { Chip, DifficultyChip, EmptyState, InsightBox, Panel } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
-import { contentText, contentList } from "@/lib/content-i18n";
+import { contentText, contentList, contentLinks } from "@/lib/content-i18n";
+import { RichText } from "@/lib/rich-text";
 import { CodeBlock } from "@/components/CodeBlock";
 import { tLesson } from "@/lib/content-translate";
 
@@ -66,6 +67,7 @@ function LessonPage() {
   const lessonTitle = contentText(lang, lesson.id, "title", lesson.title);
   const modTitle = mod ? contentText(lang, mod.id, "title", mod.title) : undefined;
   const lessonObjectives = contentList(lang, lesson.id, "objectives", lesson.objectives);
+  const lessonLinks = contentLinks(lang, lesson.id);
 
   return (
     <article className="mx-auto max-w-4xl space-y-6">
@@ -104,9 +106,7 @@ function LessonPage() {
 
       <div className="space-y-4">
         {lesson.body.map((p, i) => (
-          <p key={i} className="text-[15px] leading-relaxed text-foreground/90">
-            {p}
-          </p>
+          <RichText key={i} value={p} className="text-[15px] leading-relaxed text-foreground/90" />
         ))}
       </div>
 
@@ -121,21 +121,21 @@ function LessonPage() {
 
       <section className="space-y-3">
         <InsightBox label={t("lesson.whyMatters")} tone="why">
-          {lesson.whyItMatters}
+          <RichText value={lesson.whyItMatters} />
         </InsightBox>
         <InsightBox label={t("lesson.commonMistake")} tone="mistake">
-          {lesson.commonMistake}
+          <RichText value={lesson.commonMistake} />
         </InsightBox>
         <InsightBox label={t("lesson.productionTip")} tone="tip">
-          {lesson.productionTip}
+          <RichText value={lesson.productionTip} />
         </InsightBox>
         {lesson.securityAlert && (
           <InsightBox label={t("lesson.securityAlert")} tone="security">
-            {lesson.securityAlert}
+            <RichText value={lesson.securityAlert} />
           </InsightBox>
         )}
         <InsightBox label={t("lesson.interviewQuestion")} tone="interview">
-          {lesson.interviewQuestion}
+          <RichText value={lesson.interviewQuestion} />
         </InsightBox>
       </section>
 
@@ -153,8 +153,28 @@ function LessonPage() {
 
       <Panel>
         <h2 className="font-display font-semibold text-foreground">{t("lesson.printQuestConnection")}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{lesson.printQuestLink}</p>
+        <RichText value={lesson.printQuestLink} className="mt-2 text-sm text-muted-foreground" />
       </Panel>
+
+      {lessonLinks.length > 0 && (
+        <Panel>
+          <h2 className="font-display font-semibold text-foreground">{t("lesson.links")}</h2>
+          <ul className="mt-3 space-y-2 text-sm">
+            {lessonLinks.map((l) => (
+              <li key={l.url}>
+                <a
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
 
       {lesson.quiz.length > 0 && (
         <Panel>
