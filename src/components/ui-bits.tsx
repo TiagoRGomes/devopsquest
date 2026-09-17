@@ -130,7 +130,7 @@ export function InsightBox({
   return (
     <div className={cn("rounded-r-lg border-l-2 px-4 py-3", styles[tone])}>
       <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.14em] text-foreground/70">{label}</p>
-      <p className="text-sm leading-relaxed text-foreground/90">{children}</p>
+      <div className="text-sm leading-relaxed text-foreground/90">{children}</div>
     </div>
   );
 }
