@@ -845,34 +845,94 @@ aws iam delete-access-key --access-key-id AKIAEXEMPLO --user-name estudo`,
         id: "l-1-1",
         moduleId: "mod-1",
         title: "Filesystem e navegação com intenção",
-        duration: 35,
+        duration: 45,
         difficulty: "Iniciante",
         tools: ["Shell", "coreutils", "find", "grep"],
         xp: 25,
-        objectives: ["Entender a hierarquia FHS", "Buscar arquivos e conteúdo rapidamente", "Inspecionar arquivos grandes sem travar o terminal"],
+        objectives: [
+          "Entender a hierarquia FHS e o propósito de cada diretório",
+          "Buscar arquivos e conteúdo rapidamente com find e grep",
+          "Inspecionar arquivos grandes sem travar o terminal",
+          "Usar links simbólicos em estratégias de release e rollback",
+          "Descobrir quem está consumindo espaço em disco",
+        ],
         body: [
-          "O Linux organiza tudo em uma árvore única a partir de /. Saber o significado de cada diretório acelera qualquer investigação: /etc guarda configuração, /var dados variáveis (logs, filas, bancos), /usr programas do sistema, /opt software de terceiros, /tmp arquivos temporários e /proc uma visão viva do kernel e dos processos. Quando alguém diz 'a config está errada', você já sabe onde procurar.",
-          "Buscar é metade do trabalho. find localiza por nome, tamanho, data e permissão; grep -r localiza conteúdo; ripgrep faz isso mais rápido quando disponível. Em servidores de produção, combine com head e tail para nunca abrir um arquivo de gigabytes de uma vez — um cat descuidado em log de 4 GB congela sua sessão em plena crise.",
-          "Duas noções salvam tempo: caminhos absolutos versus relativos (em scripts e serviços, sempre absolutos) e links simbólicos, muito usados em deploy para apontar 'current' para a release ativa e permitir rollback instantâneo.",
+          "<h3>1. Uma árvore só, começando em /</h3><p>Diferente do Windows, o Linux não tem letras de unidade: tudo parte de <code>/</code>. Discos adicionais são \"montados\" em um diretório (por exemplo <code>/mnt/dados</code>) e passam a fazer parte da mesma árvore. Entender isso evita confusão quando um disco cheio afeta só parte do sistema.</p>",
+          "<h3>2. O mapa que acelera qualquer investigação</h3><ul><li><code>/etc</code> — configuração do sistema e dos serviços.</li><li><code>/var</code> — dados que mudam: logs, filas, bancos, caches.</li><li><code>/usr</code> — programas e bibliotecas do sistema.</li><li><code>/opt</code> — software de terceiros ou da empresa (usaremos <code>/opt/cloudshop</code>).</li><li><code>/tmp</code> — temporários, apagados no reinício.</li><li><code>/home</code> — arquivos de pessoas.</li><li><code>/proc</code> e <code>/sys</code> — visão viva do kernel e dos processos.</li></ul><p>Quando alguém disser \"a configuração está errada\", você já sabe onde olhar; quando disser \"o disco encheu\", você começa por <code>/var</code>.</p>",
+          "<h3>3. Caminhos absolutos e relativos</h3><p><code>/opt/cloudshop/server.js</code> é absoluto: funciona de qualquer lugar. <code>./server.js</code> é relativo ao diretório atual. Regra profissional: em scripts, serviços systemd e pipelines use <strong>sempre absoluto</strong>, porque você não controla de onde o processo será iniciado.</p>",
+          "<h3>4. Navegar com poucas teclas</h3><p><code>pwd</code> diz onde você está, <code>cd -</code> volta ao diretório anterior, <code>cd</code> sozinho vai para a sua home. <code>ls -alh</code> mostra tudo, inclusive arquivos ocultos, com tamanho legível. <code>tree -L 2</code> dá a visão de estrutura em dois níveis — ótimo para entender um servidor desconhecido.</p>",
+          "<h3>5. find: buscar por características do arquivo</h3><p><code>find</code> filtra por nome (<code>-name</code>), tamanho (<code>-size +50M</code>), tempo de modificação (<code>-mtime -2</code> = últimas 48 h), tipo (<code>-type f</code>) e permissão (<code>-perm</code>). É a ferramenta para perguntas como \"qual arquivo de configuração mudou ontem?\" — pergunta que resolve incidentes causados por alteração manual.</p>",
+          "<h3>6. grep: buscar dentro do conteúdo</h3><p><code>grep -rn \"DATABASE_URL\" /etc/</code> mostra arquivo e linha. Opções que valem memorizar: <code>-i</code> ignora maiúsculas, <code>-c</code> conta ocorrências, <code>-v</code> inverte a busca, <code>-A3/-B3</code> mostra linhas de contexto. Onde existir <code>ripgrep</code> (<code>rg</code>), a busca é bem mais rápida.</p>",
+          "<h3>7. Arquivos gigantes: nunca use cat</h3><p>Um <code>cat</code> em log de 4 GB inunda o terminal e trava sua sessão no meio da crise. Use <code>tail -n 100</code> para o fim, <code>tail -f</code> para acompanhar ao vivo, <code>head</code> para o começo e <code>less +G</code> para navegar sem carregar tudo (dentro do <code>less</code>: <code>/termo</code> busca, <code>G</code> vai ao fim, <code>q</code> sai).</p>",
+          "<h3>8. Montando um filtro em linha de montagem (pipes)</h3><p>O <code>|</code> liga a saída de um comando à entrada do próximo. É assim que se constrói diagnóstico: <code>grep ERROR app.log | awk '{print $1}' | sort | uniq -c | sort -rn | head</code> responde \"quais horários concentram erros?\". Aprenda quatro peças — <code>grep</code>, <code>awk</code>, <code>sort</code>, <code>uniq</code> — e você resolve a maioria das análises sem instalar nada.</p>",
+          "<h3>9. Metadados: stat e ls -l</h3><p><code>stat arquivo</code> mostra dono, grupo, permissões, tamanho e três datas (acesso, modificação, mudança de metadados). Em investigação, a data de modificação prova se alguém alterou a configuração antes da falha — evidência objetiva em vez de suposição.</p>",
+          "<h3>10. Links simbólicos e a estratégia de release</h3><p>Um <em>symlink</em> é um atalho para outro caminho. Deploy clássico: cada versão em <code>/opt/cloudshop/releases/2026-09-06</code> e um link <code>current</code> apontando para a ativa. Publicar é trocar o link; reverter também. Isso dá rollback praticamente instantâneo, mesma ideia que Kubernetes implementa com Deployments.</p>",
+          "<h3>11. Espaço em disco: df e du</h3><p><code>df -h</code> responde \"quanto falta em cada ponto de montagem\"; <code>du -xh --max-depth=1 /var | sort -h</code> responde \"quem está ocupando\". Faça sempre nessa ordem: primeiro identifique a partição cheia, depois desça no diretório culpado. Lembre também de <code>df -i</code>: é possível ter espaço livre e ficar sem <em>inodes</em> por excesso de arquivos pequenos.</p>",
+          "<h3>12. Rotina de primeiros 60 segundos em servidor desconhecido</h3><p><code>uname -a</code> e <code>lsb_release -a</code> (que sistema é), <code>df -h</code> (disco), <code>systemctl list-units --type=service --state=running</code> (o que roda), <code>ls /etc | less</code> e <code>ls /var/log</code> (onde estão config e logs). Escreva o resultado no runbook do módulo.</p>",
         ],
         code: [
           {
             label: "Comandos de navegação e busca que você usará todo dia",
             language: "bash",
-            code: `pwd                                 # onde estou
+            code: `pwd                                 # onde estou -> /home/usuario
 ls -alh /etc | head                 # listar com tamanho legivel
 tree -L 2 /var 2>/dev/null || ls -R /var | head
 
 find /var/log -name "*.log" -size +50M          # logs grandes
 find /etc -name "*.conf" -mtime -2              # config alterada nas ultimas 48h
 grep -rn "DATABASE_URL" /etc/cloudshop/ 2>/dev/null
+# /etc/cloudshop/app.env:4:DATABASE_URL=postgres://...
 
-tail -n 100 -f /var/log/syslog       # acompanhar em tempo real
+tail -n 100 -f /var/log/syslog       # acompanhar em tempo real (Ctrl+C sai)
 less +G /var/log/syslog              # abrir no fim sem carregar tudo
 stat /etc/hosts                      # metadados: dono, permissao, datas
-du -xh --max-depth=1 /var | sort -h  # quem ocupa espaco`,
+du -xh --max-depth=1 /var | sort -h  # quem ocupa espaco -> 2,1G /var/log`,
             securityNote:
               "Evite grep recursivo em / como root: além de lento, pode expor conteúdo sensível no histórico do terminal.",
+          },
+          {
+            label: "Análise de log com pipes (sem instalar nada)",
+            language: "bash",
+            code: `# Quantos erros por hora no log da aplicacao
+grep "ERROR" /var/log/cloudshop/app.log | awk '{print substr($2,1,2)}' | sort | uniq -c | sort -rn | head
+#  142 14      <- pico de erros as 14h
+#   87 15
+
+# Top 5 mensagens de erro repetidas
+grep "ERROR" /var/log/cloudshop/app.log | cut -d' ' -f4- | sort | uniq -c | sort -rn | head -5
+
+# IPs que mais acessaram (log do nginx)
+awk '{print $1}' /var/log/nginx/access.log | sort | uniq -c | sort -rn | head -5`,
+          },
+          {
+            label: "Release com symlink: publicar e reverter em segundos",
+            language: "bash",
+            code: `sudo mkdir -p /opt/cloudshop/releases/2026-09-06
+# ... copia os arquivos da nova versao para a pasta acima ...
+sudo ln -sfn /opt/cloudshop/releases/2026-09-06 /opt/cloudshop/current
+ls -l /opt/cloudshop/current
+# current -> /opt/cloudshop/releases/2026-09-06
+
+sudo systemctl restart cloudshop-api      # servico aponta para /opt/cloudshop/current
+
+# Rollback: basta apontar para a versao anterior
+sudo ln -sfn /opt/cloudshop/releases/2026-09-01 /opt/cloudshop/current
+sudo systemctl restart cloudshop-api`,
+          },
+          {
+            label: "Disco cheio: investigação em ordem",
+            language: "bash",
+            code: `df -h                       # /dev/root 40G 40G 0 100% /   <- partição cheia
+df -i                       # confira tambem inodes (IUse% 100% e problema diferente)
+sudo du -xh --max-depth=1 / | sort -h | tail -5
+#  1,2G /usr
+#  6,8G /var          <- desca aqui
+sudo du -xh --max-depth=1 /var | sort -h | tail -3
+#  5,9G /var/log
+sudo find /var/log -type f -size +200M -exec ls -lh {} \\;
+sudo journalctl --vacuum-size=500M   # libera espaco do journal com criterio`,
+            securityNote:
+              "Nunca apague log \"para liberar espaço\" antes de coletar a evidência do incidente: copie o trecho relevante primeiro.",
           },
         ],
         whyItMatters:
@@ -883,6 +943,11 @@ du -xh --max-depth=1 /var | sort -h  # quem ocupa espaco`,
         glossary: [
           { term: "FHS", definition: "Filesystem Hierarchy Standard: convenção sobre o propósito de cada diretório." },
           { term: "symlink", definition: "Atalho que aponta para outro caminho, usado em estratégias de release/rollback." },
+          { term: "ponto de montagem", definition: "Diretório onde um disco ou partição é acoplado à árvore de arquivos." },
+          { term: "inode", definition: "Estrutura que representa um arquivo no filesystem; podem esgotar mesmo com espaço livre." },
+          { term: "pipe", definition: "Operador | que liga a saída de um comando à entrada do próximo." },
+          { term: "glob", definition: "Padrão como *.log usado pelo shell para expandir nomes de arquivos." },
+          { term: "stat", definition: "Comando que exibe metadados de um arquivo: dono, permissões, tamanho e datas." },
         ],
         printQuestLink: "Definir /opt/cloudshop para a aplicação e /var/log/cloudshop para os logs.",
         quiz: [
@@ -892,40 +957,130 @@ du -xh --max-depth=1 /var | sort -h  # quem ocupa espaco`,
             answerIndex: 1,
             explanation: "/etc concentra configuração estática do sistema e dos serviços instalados.",
           },
+          {
+            question: "Qual comando encontra arquivos de configuração alterados nas últimas 48 horas?",
+            options: [
+              "grep -r conf /etc",
+              "find /etc -name '*.conf' -mtime -2",
+              "ls -l /etc",
+              "du -sh /etc",
+            ],
+            answerIndex: 1,
+            explanation: "-mtime -2 filtra por modificação nos últimos dois dias, evidência clássica de mudança manual.",
+          },
+          {
+            question: "O disco está em 100% e você precisa achar o culpado. Qual sequência é correta?",
+            options: [
+              "du em / primeiro, depois df",
+              "df -h para achar a partição, depois du por diretório",
+              "apagar /var/log inteiro",
+              "reiniciar o servidor",
+            ],
+            answerIndex: 1,
+            explanation: "Primeiro identifique a partição cheia (df), depois desça no diretório que ocupa (du).",
+          },
+          {
+            question: "Por que usar symlink 'current' em deploy?",
+            options: [
+              "Economiza disco",
+              "Permite publicar e reverter trocando um único ponteiro",
+              "Acelera a aplicação",
+              "Substitui o systemd",
+            ],
+            answerIndex: 1,
+            explanation: "A troca do link é atômica e barata, o que dá rollback praticamente instantâneo.",
+          },
         ],
       },
       {
         id: "l-1-2",
         moduleId: "mod-1",
         title: "Permissões, usuários e grupos sem decoreba",
-        duration: 40,
+        duration: 45,
         difficulty: "Iniciante",
         tools: ["chmod", "chown", "usermod", "sudo"],
         xp: 25,
-        objectives: ["Ler e escrever permissões em octal e simbólico", "Aplicar propriedade correta em diretórios de aplicação", "Usar sudo com responsabilidade"],
+        objectives: [
+          "Ler e escrever permissões em octal e simbólico",
+          "Diferenciar problema de modo e problema de propriedade",
+          "Aplicar propriedade correta em diretórios de aplicação",
+          "Criar usuário de serviço sem shell de login",
+          "Usar sudo com responsabilidade e rastreabilidade",
+        ],
         body: [
-          "Permissão em Linux responde a três perguntas: quem (dono, grupo, outros), o que (ler, escrever, executar) e sobre qual objeto. Em octal, leitura vale 4, escrita 2 e execução 1; portanto 640 significa dono lê e escreve, grupo lê, outros nada. Em diretórios, execução significa 'poder entrar', o que explica por que 644 em pasta quebra o acesso enquanto 755 funciona.",
-          "A maioria das falhas reais de deploy é de propriedade, não de modo: o processo roda como usuário app, mas o diretório pertence a root. A correção correta é ajustar o dono com chown e conceder o mínimo necessário — não sair distribuindo 777, que é o equivalente a deixar a porta aberta e escrever 'entre'.",
-          "Crie sempre um usuário de serviço sem shell de login para rodar a aplicação. Isso limita o dano em caso de comprometimento e é exigência de qualquer auditoria séria.",
+          "<h3>1. As três perguntas de toda permissão</h3><p>Permissão em Linux responde a: <strong>quem</strong> (dono, grupo, outros), <strong>o que</strong> (ler, escrever, executar) e sobre <strong>qual objeto</strong>. Toda mensagem de <code>permission denied</code> se resolve respondendo essas três perguntas na ordem.</p>",
+          "<h3>2. Lendo ls -l sem decorar</h3><p>Em <code>-rw-r----- 1 cloudshop cloudshop 220 app.env</code>: o primeiro caractere é o tipo (<code>-</code> arquivo, <code>d</code> diretório, <code>l</code> link). Depois vêm três blocos de três: dono, grupo, outros. Aqui o dono lê e escreve, o grupo lê, outros nada — ou seja, <code>640</code>.</p>",
+          "<h3>3. Octal: 4, 2 e 1</h3><p>Leitura vale 4, escrita 2, execução 1; soma-se para cada bloco. Então <code>755</code> = dono 7 (4+2+1), grupo 5 (4+1), outros 5. E <code>640</code> = 6, 4, 0. Com dois minutos de prática isso deixa de exigir consulta.</p>",
+          "<h3>4. Em diretório, 'x' significa entrar</h3><p>Essa é a pegadinha mais comum: <code>644</code> em pasta impede acessar o conteúdo, mesmo com leitura; é preciso <code>x</code> para atravessar o diretório. Por isso o padrão é <code>755</code> (ou <code>750</code>) em diretórios e <code>644</code> (ou <code>640</code>) em arquivos.</p>",
+          "<h3>5. Modo simbólico, quando é mais claro</h3><p><code>chmod u+x script.sh</code> torna executável para o dono; <code>chmod g-w arquivo</code> remove escrita do grupo; <code>chmod o= arquivo</code> zera o acesso de outros. Em scripts, prefira o octal por ser explícito; na mão, o simbólico erra menos.</p>",
+          "<h3>6. Propriedade é diferente de modo</h3><p>A maior parte das falhas reais de deploy é de <strong>dono</strong>, não de permissão: o processo roda como usuário <code>cloudshop</code>, mas o diretório pertence a <code>root</code>. A correção correta é <code>chown</code> para o usuário do serviço, não distribuir <code>777</code> — que é o equivalente a deixar a porta aberta com um aviso de \"entre\".</p>",
+          "<h3>7. Usuários e grupos</h3><p>Grupos existem para compartilhar acesso sem abrir para todos: coloca-se as pessoas (ou serviços) em um grupo e dá permissão ao grupo. <code>id usuario</code> mostra os grupos atuais; <code>usermod -aG grupo usuario</code> adiciona (o <code>-a</code> é obrigatório: sem ele você <em>substitui</em> a lista de grupos). A mudança vale na próxima sessão.</p>",
+          "<h3>8. Usuário de serviço: menor privilégio na prática</h3><p>Crie um usuário de sistema sem home e sem shell (<code>--shell /usr/sbin/nologin</code>) para rodar a aplicação. Se a aplicação for comprometida, o invasor herda um usuário que não pode fazer login e não tem acesso a nada além do necessário. Isso é exigência de qualquer auditoria séria.</p>",
+          "<h3>9. sudo: poder com rastro</h3><p><code>sudo</code> executa como outro usuário (normalmente root) e registra quem fez o quê. Boas práticas: nunca compartilhar conta de root, conceder permissões específicas em arquivos dentro de <code>/etc/sudoers.d/</code>, evitar <code>NOPASSWD</code> e jamais dar sudo irrestrito a um usuário de aplicação.</p>",
+          "<h3>10. umask: as permissões que nascem por padrão</h3><p><code>umask</code> é a máscara que define o que é <em>removido</em> das permissões de arquivos novos. Com <code>umask 022</code>, arquivos nascem <code>644</code> e diretórios <code>755</code>. Em servidores que lidam com dados sensíveis, <code>027</code> é comum: outros não recebem nada.</p>",
+          "<h3>11. Bits especiais que aparecem em prova</h3><ul><li><strong>setuid/setgid</strong>: fazem o programa rodar com o dono/grupo do arquivo — poderoso e perigoso.</li><li><strong>sticky bit</strong> (em <code>/tmp</code>, aparece como <code>drwxrwxrwt</code>): todos escrevem, mas cada um só apaga o que é seu.</li></ul><p>Em auditoria, procurar arquivos com setuid inesperado é rotina de segurança.</p>",
+          "<h3>12. Roteiro para diagnosticar 'permission denied'</h3><ol><li>Qual usuário executa o processo? (<code>ps -o user= -p PID</code>)</li><li>Qual caminho exato ele tentou acessar? (log ou <code>strace</code>)</li><li>Quem é o dono e qual o modo? (<code>ls -l</code>, <code>stat</code>)</li><li>Todos os diretórios do caminho têm <code>x</code> para esse usuário?</li><li>Teste como o serviço: <code>sudo -u cloudshop ls /opt/cloudshop</code>.</li></ol>",
         ],
         code: [
           {
             label: "Usuário de serviço e permissões corretas",
             language: "bash",
             code: `sudo useradd --system --no-create-home --shell /usr/sbin/nologin cloudshop
-sudo mkdir -p /opt/cloudshop /var/log/cloudshop
+sudo mkdir -p /opt/cloudshop /var/log/cloudshop /etc/cloudshop
 sudo chown -R cloudshop:cloudshop /opt/cloudshop /var/log/cloudshop
 sudo chmod 750 /opt/cloudshop        # dono total, grupo entra e le
 sudo chmod 640 /etc/cloudshop/app.env
 
-ls -ld /opt/cloudshop
-id cloudshop
+ls -ld /opt/cloudshop                # drwxr-x--- cloudshop cloudshop
+id cloudshop                         # uid=997(cloudshop) gid=997(cloudshop)
 sudo -u cloudshop ls /opt/cloudshop  # testar como o servico enxerga
 
-# auditoria rapida: arquivos com permissao perigosa
+# auditoria rapida: arquivos graváveis por qualquer usuario
 sudo find /opt -perm -o+w -type f`,
             securityNote:
               "chmod 777 em diretório de aplicação é falha de segurança: qualquer usuário local pode substituir seu binário ou script.",
+          },
+          {
+            label: "Entendendo octal na prática",
+            language: "bash",
+            code: `cd /tmp && mkdir -p perm-demo && cd perm-demo
+echo "ola" > arquivo.txt
+ls -l arquivo.txt                 # -rw-r--r--  = 644 (padrao com umask 022)
+chmod 600 arquivo.txt && ls -l arquivo.txt   # -rw-------
+chmod u+x arquivo.txt && ls -l arquivo.txt   # -rwx------  (modo simbolico)
+
+mkdir pasta && chmod 644 pasta
+ls pasta                          # ls: cannot open directory 'pasta': Permission denied
+chmod 755 pasta && ls pasta       # funciona: diretorio precisa de 'x' para ser atravessado
+umask                             # 0022 -> mostra a mascara atual`,
+          },
+          {
+            label: "Grupos e sudo com escopo limitado",
+            language: "bash",
+            code: `sudo groupadd deploy
+sudo usermod -aG deploy "$USER"     # -a e OBRIGATORIO: sem ele, substitui os grupos
+id -nG "$USER"                      # confira (precisa de nova sessao para valer)
+
+# Permitir apenas reiniciar o servico, sem sudo irrestrito
+sudo tee /etc/sudoers.d/deploy-cloudshop >/dev/null <<'EOF'
+%deploy ALL=(root) /usr/bin/systemctl restart cloudshop-api, /usr/bin/systemctl status cloudshop-api
+EOF
+sudo chmod 440 /etc/sudoers.d/deploy-cloudshop
+sudo visudo -c                      # valida a sintaxe: /etc/sudoers.d/deploy-cloudshop: parsed OK`,
+            securityNote:
+              "Erro de sintaxe em sudoers pode bloquear o acesso administrativo: valide sempre com visudo -c antes de sair da sessão.",
+          },
+          {
+            label: "Diagnóstico de permission denied em serviço",
+            language: "bash",
+            code: `systemctl status cloudshop-api --no-pager | tail -5
+# Error: EACCES: permission denied, open '/var/log/cloudshop/app.log'
+
+ps -o user=,pid=,cmd= -C node          # quem executa o processo -> cloudshop
+ls -ld /var/log/cloudshop              # drwxr-xr-x root root    <- dono errado
+sudo chown -R cloudshop:cloudshop /var/log/cloudshop
+sudo -u cloudshop touch /var/log/cloudshop/teste   # valida como o servico
+sudo systemctl restart cloudshop-api && systemctl is-active cloudshop-api   # active`,
           },
         ],
         whyItMatters:
@@ -937,6 +1092,11 @@ sudo find /opt -perm -o+w -type f`,
         glossary: [
           { term: "umask", definition: "Máscara que define as permissões padrão de arquivos recém-criados." },
           { term: "usuário de sistema", definition: "Conta sem login interativo, criada para executar serviços." },
+          { term: "chown", definition: "Comando que altera dono e grupo de arquivos e diretórios." },
+          { term: "sudoers", definition: "Configuração que define quem pode executar o quê com privilégio elevado." },
+          { term: "setuid", definition: "Bit que faz um programa executar com a identidade do dono do arquivo." },
+          { term: "sticky bit", definition: "Permissão em diretórios compartilhados que impede apagar arquivos de outros usuários." },
+          { term: "menor privilégio", definition: "Conceder apenas o acesso necessário para a tarefa, reduzindo o dano de um comprometimento." },
         ],
         printQuestLink: "Criar o usuário cloudshop que executará a API e será dono dos diretórios da aplicação.",
         quiz: [
@@ -951,21 +1111,68 @@ sudo find /opt -perm -o+w -type f`,
             answerIndex: 1,
             explanation: "7 = rwx para o dono, 5 = r-x para o grupo, 0 = nada para outros.",
           },
+          {
+            question: "Por que 644 em um diretório impede listar o conteúdo?",
+            options: [
+              "Porque falta a permissão de execução, que em diretório significa 'entrar'",
+              "Porque 644 é inválido",
+              "Porque o dono está errado",
+              "Porque diretórios não usam octal",
+            ],
+            answerIndex: 0,
+            explanation: "Em diretórios, o bit x autoriza atravessar/entrar; sem ele o conteúdo não é acessível.",
+          },
+          {
+            question: "Qual é o risco de 'usermod -G deploy usuario' sem o -a?",
+            options: [
+              "Nenhum, é equivalente",
+              "Substitui todos os grupos do usuário, podendo remover acessos existentes",
+              "Cria um novo usuário",
+              "Apaga o grupo",
+            ],
+            answerIndex: 1,
+            explanation: "Sem -a (append) a lista de grupos é sobrescrita, causando perda de acesso, inclusive a sudo.",
+          },
+          {
+            question: "Qual é a melhor prática para rodar a API em um servidor?",
+            options: [
+              "Como root, para evitar erros de permissão",
+              "Com um usuário de sistema sem shell de login, dono apenas dos diretórios necessários",
+              "Com o seu usuário pessoal",
+              "Com chmod 777 nos diretórios",
+            ],
+            answerIndex: 1,
+            explanation: "Usuário dedicado sem login limita o impacto de um comprometimento da aplicação.",
+          },
         ],
       },
       {
         id: "l-1-3",
         moduleId: "mod-1",
         title: "Processos, sinais e systemd na prática",
-        duration: 45,
+        duration: 50,
         difficulty: "Intermediário",
         tools: ["ps", "top", "kill", "systemd"],
         xp: 25,
-        objectives: ["Investigar processos e portas", "Enviar sinais corretamente", "Escrever uma unit systemd resiliente"],
+        objectives: [
+          "Investigar processos, estados e portas em uso",
+          "Enviar sinais corretamente e entender encerramento gracioso",
+          "Escrever uma unit systemd resiliente e segura",
+          "Operar o serviço: habilitar, reiniciar, verificar e ler logs",
+        ],
         body: [
-          "Todo serviço é um processo com PID, dono, estado e recursos. ps auxf mostra a árvore, top e htop mostram o comportamento vivo, e ss -tulpn revela quem está escutando qual porta — comando que resolve metade dos 'a porta está em uso'. Estados importam: um processo em D (I/O ininterrupto) indica problema de disco ou rede, não de CPU; um zumbi (Z) indica pai que não coletou o filho.",
-          "Sinais são a forma civilizada de conversar com processos. SIGTERM (15) pede encerramento e permite ao programa fechar conexões e finalizar requisições; SIGKILL (9) mata sem chance de limpeza, podendo corromper estado ou deixar arquivos de lock. Comece sempre por TERM; use KILL como último recurso.",
-          "systemd é quem garante que o serviço suba no boot, reinicie após falha e tenha logs centralizados. Uma unit bem escrita define usuário sem privilégio, diretório de trabalho, variáveis de ambiente via EnvironmentFile, política de restart e limites básicos de segurança.",
+          "<h3>1. O que é um processo</h3><p>Todo serviço em execução é um processo com <strong>PID</strong> (identificador), dono, processo pai, estado e consumo de recursos. Um container também é um processo — isolado por recursos do kernel, mas visível no host. Dominar processos é pré-requisito para entender containers e Kubernetes depois.</p>",
+          "<h3>2. Ferramentas de inspeção</h3><ul><li><code>ps auxf</code> — lista em forma de árvore, mostrando quem criou quem.</li><li><code>ps -eo pid,ppid,stat,etime,pcpu,pmem,cmd --sort=-pcpu</code> — visão sob medida, ordenada por CPU.</li><li><code>top</code> / <code>htop</code> — comportamento ao vivo.</li><li><code>pgrep -af node</code> — localizar por nome.</li><li><code>ss -tulpn</code> — quem escuta qual porta; resolve metade dos \"a porta está em uso\".</li></ul>",
+          "<h3>3. Estados que contam uma história</h3><ul><li><strong>R</strong> executando ou pronto para executar.</li><li><strong>S</strong> dormindo, esperando algo (normal).</li><li><strong>D</strong> espera ininterrupta de I/O — indica disco ou rede lenta, não CPU.</li><li><strong>Z</strong> zumbi: terminou, mas o pai não coletou o status.</li><li><strong>T</strong> parado.</li></ul><p>Muitos processos em <strong>D</strong> com CPU baixa é assinatura clássica de gargalo de armazenamento.</p>",
+          "<h3>4. Sinais: conversando com processos</h3><p>Sinal é uma notificação enviada ao processo. Os que importam: <strong>SIGTERM (15)</strong> pede encerramento e deixa o programa fechar conexões e terminar requisições; <strong>SIGKILL (9)</strong> mata imediatamente, sem chance de limpeza; <strong>SIGHUP (1)</strong> costuma significar \"recarregue a configuração\"; <strong>SIGINT (2)</strong> é o seu Ctrl+C.</p><p>Comece sempre por TERM. <code>kill -9</code> pode corromper estado, deixar arquivo de lock preso e derrubar requisições no meio.</p>",
+          "<h3>5. Encerramento gracioso na aplicação</h3><p>Do lado do código, a aplicação deve escutar SIGTERM, parar de aceitar novas conexões, terminar as que estão em andamento e fechar o banco. Sem isso, cada deploy gera erro para quem estava navegando — e é exatamente o que Kubernetes espera do seu container.</p>",
+          "<h3>6. Órfãos, zumbis e PID 1</h3><p>Se o pai morre, o filho é adotado pelo PID 1 (init/systemd). Zumbis aparecem quando o pai não faz a coleta; em containers, isso é comum quando o processo principal não é preparado para ser PID 1 — daí a recomendação de usar <code>--init</code> ou um init mínimo na imagem.</p>",
+          "<h3>7. O papel do systemd</h3><p>systemd garante que o serviço <strong>suba no boot</strong>, <strong>reinicie após falha</strong>, tenha <strong>logs centralizados</strong> e dependências respeitadas. Sem ele você depende de alguém logar no servidor às 3h da manhã para digitar um comando.</p>",
+          "<h3>8. Anatomia de uma unit</h3><ul><li><code>[Unit]</code> — descrição e ordem (<code>After</code>, <code>Wants</code>).</li><li><code>[Service]</code> — como executar: <code>User</code>, <code>WorkingDirectory</code>, <code>EnvironmentFile</code>, <code>ExecStart</code>, política de <code>Restart</code>.</li><li><code>[Install]</code> — em qual alvo o serviço é habilitado (<code>multi-user.target</code>).</li></ul>",
+          "<h3>9. Política de restart sem laço maluco</h3><p><code>Restart=on-failure</code> com <code>RestartSec=3</code> evita reinício instantâneo em loop. Para falhas persistentes, <code>StartLimitBurst</code> e <code>StartLimitIntervalSec</code> impedem que a máquina gaste CPU reiniciando algo que nunca vai subir. Teste com <code>reboot</code>: confiança se comprova, não se supõe.</p>",
+          "<h3>10. Endurecimento (hardening) de graça</h3><p>Quatro linhas que reduzem muito o risco: <code>NoNewPrivileges=true</code> (impede escalar privilégio), <code>PrivateTmp=true</code> (tmp isolado), <code>ProtectSystem=full</code> (sistema em leitura), <code>ProtectHome=true</code>. Adicione <code>ReadWritePaths</code> apenas para os diretórios que o serviço realmente precisa escrever.</p>",
+          "<h3>11. Variáveis de ambiente do jeito certo</h3><p>Use <code>EnvironmentFile=/etc/cloudshop/app.env</code> com permissão <code>640</code> e dono do serviço. Nunca coloque segredo direto em <code>ExecStart</code>: a linha de comando é visível em <code>ps</code> para qualquer usuário da máquina.</p>",
+          "<h3>12. Rotina de operação e diagnóstico</h3><p><code>daemon-reload</code> após editar a unit, <code>enable --now</code> para habilitar e iniciar, <code>status</code> para ver estado e últimas linhas, <code>journalctl -u ... -n 50</code> para o log, <code>systemctl is-enabled</code> para confirmar boot. Se o serviço não sobe, leia o log <em>antes</em> de mudar qualquer coisa.</p>",
         ],
         code: [
           {
@@ -973,11 +1180,15 @@ sudo find /opt -perm -o+w -type f`,
             language: "bash",
             code: `ps auxf | head -30
 ps -eo pid,ppid,stat,etime,pcpu,pmem,cmd --sort=-pcpu | head
-ss -tulpn | grep :3000            # quem escuta a porta da API
-lsof -p 1234 | head               # arquivos abertos pelo processo
-kill -TERM 1234                   # encerramento gracioso
-kill -KILL 1234                   # ultimo recurso
-pgrep -af node                    # localizar por nome`,
+# PID  PPID STAT ELAPSED %CPU %MEM CMD
+# 1841    1 Ssl  02:14:11 87.4  6.1 /usr/bin/node /opt/cloudshop/server.js
+
+ss -tulpn | grep :3000            # LISTEN 0 511 *:3000 users:(("node",pid=1841))
+lsof -p 1841 | head               # arquivos e sockets abertos pelo processo
+kill -TERM 1841                   # encerramento gracioso (sinal 15)
+kill -KILL 1841                   # ultimo recurso (sinal 9)
+pgrep -af node                    # localizar por nome
+ps -eo stat | grep -c '^Z'        # quantidade de zumbis`,
           },
           {
             label: "Unit systemd da API do CloudShop",
@@ -991,14 +1202,18 @@ Wants=network-online.target
 [Service]
 User=cloudshop
 Group=cloudshop
-WorkingDirectory=/opt/cloudshop
+WorkingDirectory=/opt/cloudshop/current
 EnvironmentFile=/etc/cloudshop/app.env
-ExecStart=/usr/bin/node /opt/cloudshop/server.js
+ExecStart=/usr/bin/node /opt/cloudshop/current/server.js
 Restart=on-failure
 RestartSec=3
+StartLimitBurst=5
+StartLimitIntervalSec=60
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/var/log/cloudshop
 StandardOutput=journal
 StandardError=journal
 
@@ -1010,12 +1225,38 @@ WantedBy=multi-user.target`,
           {
             label: "Operar o serviço",
             language: "bash",
-            code: `sudo systemctl daemon-reload
+            code: `sudo systemctl daemon-reload          # obrigatorio apos editar a unit
 sudo systemctl enable --now cloudshop-api
 systemctl status cloudshop-api --no-pager
+# Active: active (running) since Sun 2026-09-06 10:22:01; 5s ago
 sudo systemctl restart cloudshop-api
-systemctl is-enabled cloudshop-api
-journalctl -u cloudshop-api -n 50 --no-pager`,
+systemctl is-enabled cloudshop-api    # enabled -> sobe no boot
+journalctl -u cloudshop-api -n 50 --no-pager
+
+# Teste de resiliencia: mate o processo e veja o systemd trazer de volta
+sudo kill -9 "$(systemctl show -p MainPID --value cloudshop-api)"
+sleep 5 && systemctl is-active cloudshop-api    # active (reiniciado sozinho)`,
+          },
+          {
+            label: "Encerramento gracioso na aplicação (Node)",
+            language: "javascript",
+            code: `const server = app.listen(3000);
+
+async function shutdown(signal) {
+  console.log(JSON.stringify({ level: "info", msg: "shutdown iniciado", signal }));
+  server.close(async () => {          // para de aceitar novas conexoes
+    try {
+      await pool.end();               // fecha o pool do PostgreSQL
+      process.exit(0);                // saida limpa: systemd registra sucesso
+    } catch (e) {
+      process.exit(1);
+    }
+  });
+  setTimeout(() => process.exit(1), 10000).unref();  // limite de espera
+}
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));  // systemd/Kubernetes enviam SIGTERM
+process.on("SIGINT", () => shutdown("SIGINT"));    // Ctrl+C no terminal`,
           },
         ],
         whyItMatters:
@@ -1026,6 +1267,12 @@ journalctl -u cloudshop-api -n 50 --no-pager`,
         glossary: [
           { term: "unit", definition: "Arquivo de definição de um recurso gerenciado pelo systemd (serviço, timer, socket)." },
           { term: "zumbi", definition: "Processo que terminou mas cujo status ainda não foi coletado pelo processo pai." },
+          { term: "SIGTERM", definition: "Sinal que pede encerramento e permite ao programa finalizar com ordem." },
+          { term: "SIGKILL", definition: "Sinal que encerra o processo imediatamente, sem oportunidade de limpeza." },
+          { term: "daemon-reload", definition: "Comando que faz o systemd reler os arquivos de unit após uma alteração." },
+          { term: "encerramento gracioso", definition: "Parar de aceitar novas requisições, concluir as em andamento e fechar recursos antes de sair." },
+          { term: "load average", definition: "Média de processos prontos ou esperando execução, comparada ao número de núcleos." },
+          { term: "socket em escuta", definition: "Porta aberta por um processo aguardando conexões, visível com ss -tulpn." },
         ],
         printQuestLink: "Colocar a API do CloudShop sob systemd, com restart automático e logs no journal.",
         quiz: [
@@ -1035,21 +1282,64 @@ journalctl -u cloudshop-api -n 50 --no-pager`,
             answerIndex: 1,
             explanation: "ss -tulpn lista sockets em escuta com o processo associado.",
           },
+          {
+            question: "Por que preferir SIGTERM a SIGKILL em um deploy?",
+            options: [
+              "SIGTERM é mais rápido",
+              "SIGTERM permite fechar conexões e concluir requisições antes de sair",
+              "SIGKILL não funciona em servidores",
+              "Não há diferença prática",
+            ],
+            answerIndex: 1,
+            explanation: "TERM é encerramento negociado; KILL interrompe na hora e pode deixar dados e locks inconsistentes.",
+          },
+          {
+            question: "Muitos processos em estado D com CPU baixa indicam o quê?",
+            options: ["Falta de CPU", "Gargalo de I/O (disco ou rede)", "Memória vazando", "Erro de permissão"],
+            answerIndex: 1,
+            explanation: "Estado D é espera ininterrupta de entrada/saída; a CPU está ociosa aguardando o armazenamento.",
+          },
+          {
+            question: "O que garante que o serviço volte sozinho depois de uma falha?",
+            options: [
+              "Restart=on-failure com RestartSec na unit do systemd",
+              "Um cron reiniciando de hora em hora",
+              "kill -9 automático",
+              "Monitorar o log manualmente",
+            ],
+            answerIndex: 0,
+            explanation: "A política de restart do systemd supervisiona o processo e o recoloca em execução após falha.",
+          },
         ],
       },
       {
         id: "l-1-4",
         moduleId: "mod-1",
         title: "Logs: encontrar a causa raiz com journalctl",
-        duration: 40,
+        duration: 45,
         difficulty: "Intermediário",
         tools: ["journalctl", "grep", "logrotate"],
         xp: 25,
-        objectives: ["Filtrar logs por unidade, prioridade e tempo", "Correlacionar eventos entre serviços", "Evitar disco cheio por log"],
+        objectives: [
+          "Filtrar logs por unidade, prioridade e janela de tempo",
+          "Encontrar o primeiro erro de uma cascata de falhas",
+          "Correlacionar eventos entre proxy, aplicação e banco",
+          "Padronizar log estruturado e evitar disco cheio",
+          "Proteger dados sensíveis ao compartilhar log",
+        ],
         body: [
-          "Log é a fonte primária de verdade em incidente. Com journalctl você filtra por unidade (-u), por prioridade (-p err), por janela de tempo (--since/--until) e acompanha em tempo real (-f). O poder está na combinação: erros de uma unidade nos últimos dez minutos, em ordem, é geralmente o suficiente para achar a primeira falha — que costuma ser diferente do erro mais visível.",
-          "A regra de ouro é procurar o primeiro erro, não o último. Cascatas escondem a origem: o timeout do frontend aparece depois do erro de conexão do banco. Correlacionar por timestamp entre proxy, aplicação e banco é a habilidade que separa quem adivinha de quem diagnostica.",
-          "Log também é risco operacional e de segurança: enche disco e vaza dado sensível. Configure rotação e limite o journal, e revise o que a aplicação escreve — token, senha e dado pessoal jamais devem ir para log.",
+          "<h3>1. Log é a fonte primária de verdade</h3><p>Em um incidente, opinião não vale nada; evidência vale tudo. O log é o registro do que o sistema realmente fez, com hora. Toda investigação séria começa nele e só depois formula hipótese.</p>",
+          "<h3>2. Onde os logs ficam</h3><ul><li><strong>journald</strong> (systemd): consultado com <code>journalctl</code>, indexado por unidade, prioridade e tempo.</li><li><code>/var/log/</code>: arquivos de serviços que escrevem direto (nginx, PostgreSQL, aplicação).</li><li><strong>Containers</strong>: saída padrão do processo, coletada pelo runtime.</li></ul>",
+          "<h3>3. Níveis de prioridade</h3><p>De 0 a 7: emerg, alert, crit, err, warning, notice, info, debug. <code>journalctl -p err</code> traz erro e acima. Em produção, a aplicação registra em info; debug só temporariamente, porque enche disco e pode expor dados.</p>",
+          "<h3>4. As quatro consultas que resolvem quase tudo</h3><ul><li>Por unidade: <code>journalctl -u cloudshop-api -n 200</code>.</li><li>Só erros recentes: <code>journalctl -u cloudshop-api -p err --since \"10 min ago\"</code>.</li><li>Janela exata: <code>--since \"2026-09-06 09:00\" --until \"09:30\"</code>.</li><li>Ao vivo: <code>journalctl -u cloudshop-api -f</code>.</li></ul><p>Combine-as: a interseção de unidade, prioridade e tempo costuma revelar a primeira falha.</p>",
+          "<h3>5. Procure o primeiro erro, não o último</h3><p>Cascatas escondem a origem: o timeout do frontend aparece <em>depois</em> do erro de conexão com o banco. Ordene por tempo crescente e pergunte: qual foi a primeira anomalia? Essa disciplina separa quem adivinha de quem diagnostica.</p>",
+          "<h3>6. Correlação entre camadas</h3><p>Pegue o horário do erro visto pelo usuário e compare, no mesmo minuto: log do proxy (código HTTP e latência), log da aplicação (exceção) e log do banco (conexões recusadas, lentidão, deadlock). Se a aplicação propaga um identificador de requisição, a correlação fica trivial.</p>",
+          "<h3>7. Log estruturado (JSON) muda o jogo</h3><p>Texto livre é difícil de filtrar. Log em JSON com <code>level</code>, <code>msg</code>, <code>requestId</code>, <code>rota</code> e <code>duracaoMs</code> permite consultas precisas, gráficos e alertas — e é o formato que ferramentas como Loki e OpenSearch esperam. Vamos usá-lo no módulo de observabilidade.</p>",
+          "<h3>8. Preserve a evidência</h3><p>Erro clássico de iniciante: reiniciar o serviço antes de coletar log, apagando o rastro. A ordem correta é: copiar o trecho relevante para o registro do incidente, depois agir. Em container, reiniciar pode apagar o log anterior por completo.</p>",
+          "<h3>9. Log enche disco — e derruba serviço</h3><p>Limite o journal (<code>SystemMaxUse</code> em <code>/etc/systemd/journald.conf</code>) e configure <strong>logrotate</strong> para os arquivos da aplicação: rotação diária, retenção de 14 dias, compressão. Sem isso, o incidente seguinte será \"disco cheio\" causado pela sua própria observabilidade.</p>",
+          "<h3>10. Log é risco de vazamento</h3><p>Token, cookie de sessão, cartão, CPF e e-mail não devem ir para log. Antes de colar log em chamado ou chat, remova identificadores. Muitos vazamentos reais aconteceram por log compartilhado, não por invasão.</p>",
+          "<h3>11. Analisando com pipes quando não há ferramenta</h3><p><code>grep</code>, <code>awk</code>, <code>sort</code>, <code>uniq -c</code> e <code>wc -l</code> resolvem contagem por hora, top de mensagens e taxa de erro. É o que você usa em um servidor sem acesso a painel — situação mais comum do que parece.</p>",
+          "<h3>12. Checklist de investigação por log</h3><ol><li>Qual serviço reclamou e em que horário exato?</li><li>Quais erros existem nessa janela, em ordem crescente?</li><li>Qual foi o primeiro?</li><li>O que mudou antes disso (deploy, configuração, tráfego)?</li><li>Que evidência eu guardo no registro do incidente?</li></ol>",
         ],
         code: [
           {
@@ -1059,15 +1349,58 @@ journalctl -u cloudshop-api -n 50 --no-pager`,
 journalctl -u cloudshop-api -p err --since "10 min ago"
 journalctl --since "2026-09-06 09:00" --until "2026-09-06 09:30"
 journalctl -u cloudshop-api -f              # seguir ao vivo
-journalctl -k -p warning                     # mensagens do kernel
-journalctl --disk-usage
-sudo journalctl --vacuum-size=500M
+journalctl -k -p warning                     # mensagens do kernel (ex.: OOM killer)
+journalctl --disk-usage                      # Archived and active journals take 1.8G
+sudo journalctl --vacuum-size=500M           # reduz para 500M
 
 # logs de aplicacao fora do journal
-sudo grep -c "ERROR" /var/log/cloudshop/app.log
+sudo grep -c "ERROR" /var/log/cloudshop/app.log        # 312
 sudo awk '/ERROR/{print $1, $2, $NF}' /var/log/cloudshop/app.log | tail -20`,
             securityNote:
               "Antes de colar log em ticket ou chat, remova tokens, e-mails e IDs de clientes. Log compartilhado é vazamento frequente.",
+          },
+          {
+            label: "Encontrando o primeiro erro de uma cascata",
+            language: "bash",
+            code: `# 1) Janela do incidente, todos os servicos, ordem crescente
+journalctl --since "09:58" --until "10:05" -p warning --no-pager | head -40
+# 09:59:12 cloudshop-db  FATAL: too many connections   <- PRIMEIRA anomalia (causa)
+# 09:59:14 cloudshop-api Error: connect ETIMEDOUT
+# 10:00:02 nginx         upstream timed out (110)      <- sintoma visivel
+
+# 2) Confirme a hipotese no servico de origem
+journalctl -u cloudshop-db --since "09:55" | grep -i "connection" | head
+# 3) O que mudou antes? Deploy, reinicio ou configuracao
+journalctl --since "09:30" | grep -iE "started|stopped|reload" | head`,
+          },
+          {
+            label: "Log estruturado em JSON na aplicação",
+            language: "javascript",
+            code: `function log(level, msg, extra = {}) {
+  // uma linha por evento: facil de filtrar, agregar e alertar
+  process.stdout.write(JSON.stringify({
+    ts: new Date().toISOString(),
+    level,                       // info | warn | error
+    msg,
+    service: "cloudshop-api",
+    ...extra,
+  }) + "\\n");
+}
+
+app.use((req, res, next) => {
+  const inicio = Date.now();
+  res.on("finish", () => {
+    log("info", "request", {
+      requestId: req.headers["x-request-id"],   // permite correlacionar entre servicos
+      rota: req.path,
+      status: res.statusCode,
+      duracaoMs: Date.now() - inicio,
+    });
+  });
+  next();
+});`,
+            securityNote:
+              "Nunca inclua headers de Authorization, cookies, senha ou dados pessoais no objeto de log.",
           },
           {
             label: "Rotação de log da aplicação",
@@ -1085,7 +1418,9 @@ sudo awk '/ERROR/{print $1, $2, $NF}' /var/log/cloudshop/app.log | tail -20`,
   postrotate
     systemctl reload cloudshop-api > /dev/null 2>&1 || true
   endscript
-}`,
+}
+# Teste sem aplicar: sudo logrotate -d /etc/logrotate.d/cloudshop
+# Forcar execucao:   sudo logrotate -f /etc/logrotate.d/cloudshop`,
           },
         ],
         whyItMatters: "Vagas pedem troubleshooting. Na prática, isso significa ler log com método e provar a causa com evidência.",
@@ -1096,6 +1431,11 @@ sudo awk '/ERROR/{print $1, $2, $NF}' /var/log/cloudshop/app.log | tail -20`,
         glossary: [
           { term: "journald", definition: "Coletor de logs do systemd, com índice binário e filtros por metadados." },
           { term: "logrotate", definition: "Utilitário que rotaciona, comprime e remove logs antigos por política." },
+          { term: "prioridade (severity)", definition: "Nível do evento, de emerg a debug, usado para filtrar ruído." },
+          { term: "log estruturado", definition: "Log em formato de dados (JSON) com campos consultáveis em vez de texto livre." },
+          { term: "requestId", definition: "Identificador propagado entre serviços para reconstruir o caminho de uma requisição." },
+          { term: "cascata de falhas", definition: "Sequência de erros derivados de uma causa única, que esconde a origem." },
+          { term: "OOM killer", definition: "Mecanismo do kernel que encerra processos quando a memória se esgota." },
         ],
         printQuestLink: "Padronizar o log JSON da API do CloudShop e configurar rotação diária.",
         quiz: [
@@ -1110,21 +1450,63 @@ sudo awk '/ERROR/{print $1, $2, $NF}' /var/log/cloudshop/app.log | tail -20`,
             answerIndex: 1,
             explanation: "-p err filtra por prioridade e --since limita a janela de tempo.",
           },
+          {
+            question: "Em uma cascata de erros, qual deles normalmente aponta a causa?",
+            options: ["O último", "O primeiro, em ordem de tempo", "O mais repetido", "O do serviço mais visível"],
+            answerIndex: 1,
+            explanation: "Os erros seguintes costumam ser consequência; a primeira anomalia indica a origem.",
+          },
+          {
+            question: "Por que preferir log em JSON a texto livre?",
+            options: [
+              "Ocupa menos espaço",
+              "Permite filtrar, agregar e alertar por campos específicos",
+              "É exigência do Linux",
+              "Evita rotação de log",
+            ],
+            answerIndex: 1,
+            explanation: "Campos estruturados tornam a busca e a criação de métricas e alertas viáveis.",
+          },
+          {
+            question: "Qual é a atitude correta ao encontrar um serviço com erro?",
+            options: [
+              "Reiniciar imediatamente para restabelecer",
+              "Coletar a evidência do log e só então agir",
+              "Apagar os logs antigos",
+              "Aumentar o nível para debug em produção e deixar assim",
+            ],
+            answerIndex: 1,
+            explanation: "Reiniciar antes de coletar destrói a evidência e impede a análise de causa raiz.",
+          },
         ],
       },
       {
         id: "l-1-5",
         moduleId: "mod-1",
         title: "SSH, acesso remoto e diagnóstico de recursos",
-        duration: 40,
+        duration: 50,
         difficulty: "Intermediário",
         tools: ["SSH", "top", "vmstat", "iostat", "df"],
         xp: 25,
-        objectives: ["Acessar servidores com segurança e conforto", "Interpretar CPU, memória e disco", "Aplicar hardening básico no SSH"],
+        objectives: [
+          "Acessar servidores com segurança e conforto, inclusive via bastion",
+          "Aplicar hardening básico no serviço SSH",
+          "Seguir um roteiro de diagnóstico para CPU, memória, disco e rede",
+          "Interpretar load average, swap, %wa e inodes sem se enganar",
+        ],
         body: [
-          "SSH é a porta de entrada do trabalho remoto. Configure ~/.ssh/config com apelidos, usuário, chave e ProxyJump para bastion: além de digitar menos, você evita erro de conectar no host errado. No servidor, o hardening mínimo é desabilitar login por senha e login direto de root, deixando apenas chave.",
-          "Ao entrar em um servidor com queixa de lentidão, siga uma ordem: carga e CPU (uptime, top), memória e swap (free -h, vmstat), disco em espaço e em I/O (df -h, iostat), depois rede e conexões. Load average acima do número de núcleos indica fila; swap ativo indica pressão de memória; %wa alto indica gargalo de I/O, não de processamento.",
-          "Memória no Linux confunde: cache não é vazamento, é otimização. O que importa é available e a atividade de swap. E disco lotado, muitas vezes por logs ou imagens de container, produz sintomas que parecem falha de aplicação.",
+          "<h3>1. SSH é a porta de entrada do trabalho remoto</h3><p>Praticamente toda operação em servidor passa por SSH: acesso, cópia de arquivo (<code>scp</code>/<code>rsync</code>), túnel para banco e execução de comando remoto. Configurar bem economiza tempo todos os dias e evita o erro grave de conectar no host errado.</p>",
+          "<h3>2. ~/.ssh/config: apelidos que evitam acidente</h3><p>Defina <code>Host cloudshop-prod</code> com endereço, usuário e chave. Além de digitar menos, o nome deixa explícito onde você está agindo. Adicione <code>ServerAliveInterval 30</code> para não cair em conexões longas.</p>",
+          "<h3>3. Bastion e ProxyJump</h3><p>Em nuvem, bancos e máquinas internas não têm endereço público. O acesso passa por um <strong>bastion</strong> (host de salto). Com <code>ProxyJump cloudshop-prod</code> você conecta ao host interno em um comando, sem copiar chave para o bastion — copiar chave privada para servidor é erro de segurança clássico.</p>",
+          "<h3>4. Túnel de porta</h3><p><code>ssh -L 5432:localhost:5432 cloudshop-db</code> traz a porta do banco para a sua máquina, permitindo usar um cliente local sem expor o banco na internet. É a forma correta de \"acessar o banco de produção\": leitura pontual, por túnel, com credencial própria e auditada.</p>",
+          "<h3>5. Hardening mínimo do servidor</h3><ul><li><code>PasswordAuthentication no</code> — só chave.</li><li><code>PermitRootLogin no</code> — root não entra direto.</li><li><code>AllowUsers</code>/<code>AllowGroups</code> — lista curta de quem pode entrar.</li><li><code>fail2ban</code> — bloqueia tentativas repetidas.</li></ul><p>Aplique, <strong>teste em outra sessão</strong> e só então encerre a atual. Assim um erro de configuração não te tranca fora do servidor.</p>",
+          "<h3>6. Rastreabilidade: uma chave por pessoa</h3><p>Cada pessoa com seu usuário e sua chave. Chave compartilhada elimina a resposta para \"quem executou isso?\", e é a primeira pergunta de qualquer auditoria depois de um incidente.</p>",
+          "<h3>7. Servidor lento: siga um roteiro, não o instinto</h3><p>Ordem que funciona: <strong>carga e CPU</strong> → <strong>memória e swap</strong> → <strong>disco (espaço e I/O)</strong> → <strong>rede e conexões</strong> → <strong>logs</strong>. Roteiro evita o vício de olhar sempre a mesma coisa e concluir errado.</p>",
+          "<h3>8. Load average, o número mais mal interpretado</h3><p>Load é a média de processos prontos <em>ou esperando</em>, nos últimos 1, 5 e 15 minutos. Compare sempre com <code>nproc</code>: load 4 em 4 núcleos é ocupação total saudável; load 12 em 4 núcleos é fila. Importante: espera por disco também conta no load do Linux — por isso load alto com CPU baixa aponta I/O.</p>",
+          "<h3>9. Memória: cache não é vazamento</h3><p>O Linux usa memória livre como cache de disco de propósito. Olhe a coluna <strong>available</strong> em <code>free -h</code>, não <code>used</code>. Os sinais reais de pressão são swap em atividade (colunas <code>si</code>/<code>so</code> no <code>vmstat</code>) e mensagens do <em>OOM killer</em> no log do kernel.</p>",
+          "<h3>10. Disco: espaço, inodes e I/O</h3><p>São três problemas diferentes: <code>df -h</code> para espaço, <code>df -i</code> para inodes (milhões de arquivos pequenos esgotam inodes com disco \"livre\") e <code>iostat -xz</code> para I/O, onde <code>%util</code> e <code>await</code> altos indicam disco saturado. Em nuvem, também há limite de IOPS do volume contratado.</p>",
+          "<h3>11. Rede e conexões</h3><p><code>ss -s</code> resume os sockets; <code>ss -tan state time-wait | wc -l</code> mostra conexões em encerramento; <code>ping</code> e <code>traceroute</code> avaliam caminho. Erros comuns: esgotar limite de conexões da aplicação ou do banco, e DNS lento fazendo tudo parecer travado.</p>",
+          "<h3>12. Do diagnóstico ao runbook</h3><p>Fecha o módulo escrevendo o seu <code>docs/runbook-linux.md</code>: para cada sintoma (lento, disco cheio, serviço caiu, porta ocupada, memória alta), liste os comandos em ordem, o que observar e a ação. Runbook é o documento que operadores de plantão realmente usam — e um item forte no seu portfólio.</p>",
         ],
         code: [
           {
@@ -1140,25 +1522,71 @@ Host cloudshop-prod
 Host cloudshop-db
   HostName 10.0.2.15
   User cloudshop-ops
-  ProxyJump cloudshop-prod
+  ProxyJump cloudshop-prod     # salta pelo bastion, sem copiar chave para la
 EOF
 
 ssh cloudshop-prod
-ssh -L 5432:localhost:5432 cloudshop-db   # tunel para acessar o banco local`,
+ssh -L 5432:localhost:5432 cloudshop-db   # tunel para acessar o banco local
+ssh cloudshop-prod 'uptime; df -h /'      # executa comando remoto e sai`,
             securityNote:
               "No servidor: PasswordAuthentication no, PermitRootLogin no. Aplique e teste em outra sessão antes de encerrar a atual.",
           },
           {
+            label: "Hardening do SSH com validação segura",
+            language: "bash",
+            code: `sudo tee /etc/ssh/sshd_config.d/99-hardening.conf >/dev/null <<'EOF'
+PasswordAuthentication no
+PermitRootLogin no
+KbdInteractiveAuthentication no
+AllowGroups ssh-users
+MaxAuthTries 3
+EOF
+
+sudo groupadd -f ssh-users && sudo usermod -aG ssh-users cloudshop-ops
+sudo sshd -t                       # valida a sintaxe ANTES de reiniciar (sem saida = ok)
+sudo systemctl reload ssh
+# Agora abra UMA NOVA sessao em outro terminal para confirmar o acesso.
+# Se falhar, voce ainda tem a sessao antiga aberta para corrigir.`,
+            securityNote:
+              "Nunca encerre a sessão atual antes de validar o novo acesso: é a forma mais comum de perder o servidor.",
+          },
+          {
             label: "Diagnóstico em ordem",
             language: "bash",
-            code: `uptime                       # load average 1/5/15 min
-nproc                        # comparar load com nucleos
-top -b -n1 | head -15
-free -h                      # olhe a coluna available
-vmstat 1 5                   # si/so indicam swap ativo
+            code: `uptime                       # load average: 12,04 10,88 7,31
+nproc                        # 4  -> load 12 em 4 nucleos = fila de 3x
+top -b -n1 | head -15        # veja %Cpu(s): us, sy e wa (wa alto = espera de I/O)
+free -h                      # olhe a coluna available, nao used
+vmstat 1 5                   # si/so > 0 indicam swap ativo = pressao de memoria
 df -h && df -i               # espaco e inodes
-iostat -xz 1 3 2>/dev/null   # %util e await por disco
-ss -s                        # resumo de conexoes`,
+iostat -xz 1 3 2>/dev/null   # %util ~100 e await alto = disco saturado
+ss -s                        # resumo de conexoes
+journalctl -k -p err --since "30 min ago" | tail    # OOM killer, erros de disco`,
+          },
+          {
+            label: "Esqueleto do runbook (docs/runbook-linux.md)",
+            language: "markdown",
+            code: `# Runbook Linux — CloudShop
+
+## Sintoma: servidor lento
+1. uptime / nproc      -> load vs nucleos (fila?)
+2. top                 -> %wa alto? entao I/O, nao CPU
+3. free -h / vmstat 1 5-> available baixo e swap ativo?
+4. iostat -xz 1 3      -> %util e await por disco
+5. journalctl -k -p err-> OOM killer, erro de disco
+Acao: identificar o processo dominante e decidir entre limitar, escalar ou corrigir consulta.
+
+## Sintoma: disco cheio
+1. df -h  (partição)  2. df -i (inodes)  3. du -xh --max-depth=1 <dir> | sort -h
+Acao: rotacionar logs, podar imagens de container, alertar em 80%.
+
+## Sintoma: servico caiu
+1. systemctl status <unit>  2. journalctl -u <unit> -p err --since "15 min ago"
+3. Verificar dono/permissao de diretorios e EnvironmentFile
+Acao: corrigir causa, confirmar Restart=on-failure, registrar no diario.
+
+## Sintoma: porta em uso
+ss -tulpn | grep :<porta>  -> identificar PID  -> kill -TERM antes de kill -KILL`,
           },
         ],
         whyItMatters:
@@ -1170,6 +1598,12 @@ ss -s                        # resumo de conexoes`,
         glossary: [
           { term: "load average", definition: "Média de processos prontos ou esperando execução; comparar sempre com o número de núcleos." },
           { term: "ProxyJump", definition: "Recurso do SSH para acessar host interno através de um bastion." },
+          { term: "bastion", definition: "Host de salto exposto de forma controlada, único caminho de acesso à rede privada." },
+          { term: "swap", definition: "Área em disco usada quando a memória física se esgota; atividade constante indica pressão." },
+          { term: "%wa (iowait)", definition: "Percentual de tempo em que a CPU está ociosa esperando entrada/saída." },
+          { term: "IOPS", definition: "Operações de entrada/saída por segundo suportadas pelo disco ou volume." },
+          { term: "túnel SSH", definition: "Encaminhamento de porta que permite acessar um serviço interno pela conexão SSH." },
+          { term: "runbook", definition: "Documento com sintomas, comandos e ações usado durante plantão e incidentes." },
         ],
         printQuestLink: "Preparar acesso seguro ao host de produção do CloudShop via bastion.",
         quiz: [
@@ -1178,6 +1612,34 @@ ss -s                        # resumo de conexoes`,
             options: ["used", "free", "available", "shared"],
             answerIndex: 2,
             explanation: "available estima quanto pode ser alocado sem swap, já considerando cache recuperável.",
+          },
+          {
+            question: "Load average 12 em uma máquina de 4 núcleos, com %wa alto. Qual hipótese é mais provável?",
+            options: [
+              "Falta de CPU apenas",
+              "Gargalo de disco ou rede fazendo processos esperarem",
+              "Memória insuficiente",
+              "Erro de DNS",
+            ],
+            answerIndex: 1,
+            explanation: "No Linux, espera por I/O entra no load; %wa alto aponta armazenamento ou rede como gargalo.",
+          },
+          {
+            question: "Qual é a forma correta de acessar um banco em rede privada?",
+            options: [
+              "Expor a porta do banco na internet",
+              "Copiar sua chave privada para o bastion",
+              "Usar ProxyJump/túnel SSH através do bastion",
+              "Compartilhar uma chave única entre a equipe",
+            ],
+            answerIndex: 2,
+            explanation: "O salto pelo bastion mantém o banco privado e preserva a chave privada na sua máquina.",
+          },
+          {
+            question: "Disco com 40% livre, mas a aplicação não consegue criar arquivos. O que verificar?",
+            options: ["df -h novamente", "df -i para inodes esgotados", "free -h", "uptime"],
+            answerIndex: 1,
+            explanation: "Inodes podem esgotar com muitos arquivos pequenos, mesmo havendo espaço disponível.",
           },
         ],
       },
