@@ -5,6 +5,27 @@ import { CONTAINERS_CICD_MODULES } from "./modules-containers-cicd";
 import { CLOUD_IAC_MODULES } from "./modules-cloud-iac";
 import { K8S_GITOPS_MODULES } from "./modules-k8s-gitops";
 import { SRE_FINAL_MODULES } from "./modules-sre-final";
+import { DEEP_REDES_GIT, type LessonDeep } from "./deep-redes-git";
+
+const DEEP: Record<string, LessonDeep> = { ...DEEP_REDES_GIT };
+
+function enrich(m: Module): Module {
+  return {
+    ...m,
+    lessons: m.lessons.map((l) => {
+      const d = DEEP[l.id];
+      if (!d) return l;
+      return {
+        ...l,
+        objectives: [...l.objectives, ...(d.objectives ?? [])],
+        body: [...l.body, ...(d.body ?? [])],
+        code: [...l.code, ...(d.code ?? [])],
+        glossary: [...l.glossary, ...(d.glossary ?? [])],
+        quiz: [...l.quiz, ...(d.quiz ?? [])],
+      };
+    }),
+  };
+}
 
 export const MODULES: Module[] = [
   ...FUNDAMENTOS_MODULES,
@@ -13,7 +34,7 @@ export const MODULES: Module[] = [
   ...CLOUD_IAC_MODULES,
   ...K8S_GITOPS_MODULES,
   ...SRE_FINAL_MODULES,
-];
+].map(enrich);
 
 export const ALL_LESSONS: Lesson[] = MODULES.flatMap((m) => m.lessons);
 
