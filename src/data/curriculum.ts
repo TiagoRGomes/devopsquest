@@ -6,8 +6,9 @@ import { CLOUD_IAC_MODULES } from "./modules-cloud-iac";
 import { K8S_GITOPS_MODULES } from "./modules-k8s-gitops";
 import { SRE_FINAL_MODULES } from "./modules-sre-final";
 import { DEEP_REDES_GIT, type LessonDeep } from "./deep-redes-git";
+import { DEEP_CONTAINERS_CICD } from "./deep-containers-cicd";
 
-const DEEP: Record<string, LessonDeep> = { ...DEEP_REDES_GIT };
+const DEEP: Record<string, LessonDeep> = { ...DEEP_REDES_GIT, ...DEEP_CONTAINERS_CICD };
 
 function enrich(m: Module): Module {
   return {
