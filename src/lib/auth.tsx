@@ -1,3 +1,4 @@
+import type React from "react";
 import {
   createContext,
   useCallback,
@@ -25,7 +26,9 @@ interface AuthContextValue {
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext: React.Context<AuthContextValue | null> =
+  ((globalThis as Record<string, unknown>).__authCtx as React.Context<AuthContextValue | null>) ??
+  ((globalThis as Record<string, unknown>).__authCtx = createContext<AuthContextValue | null>(null));
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);

@@ -1,3 +1,4 @@
+import type React from "react";
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { ptA, esA, enA } from "@/lib/i18n-pages/a";
 import { ptB, esB, enB } from "@/lib/i18n-pages/b";
@@ -438,7 +439,9 @@ interface I18nValue {
   t: (key: string, vars?: Record<string, string | number>) => string;
 }
 
-const I18nContext = createContext<I18nValue | null>(null);
+const I18nContext: React.Context<I18nValue | null> =
+  ((globalThis as Record<string, unknown>).__i18nCtx as React.Context<I18nValue | null>) ??
+  ((globalThis as Record<string, unknown>).__i18nCtx = createContext<I18nValue | null>(null));
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("pt");
