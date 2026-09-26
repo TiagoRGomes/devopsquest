@@ -440,8 +440,8 @@ interface I18nValue {
 }
 
 const I18nContext: React.Context<I18nValue | null> =
-  ((globalThis as Record<string, unknown>).__i18nCtx as React.Context<I18nValue | null>) ??
-  ((globalThis as Record<string, unknown>).__i18nCtx = createContext<I18nValue | null>(null));
+  ((globalThis as Record<string, unknown>)["__i18nCtx"] as React.Context<I18nValue | null>) ??
+  ((globalThis as Record<string, unknown>)["__i18nCtx"] = createContext<I18nValue | null>(null));
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("pt");

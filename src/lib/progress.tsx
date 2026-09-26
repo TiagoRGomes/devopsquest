@@ -82,8 +82,8 @@ interface ProgressContextValue {
 }
 
 const ProgressContext: React.Context<ProgressContextValue | null> =
-  ((globalThis as Record<string, unknown>).__progressCtx as React.Context<ProgressContextValue | null>) ??
-  ((globalThis as Record<string, unknown>).__progressCtx = createContext<ProgressContextValue | null>(null));
+  ((globalThis as Record<string, unknown>)["__progressCtx"] as React.Context<ProgressContextValue | null>) ??
+  ((globalThis as Record<string, unknown>)["__progressCtx"] = createContext<ProgressContextValue | null>(null));
 
 function readLocal(): UserProgress {
   try {
