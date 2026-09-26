@@ -1,3 +1,4 @@
+import type React from "react";
 import {
   createContext,
   useCallback,
@@ -80,7 +81,9 @@ interface ProgressContextValue {
   regionProgress: (moduleIds: string[]) => number;
 }
 
-const ProgressContext = createContext<ProgressContextValue | null>(null);
+const ProgressContext: React.Context<ProgressContextValue | null> =
+  ((globalThis as Record<string, unknown>)["__progressCtx"] as React.Context<ProgressContextValue | null>) ??
+  ((globalThis as Record<string, unknown>)["__progressCtx"] = createContext<ProgressContextValue | null>(null));
 
 function readLocal(): UserProgress {
   try {
