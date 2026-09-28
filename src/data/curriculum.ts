@@ -9,8 +9,9 @@ import { DEEP_REDES_GIT, type LessonDeep } from "./deep-redes-git";
 import { DEEP_CONTAINERS_CICD } from "./deep-containers-cicd";
 import { DEEP_CLOUD_IAC } from "./deep-cloud-iac";
 import { DEEP_K8S_GITOPS } from "./deep-k8s-gitops";
+import { DEEP_SRE_FINAL } from "./deep-sre-final";
 
-const DEEP: Record<string, LessonDeep> = { ...DEEP_REDES_GIT, ...DEEP_CONTAINERS_CICD, ...DEEP_CLOUD_IAC, ...DEEP_K8S_GITOPS };
+const DEEP: Record<string, LessonDeep> = { ...DEEP_REDES_GIT, ...DEEP_CONTAINERS_CICD, ...DEEP_CLOUD_IAC, ...DEEP_K8S_GITOPS, ...DEEP_SRE_FINAL };
 
 function enrich(m: Module): Module {
   return {
