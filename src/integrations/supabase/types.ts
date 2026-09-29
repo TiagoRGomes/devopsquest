@@ -14,6 +14,77 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_messages: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "community_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      community_bans: {
+        Row: {
+          created_at: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_profiles: {
+        Row: {
+          created_at: string
+          nickname: string
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          nickname: string
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          nickname?: string
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
       content_overrides: {
         Row: {
           created_at: string
@@ -43,6 +114,95 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      forum_replies: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          topic_id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          topic_id: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          topic_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_replies_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "community_profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "forum_replies_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "forum_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_topics: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          is_closed: boolean
+          is_pinned: boolean
+          is_solved: boolean
+          last_activity_at: string
+          reply_count: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          is_closed?: boolean
+          is_pinned?: boolean
+          is_solved?: boolean
+          last_activity_at?: string
+          reply_count?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          is_closed?: boolean
+          is_pinned?: boolean
+          is_solved?: boolean
+          last_activity_at?: string
+          reply_count?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_topics_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "community_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -154,6 +314,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_post: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
