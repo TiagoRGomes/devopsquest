@@ -3,6 +3,7 @@ type Dict = Record<string, string>;
 
 export const ptD: Dict = {
   "nav.path": "Minha Trilha",
+  "nav.community": "Comunidade",
   "nav.admin": "Administração",
 
   "path.eyebrow": "Plano de estudo",
@@ -117,6 +118,7 @@ export const ptD: Dict = {
 
 export const esD: Dict = {
   "nav.path": "Mi ruta",
+  "nav.community": "Comunidad",
   "nav.admin": "Administración",
 
   "path.eyebrow": "Plan de estudio",
@@ -231,6 +233,7 @@ export const esD: Dict = {
 
 export const enD: Dict = {
   "nav.path": "My path",
+  "nav.community": "Community",
   "nav.admin": "Admin",
 
   "path.eyebrow": "Study plan",
