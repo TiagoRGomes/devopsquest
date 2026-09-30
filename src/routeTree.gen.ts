@@ -26,6 +26,8 @@ import { Route as ProjetoRouteImport } from './routes/projeto'
 import { Route as RecursosRouteImport } from './routes/recursos'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as AulasLessonIdRouteImport } from './routes/aulas.$lessonId'
+import { Route as ComunidadeIndexRouteImport } from './routes/comunidade.index'
+import { Route as ComunidadeTopicIdRouteImport } from './routes/comunidade.$topicId'
 import { Route as ExameSlugRouteImport } from './routes/exame.$slug'
 import { Route as ModulosIndexRouteImport } from './routes/modulos.index'
 import { Route as ModulosSlugRouteImport } from './routes/modulos.$slug'
@@ -115,6 +117,16 @@ const AulasLessonIdRoute = AulasLessonIdRouteImport.update({
   path: '/aulas/$lessonId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComunidadeIndexRoute = ComunidadeIndexRouteImport.update({
+  id: '/comunidade/',
+  path: '/comunidade/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComunidadeTopicIdRoute = ComunidadeTopicIdRouteImport.update({
+  id: '/comunidade/$topicId',
+  path: '/comunidade/$topicId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExameSlugRoute = ExameSlugRouteImport.update({
   id: '/exame/$slug',
   path: '/exame/$slug',
@@ -149,8 +161,10 @@ export interface FileRoutesByFullPath {
   '/recursos': typeof RecursosRoute
   '/skills': typeof SkillsRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
+  '/comunidade/$topicId': typeof ComunidadeTopicIdRoute
   '/exame/$slug': typeof ExameSlugRoute
   '/modulos/$slug': typeof ModulosSlugRoute
+  '/comunidade/': typeof ComunidadeIndexRoute
   '/modulos/': typeof ModulosIndexRoute
 }
 export interface FileRoutesByTo {
@@ -171,8 +185,10 @@ export interface FileRoutesByTo {
   '/recursos': typeof RecursosRoute
   '/skills': typeof SkillsRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
+  '/comunidade/$topicId': typeof ComunidadeTopicIdRoute
   '/exame/$slug': typeof ExameSlugRoute
   '/modulos/$slug': typeof ModulosSlugRoute
+  '/comunidade': typeof ComunidadeIndexRoute
   '/modulos': typeof ModulosIndexRoute
 }
 export interface FileRoutesById {
@@ -194,8 +210,10 @@ export interface FileRoutesById {
   '/recursos': typeof RecursosRoute
   '/skills': typeof SkillsRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
+  '/comunidade/$topicId': typeof ComunidadeTopicIdRoute
   '/exame/$slug': typeof ExameSlugRoute
   '/modulos/$slug': typeof ModulosSlugRoute
+  '/comunidade/': typeof ComunidadeIndexRoute
   '/modulos/': typeof ModulosIndexRoute
 }
 export interface FileRouteTypes {
@@ -218,8 +236,10 @@ export interface FileRouteTypes {
     | '/recursos'
     | '/skills'
     | '/aulas/$lessonId'
+    | '/comunidade/$topicId'
     | '/exame/$slug'
     | '/modulos/$slug'
+    | '/comunidade/'
     | '/modulos/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -240,8 +260,10 @@ export interface FileRouteTypes {
     | '/recursos'
     | '/skills'
     | '/aulas/$lessonId'
+    | '/comunidade/$topicId'
     | '/exame/$slug'
     | '/modulos/$slug'
+    | '/comunidade'
     | '/modulos'
   id:
     | '__root__'
@@ -262,8 +284,10 @@ export interface FileRouteTypes {
     | '/recursos'
     | '/skills'
     | '/aulas/$lessonId'
+    | '/comunidade/$topicId'
     | '/exame/$slug'
     | '/modulos/$slug'
+    | '/comunidade/'
     | '/modulos/'
   fileRoutesById: FileRoutesById
 }
@@ -285,8 +309,10 @@ export interface RootRouteChildren {
   RecursosRoute: typeof RecursosRoute
   SkillsRoute: typeof SkillsRoute
   AulasLessonIdRoute: typeof AulasLessonIdRoute
+  ComunidadeTopicIdRoute: typeof ComunidadeTopicIdRoute
   ExameSlugRoute: typeof ExameSlugRoute
   ModulosSlugRoute: typeof ModulosSlugRoute
+  ComunidadeIndexRoute: typeof ComunidadeIndexRoute
   ModulosIndexRoute: typeof ModulosIndexRoute
 }
 
@@ -411,6 +437,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AulasLessonIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comunidade/': {
+      id: '/comunidade/'
+      path: '/comunidade'
+      fullPath: '/comunidade/'
+      preLoaderRoute: typeof ComunidadeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comunidade/$topicId': {
+      id: '/comunidade/$topicId'
+      path: '/comunidade/$topicId'
+      fullPath: '/comunidade/$topicId'
+      preLoaderRoute: typeof ComunidadeTopicIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/exame/$slug': {
       id: '/exame/$slug'
       path: '/exame/$slug'
@@ -453,8 +493,10 @@ const rootRouteChildren: RootRouteChildren = {
   RecursosRoute: RecursosRoute,
   SkillsRoute: SkillsRoute,
   AulasLessonIdRoute: AulasLessonIdRoute,
+  ComunidadeTopicIdRoute: ComunidadeTopicIdRoute,
   ExameSlugRoute: ExameSlugRoute,
   ModulosSlugRoute: ModulosSlugRoute,
+  ComunidadeIndexRoute: ComunidadeIndexRoute,
   ModulosIndexRoute: ModulosIndexRoute,
 }
 export const routeTree = rootRouteImport
