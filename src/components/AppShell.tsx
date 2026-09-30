@@ -7,6 +7,7 @@ import {
   Boxes,
   Briefcase,
   CalendarRange,
+  MessagesSquare,
   Flame,
   FlaskConical,
   Gauge,
@@ -37,6 +38,7 @@ import { useIsAdmin } from "@/lib/admin";
 const NAV = [
   { to: "/dashboard", key: "nav.dashboard", icon: Gauge },
   { to: "/minha-trilha", key: "nav.path", icon: CalendarRange },
+  { to: "/comunidade", key: "nav.community", icon: MessagesSquare },
   { to: "/mapa", key: "nav.map", icon: Map },
   { to: "/skills", key: "nav.skills", icon: Activity },
   { to: "/modulos", key: "nav.modules", icon: BookOpen },
