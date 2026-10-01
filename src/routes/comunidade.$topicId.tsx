@@ -88,32 +88,32 @@ function TopicPage() {
 
   async function update(values: Partial<Pick<Topic, "is_closed" | "is_solved" | "is_pinned">>) {
     const { error } = await supabase.from("forum_topics").update(values).eq("id", topicId);
-    if (error) return toast.error(ct("error"));
+    if (error) { toast.error(ct("error")); return; }
     void load();
   }
   async function removeTopic() {
     if (!confirm(ct("confirmDelete"))) return;
     const { error } = await supabase.from("forum_topics").delete().eq("id", topicId);
-    if (error) return toast.error(ct("error"));
+    if (error) { toast.error(ct("error")); return; }
     void navigate({ to: "/comunidade" });
   }
   async function removeReply(id: string) {
     if (!confirm(ct("confirmDelete"))) return;
     const { error } = await supabase.from("forum_replies").delete().eq("id", id);
-    if (error) return toast.error(ct("error"));
+    if (error) { toast.error(ct("error")); return; }
     void load();
   }
   async function ban(userId: string) {
     if (!confirm(ct("ban") + "?")) return;
     const { error } = await supabase.from("community_bans").insert({ user_id: userId });
-    if (error && error.code !== "23505") return toast.error(ct("error"));
+    if (error && error.code !== "23505") { toast.error(ct("error")); return; }
     toast.success(ct("ban"));
   }
   async function sendReply(e: React.FormEvent) {
     e.preventDefault();
     if (!me.user || !text.trim()) return;
     const { error } = await supabase.from("forum_replies").insert({ topic_id: topicId, author_id: me.user.id, body: text.trim() });
-    if (error) return toast.error(ct("error"));
+    if (error) { toast.error(ct("error")); return; }
     setText("");
     void load();
   }

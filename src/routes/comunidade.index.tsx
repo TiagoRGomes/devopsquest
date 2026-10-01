@@ -110,7 +110,7 @@ function TopicList({ closed, me }: { closed: boolean; me: ReturnType<typeof useM
       .insert({ author_id: me.user.id, title: title.trim(), body: body.trim() })
       .select("id")
       .single();
-    if (error || !data) return toast.error(ct("error"));
+    if (error || !data) { toast.error(ct("error")); return; }
     setTitle("");
     setBody("");
     setComposing(false);
@@ -249,7 +249,7 @@ function Chat({ me }: { me: ReturnType<typeof useMyCommunity> }) {
 
   async function remove(id: string) {
     const { error } = await supabase.from("chat_messages").delete().eq("id", id);
-    if (error) return toast.error(ct("error"));
+    if (error) { toast.error(ct("error")); return; }
     setRows((prev) => prev.filter((m) => m.id !== id));
   }
 
