@@ -428,9 +428,9 @@ const en: Dict = {
 };
 
 const DICTS: Record<Lang, Dict> = {
-  pt: { ...pt, ...ptA, ...ptB, ...ptC, ...ptD },
-  es: { ...es, ...esA, ...esB, ...esC, ...esD },
-  en: { ...en, ...enA, ...enB, ...enC, ...enD },
+  pt: { ...pt, ...ptA, ...ptB, ...ptC, ...ptD, ...ptE },
+  es: { ...es, ...esA, ...esB, ...esC, ...esD, ...esE },
+  en: { ...en, ...enA, ...enB, ...enC, ...enD, ...enE },
 };
 
 interface I18nValue {
