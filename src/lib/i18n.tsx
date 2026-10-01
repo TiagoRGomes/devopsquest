@@ -4,6 +4,7 @@ import { ptA, esA, enA } from "@/lib/i18n-pages/a";
 import { ptB, esB, enB } from "@/lib/i18n-pages/b";
 import { ptC, esC, enC } from "@/lib/i18n-pages/c";
 import { ptD, esD, enD } from "@/lib/i18n-pages/d";
+import { ptE, esE, enE } from "@/lib/i18n-pages/e";
 
 export type Lang = "pt" | "es" | "en";
 
@@ -428,9 +429,9 @@ const en: Dict = {
 };
 
 const DICTS: Record<Lang, Dict> = {
-  pt: { ...pt, ...ptA, ...ptB, ...ptC, ...ptD },
-  es: { ...es, ...esA, ...esB, ...esC, ...esD },
-  en: { ...en, ...enA, ...enB, ...enC, ...enD },
+  pt: { ...pt, ...ptA, ...ptB, ...ptC, ...ptD, ...ptE },
+  es: { ...es, ...esA, ...esB, ...esC, ...esD, ...esE },
+  en: { ...en, ...enA, ...enB, ...enC, ...enD, ...enE },
 };
 
 interface I18nValue {
