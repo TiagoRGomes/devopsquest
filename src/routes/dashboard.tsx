@@ -36,48 +36,85 @@ function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <section className="panel overflow-hidden bg-hero p-6 sm:p-8">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
-          {t("dash.levelClass", { level: level.level, className: contentText(lang, `class.${slugifyClassName(level.className)}`, "title", level.className) })}
-        </p>
-        <h1 className="mt-2 max-w-3xl font-display text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
-          {t("dash.heroTitle")}
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
-          {t("dash.heroSubtitle", {
-            modules: MODULES.length,
-            lessons: ALL_LESSONS.length,
-            labs: LABS.length,
-            challenges: CHALLENGES.length,
-            bosses: BOSSES.length,
-            weeks: TOTAL_WEEKS,
-          })}
-        </p>
-        <div className="mt-6 max-w-xl">
-          <div className="flex items-baseline justify-between text-sm">
-            <span className="text-muted-foreground">{t("dash.levelProgress")}</span>
-            <span className="font-mono text-accent">
-              {level.xpIntoLevel}/{level.xpForNext} XP
-            </span>
+      <section className="panel relative overflow-hidden bg-hero p-6 shadow-elevated sm:p-8">
+        <div className="pointer-events-none absolute inset-0 bg-grid opacity-40" aria-hidden />
+        <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-level opacity-20 blur-3xl" aria-hidden />
+        <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
+              {t("dash.levelClass", { level: level.level, className: contentText(lang, `class.${slugifyClassName(level.className)}`, "title", level.className) })}
+            </p>
+            <h1 className="mt-2 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl">
+              {t("dash.heroTitle")}
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
+              {t("dash.heroSubtitle", {
+                modules: MODULES.length,
+                lessons: ALL_LESSONS.length,
+                labs: LABS.length,
+                challenges: CHALLENGES.length,
+                bosses: BOSSES.length,
+                weeks: TOTAL_WEEKS,
+              })}
+            </p>
+            {upcoming && (
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <Link
+                  to="/aulas/$lessonId"
+                  params={{ lessonId: upcoming.id }}
+                  className="inline-flex items-center gap-2 rounded-xl bg-level px-5 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5"
+                >
+                  <Play className="size-4" />
+                  {progress.completedLessons.length ? t("dash.continue") : t("dash.start")}
+                </Link>
+                <span className="text-sm text-muted-foreground">
+                  {t("dash.next")} <span className="text-foreground">{contentText(lang, upcoming.id, "title", upcoming.title)}</span>
+                  {upcomingModule && ` · ${t("dash.moduleShort", { index: upcomingModule.index })}`}
+                </span>
+              </div>
+            )}
           </div>
-          <XpBar percent={level.progress} className="mt-2 h-2.5" />
+          <div className="relative">
+            <div className="absolute -inset-3 rounded-[2rem] bg-level opacity-20 blur-2xl" aria-hidden />
+            <div className="panel relative p-5">
+              <div className="flex items-center gap-3">
+                <span className="relative grid size-14 shrink-0 place-items-center rounded-xl bg-level text-primary-foreground shadow-glow">
+                  <Zap className="size-6" />
+                  <span className="absolute -bottom-1.5 -right-1.5 grid size-6 place-items-center rounded-full border border-background bg-surface font-mono text-[10px] font-semibold text-accent">
+                    {level.level}
+                  </span>
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate font-display text-lg font-semibold text-foreground">
+                    {contentText(lang, `class.${slugifyClassName(level.className)}`, "title", level.className)}
+                  </p>
+                  <p className="font-mono text-xs text-muted-foreground">{progress.xp} XP</p>
+                </div>
+              </div>
+              <div className="mt-5 flex items-baseline justify-between text-xs">
+                <span className="text-muted-foreground">{t("dash.levelProgress")}</span>
+                <span className="font-mono text-accent">
+                  {level.xpIntoLevel}/{level.xpForNext} XP
+                </span>
+              </div>
+              <XpBar percent={level.progress} className="mt-2 h-2.5" />
+              <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+                <div className="rounded-lg bg-surface-2 px-2 py-2">
+                  <Flame className="mx-auto size-4 text-warning" />
+                  <p className="mt-1 font-mono text-sm text-foreground">{progress.streak}</p>
+                </div>
+                <div className="rounded-lg bg-surface-2 px-2 py-2">
+                  <BookOpen className="mx-auto size-4 text-accent" />
+                  <p className="mt-1 font-mono text-sm text-foreground">{lessonsPercent}%</p>
+                </div>
+                <div className="rounded-lg bg-surface-2 px-2 py-2">
+                  <Award className="mx-auto size-4 text-legendary" />
+                  <p className="mt-1 font-mono text-sm text-foreground">{earnedBadges.length}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        {upcoming && (
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Link
-              to="/aulas/$lessonId"
-              params={{ lessonId: upcoming.id }}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition-opacity hover:opacity-90"
-            >
-              <Play className="size-4" />
-              {progress.completedLessons.length ? t("dash.continue") : t("dash.start")}
-            </Link>
-            <span className="text-sm text-muted-foreground">
-              {t("dash.next")} <span className="text-foreground">{contentText(lang, upcoming.id, "title", upcoming.title)}</span>
-              {upcomingModule && ` · ${t("dash.moduleShort", { index: upcomingModule.index })}`}
-            </span>
-          </div>
-        )}
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
