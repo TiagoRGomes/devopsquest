@@ -21,7 +21,7 @@ import {
   Zap,
 } from "lucide-react";
 import heroImage from "@/assets/landing-hero.jpg";
-import { ALL_LESSONS, MODULES } from "@/data/curriculum";
+import { ALL_LESSONS } from "@/data/curriculum";
 import { LABS } from "@/data/labs";
 import { BOSSES } from "@/data/challenges";
 import { REGIONS } from "@/data/world";
@@ -62,7 +62,7 @@ function Landing() {
   };
 
   const hud = [
-    { icon: Boxes, value: MODULES.length, label: t("rpg.hudRealms") },
+    { icon: Boxes, value: REGIONS.length, label: t("rpg.hudRealms") },
     { icon: BookOpen, value: ALL_LESSONS.length, label: t("rpg.hudQuests") },
     { icon: FlaskConical, value: LABS.length, label: t("rpg.hudLabs") },
     { icon: Skull, value: BOSSES.length, label: t("rpg.hudBosses") },
@@ -334,7 +334,7 @@ function Landing() {
           <p className="mt-2 text-sm text-muted-foreground">{t("rpg.mapLead")}</p>
 
           <ol className="relative mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {REGIONS.map((r, i) => (
+            {REGIONS.map((r) => (
               <li
                 key={r.id}
                 className="group panel relative overflow-hidden p-4 transition-all hover:-translate-y-0.5 hover:border-primary/45"
@@ -350,7 +350,6 @@ function Landing() {
                   <div className="min-w-0">
                     <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
                       {t("rpg.mapRealm")} {r.order}
-                      {i === 0 ? "" : ""}
                     </p>
                     <p className="font-display text-base font-semibold leading-tight text-foreground">
                       {contentText(lang, r.id, "name", r.name)}
