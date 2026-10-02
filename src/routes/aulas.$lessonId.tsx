@@ -71,24 +71,34 @@ function LessonPage() {
 
   return (
     <article className="mx-auto max-w-4xl space-y-6">
-      <header>
-        {mod && (
-          <Link to="/modulos/$slug" params={{ slug: mod.slug }} className="text-sm text-primary hover:underline">
-            {t("lesson.moduleLink", { index: mod.index, title: modTitle ?? "" })}
-          </Link>
-        )}
-        <h1 className="mt-2 font-display text-2xl font-semibold text-foreground sm:text-3xl">{lessonTitle}</h1>
-        <div className="mt-3 flex flex-wrap items-center gap-1.5">
-          <DifficultyChip level={lesson.difficulty} />
-          <Chip>
-            <Clock className="size-3" /> {lesson.duration} min
-          </Chip>
-          <Chip tone="primary">+{lesson.xp} XP</Chip>
-          {lesson.tools.map((t) => (
-            <Chip key={t} tone="accent">
-              {t}
+      <header className="panel relative overflow-hidden bg-hero p-6 shadow-elevated sm:p-8">
+        <div className="pointer-events-none absolute inset-0 bg-grid opacity-40" aria-hidden />
+        <div className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-level opacity-20 blur-3xl" aria-hidden />
+        <div className="relative">
+          {mod && (
+            <Link
+              to="/modulos/$slug"
+              params={{ slug: mod.slug }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-surface-2 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-accent hover:bg-surface"
+            >
+              {t("lesson.moduleLink", { index: mod.index, title: modTitle ?? "" })}
+            </Link>
+          )}
+          <h1 className="mt-4 font-display text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl">
+            {lessonTitle}
+          </h1>
+          <div className="mt-4 flex flex-wrap items-center gap-1.5">
+            <DifficultyChip level={lesson.difficulty} />
+            <Chip>
+              <Clock className="size-3" /> {lesson.duration} min
             </Chip>
-          ))}
+            <Chip tone="primary">+{lesson.xp} XP</Chip>
+            {lesson.tools.map((t) => (
+              <Chip key={t} tone="accent">
+                {t}
+              </Chip>
+            ))}
+          </div>
         </div>
       </header>
 
