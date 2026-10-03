@@ -22,9 +22,11 @@ import { Route as LaboratoriosRouteImport } from './routes/laboratorios'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as MinhaTrilhaRouteImport } from './routes/minha-trilha'
 import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ProjetoRouteImport } from './routes/projeto'
 import { Route as RecursosRouteImport } from './routes/recursos'
 import { Route as SkillsRouteImport } from './routes/skills'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as AulasLessonIdRouteImport } from './routes/aulas.$lessonId'
 import { Route as ComunidadeIndexRouteImport } from './routes/comunidade.index'
 import { Route as ComunidadeTopicIdRouteImport } from './routes/comunidade.$topicId'
@@ -97,6 +99,11 @@ const PerfilRoute = PerfilRouteImport.update({
   path: '/perfil',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjetoRoute = ProjetoRouteImport.update({
   id: '/projeto',
   path: '/projeto',
@@ -110,6 +117,11 @@ const RecursosRoute = RecursosRouteImport.update({
 const SkillsRoute = SkillsRouteImport.update({
   id: '/skills',
   path: '/skills',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AulasLessonIdRoute = AulasLessonIdRouteImport.update({
@@ -157,9 +169,11 @@ export interface FileRoutesByFullPath {
   '/mapa': typeof MapaRoute
   '/minha-trilha': typeof MinhaTrilhaRoute
   '/perfil': typeof PerfilRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/projeto': typeof ProjetoRoute
   '/recursos': typeof RecursosRoute
   '/skills': typeof SkillsRoute
+  '/termos': typeof TermosRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/comunidade/$topicId': typeof ComunidadeTopicIdRoute
   '/exame/$slug': typeof ExameSlugRoute
@@ -181,9 +195,11 @@ export interface FileRoutesByTo {
   '/mapa': typeof MapaRoute
   '/minha-trilha': typeof MinhaTrilhaRoute
   '/perfil': typeof PerfilRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/projeto': typeof ProjetoRoute
   '/recursos': typeof RecursosRoute
   '/skills': typeof SkillsRoute
+  '/termos': typeof TermosRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/comunidade/$topicId': typeof ComunidadeTopicIdRoute
   '/exame/$slug': typeof ExameSlugRoute
@@ -206,9 +222,11 @@ export interface FileRoutesById {
   '/mapa': typeof MapaRoute
   '/minha-trilha': typeof MinhaTrilhaRoute
   '/perfil': typeof PerfilRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/projeto': typeof ProjetoRoute
   '/recursos': typeof RecursosRoute
   '/skills': typeof SkillsRoute
+  '/termos': typeof TermosRoute
   '/aulas/$lessonId': typeof AulasLessonIdRoute
   '/comunidade/$topicId': typeof ComunidadeTopicIdRoute
   '/exame/$slug': typeof ExameSlugRoute
@@ -232,9 +250,11 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/minha-trilha'
     | '/perfil'
+    | '/privacidade'
     | '/projeto'
     | '/recursos'
     | '/skills'
+    | '/termos'
     | '/aulas/$lessonId'
     | '/comunidade/$topicId'
     | '/exame/$slug'
@@ -256,9 +276,11 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/minha-trilha'
     | '/perfil'
+    | '/privacidade'
     | '/projeto'
     | '/recursos'
     | '/skills'
+    | '/termos'
     | '/aulas/$lessonId'
     | '/comunidade/$topicId'
     | '/exame/$slug'
@@ -280,9 +302,11 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/minha-trilha'
     | '/perfil'
+    | '/privacidade'
     | '/projeto'
     | '/recursos'
     | '/skills'
+    | '/termos'
     | '/aulas/$lessonId'
     | '/comunidade/$topicId'
     | '/exame/$slug'
@@ -305,9 +329,11 @@ export interface RootRouteChildren {
   MapaRoute: typeof MapaRoute
   MinhaTrilhaRoute: typeof MinhaTrilhaRoute
   PerfilRoute: typeof PerfilRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
   ProjetoRoute: typeof ProjetoRoute
   RecursosRoute: typeof RecursosRoute
   SkillsRoute: typeof SkillsRoute
+  TermosRoute: typeof TermosRoute
   AulasLessonIdRoute: typeof AulasLessonIdRoute
   ComunidadeTopicIdRoute: typeof ComunidadeTopicIdRoute
   ExameSlugRoute: typeof ExameSlugRoute
@@ -409,6 +435,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PerfilRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projeto': {
       id: '/projeto'
       path: '/projeto'
@@ -428,6 +461,13 @@ declare module '@tanstack/react-router' {
       path: '/skills'
       fullPath: '/skills'
       preLoaderRoute: typeof SkillsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/aulas/$lessonId': {
@@ -489,9 +529,11 @@ const rootRouteChildren: RootRouteChildren = {
   MapaRoute: MapaRoute,
   MinhaTrilhaRoute: MinhaTrilhaRoute,
   PerfilRoute: PerfilRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
   ProjetoRoute: ProjetoRoute,
   RecursosRoute: RecursosRoute,
   SkillsRoute: SkillsRoute,
+  TermosRoute: TermosRoute,
   AulasLessonIdRoute: AulasLessonIdRoute,
   ComunidadeTopicIdRoute: ComunidadeTopicIdRoute,
   ExameSlugRoute: ExameSlugRoute,
