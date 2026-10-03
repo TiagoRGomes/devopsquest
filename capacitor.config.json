@@ -1,0 +1,10 @@
+{
+  "appId": "com.devopsquest.app",
+  "appName": "DevOpsQuest",
+  "webDir": "dist/client",
+  "server": {
+    "url": "https://id-preview--a74cadcb-6179-433a-b53d-9fe784d9b502.lovable.app",
+    "cleartext": false
+  },
+  "backgroundColor": "#070b18"
+}
