@@ -13,13 +13,13 @@ import { contentText, slugifyClassName } from "@/lib/content-i18n";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Painel — Jornada DevOps" },
+      { title: "Painel — DevOpsQuest" },
       {
         name: "description",
         content:
           "Seu painel de progresso na jornada DevOps: XP, nível, próxima aula, laboratórios e projeto CloudShop.",
       },
-      { property: "og:title", content: "Painel — Jornada DevOps" },
+      { property: "og:title", content: "Painel — DevOpsQuest" },
       { property: "og:description", content: "Acompanhe XP, nível, streak e a próxima etapa da sua trilha DevOps." },
     ],
   }),

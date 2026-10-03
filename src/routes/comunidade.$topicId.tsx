@@ -12,9 +12,9 @@ import { Chip, Panel } from "@/components/ui-bits";
 export const Route = createFileRoute("/comunidade/$topicId")({
   head: () => ({
     meta: [
-      { title: "Tópico da comunidade | Jornada DevOps" },
-      { name: "description", content: "Discussão da comunidade Jornada DevOps: pergunta, respostas e status de solução." },
-      { property: "og:title", content: "Tópico da comunidade Jornada DevOps" },
+      { title: "Tópico da comunidade | DevOpsQuest" },
+      { name: "description", content: "Discussão da comunidade DevOpsQuest: pergunta, respostas e status de solução." },
+      { property: "og:title", content: "Tópico da comunidade DevOpsQuest" },
       { property: "og:description", content: "Veja a pergunta, as respostas dos alunos e se foi solucionada." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },

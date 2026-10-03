@@ -9,12 +9,12 @@ import { tCareerField, tCareerList } from "@/lib/content-translate";
 export const Route = createFileRoute("/carreira")({
   head: () => ({
     meta: [
-      { title: "Carreira DevOps — DevOps Quest RPG" },
+      { title: "Carreira DevOps — DevOpsQuest" },
       {
         name: "description",
         content: "Trilhas de DevOps, Cloud, Platform, SRE e DevSecOps: o que as vagas pedem, checklist da primeira vaga e banco de entrevistas.",
       },
-      { property: "og:title", content: "Carreira DevOps — DevOps Quest RPG" },
+      { property: "og:title", content: "Carreira DevOps — DevOpsQuest" },
       { property: "og:description", content: "Prepare currículo, portfólio e entrevistas com base nas vagas atuais." },
     ],
   }),

@@ -33,7 +33,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Jornada DevOps — campanha do nível 1 ao Ninja" },
+      { title: "DevOpsQuest — campanha do nível 1 ao Ninja" },
       {
         name: "description",
         content:
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "Jornada DevOps — campanha do nível 1 ao Ninja" },
+      { property: "og:title", content: "DevOpsQuest — campanha do nível 1 ao Ninja" },
       {
         property: "og:description",
         content:

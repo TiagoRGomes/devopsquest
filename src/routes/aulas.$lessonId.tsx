@@ -22,9 +22,9 @@ export const Route = createFileRoute("/aulas/$lessonId")({
     }
     return {
       meta: [
-        { title: `${loaderData.title} — DevOps Quest RPG` },
+        { title: `${loaderData.title} — DevOpsQuest` },
         { name: "description", content: loaderData.description },
-        { property: "og:title", content: `${loaderData.title} — DevOps Quest RPG` },
+        { property: "og:title", content: `${loaderData.title} — DevOpsQuest` },
         { property: "og:description", content: loaderData.description },
       ],
     };

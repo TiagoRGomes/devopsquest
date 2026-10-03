@@ -10,12 +10,12 @@ import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
 export const Route = createFileRoute("/modulos/")({
   head: () => ({
     meta: [
-      { title: "Módulos — DevOps Quest RPG" },
+      { title: "Módulos — DevOpsQuest" },
       {
         name: "description",
         content: "Os 12 módulos da trilha DevOps: Linux, redes, Git, Docker, CI/CD, AWS, Terraform, Kubernetes, GitOps, SRE e segurança.",
       },
-      { property: "og:title", content: "Módulos — DevOps Quest RPG" },
+      { property: "og:title", content: "Módulos — DevOpsQuest" },
       { property: "og:description", content: "Currículo completo de DevOps com aulas, labs e entregas por módulo." },
     ],
   }),

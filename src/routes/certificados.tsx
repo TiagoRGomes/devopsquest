@@ -13,14 +13,14 @@ import { Certificate, type CertificateData } from "@/components/Certificate";
 export const Route = createFileRoute("/certificados")({
   head: () => ({
     meta: [
-      { title: "Certificados — Jornada DevOps" },
+      { title: "Certificados — DevOpsQuest" },
       {
         name: "description",
         content:
-          "Baixe o certificado de cada módulo aprovado e o certificado final do curso Jornada DevOps, com carga horária total.",
+          "Baixe o certificado de cada módulo aprovado e o certificado final do curso DevOpsQuest, com carga horária total.",
       },
-      { property: "og:title", content: "Certificados — Jornada DevOps" },
-      { property: "og:description", content: "Certificados por módulo e certificado final da Jornada DevOps." },
+      { property: "og:title", content: "Certificados — DevOpsQuest" },
+      { property: "og:description", content: "Certificados por módulo e certificado final da DevOpsQuest." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

@@ -15,7 +15,7 @@ export interface Author {
 const DICT: Record<Lang, Record<string, string>> = {
   pt: {
     eyebrow: "Comunidade",
-    title: "Comunidade Jornada DevOps",
+    title: "Comunidade DevOpsQuest",
     lead: "Tire dúvidas, ajude outros alunos e converse ao vivo. Seu nível aparece ao lado do nick.",
     open: "Tópicos abertos",
     closed: "Tópicos fechados",
@@ -63,7 +63,7 @@ const DICT: Record<Lang, Record<string, string>> = {
   },
   es: {
     eyebrow: "Comunidad",
-    title: "Comunidad Jornada DevOps",
+    title: "Comunidad DevOpsQuest",
     lead: "Resuelve dudas, ayuda a otros alumnos y charla en directo. Tu nivel aparece junto a tu nick.",
     open: "Temas abiertos",
     closed: "Temas cerrados",
@@ -111,7 +111,7 @@ const DICT: Record<Lang, Record<string, string>> = {
   },
   en: {
     eyebrow: "Community",
-    title: "Jornada DevOps Community",
+    title: "DevOpsQuest Community",
     lead: "Ask questions, help other students and chat live. Your level shows next to your nickname.",
     open: "Open topics",
     closed: "Closed topics",

@@ -12,13 +12,13 @@ import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
 export const Route = createFileRoute("/minha-trilha")({
   head: () => ({
     meta: [
-      { title: "Minha Trilha — plano semanal | Jornada DevOps" },
+      { title: "Minha Trilha — plano semanal | DevOpsQuest" },
       {
         name: "description",
         content:
-          "Plano de estudo semana a semana da Jornada DevOps: aulas, laboratórios e exames de cada módulo, atualizados conforme seu progresso.",
+          "Plano de estudo semana a semana da DevOpsQuest: aulas, laboratórios e exames de cada módulo, atualizados conforme seu progresso.",
       },
-      { property: "og:title", content: "Minha Trilha — Jornada DevOps" },
+      { property: "og:title", content: "Minha Trilha — DevOpsQuest" },
       {
         property: "og:description",
         content: "Seu plano semanal de aulas, laboratórios e exames de DevOps.",

@@ -18,12 +18,12 @@ const YEAR_SECONDS = 60 * 60 * 24 * 365;
 export const Route = createFileRoute("/perfil")({
   head: () => ({
     meta: [
-      { title: "Meu perfil — DevOps Quest RPG" },
+      { title: "Meu perfil — DevOpsQuest" },
       {
         name: "description",
         content: "Seu perfil de aprendiz DevOps: nível, XP, sequência de estudo, anotações e progresso por área.",
       },
-      { property: "og:title", content: "Meu perfil — DevOps Quest RPG" },
+      { property: "og:title", content: "Meu perfil — DevOpsQuest" },
       { property: "og:description", content: "Resumo do seu progresso na jornada DevOps." },
     ],
   }),

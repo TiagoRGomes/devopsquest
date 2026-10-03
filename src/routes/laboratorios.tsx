@@ -12,12 +12,12 @@ import { tLab } from "@/lib/content-translate";
 export const Route = createFileRoute("/laboratorios")({
   head: () => ({
     meta: [
-      { title: "Laboratórios — DevOps Quest RPG" },
+      { title: "Laboratórios — DevOpsQuest" },
       {
         name: "description",
         content: "30 laboratórios práticos de DevOps: Linux, Nginx, Docker, CI/CD, AWS, Terraform, Kubernetes, GitOps e observabilidade.",
       },
-      { property: "og:title", content: "Laboratórios — DevOps Quest RPG" },
+      { property: "og:title", content: "Laboratórios — DevOpsQuest" },
       { property: "og:description", content: "Pratique com passo a passo, comandos, validação e erros comuns." },
     ],
   }),

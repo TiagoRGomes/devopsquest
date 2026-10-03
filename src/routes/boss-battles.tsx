@@ -11,12 +11,12 @@ import { tBoss } from "@/lib/content-translate";
 export const Route = createFileRoute("/boss-battles")({
   head: () => ({
     meta: [
-      { title: "Boss Battles — DevOps Quest RPG" },
+      { title: "Boss Battles — DevOpsQuest" },
       {
         name: "description",
         content: "Incidentes reais para investigar: 502, CrashLoopBackOff, drift de Terraform, pipeline quebrado e queda em produção.",
       },
-      { property: "og:title", content: "Boss Battles — DevOps Quest RPG" },
+      { property: "og:title", content: "Boss Battles — DevOpsQuest" },
       { property: "og:description", content: "Diagnostique sintomas, siga a investigação e resolva como um plantonista." },
     ],
   }),
