@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Native Android/iOS apps use Capacitor loading the hosted web app via server.url — one codebase and one backend for web and apps.
