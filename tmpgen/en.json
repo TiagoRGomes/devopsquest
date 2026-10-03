@@ -1,6 +1,4 @@
-// Arquivo gerado automaticamente: traduções (EN) de todo o conteúdo do curso.
-// Chaves: `${id}.${campo}`. Listas usam " | " como separador.
-export const CONTENT_GEN_EN: Record<string, string> = {
+{
  "mod-0.title": "Welcome and Environment",
  "mod-0.tagline": "Set up the workbench of someone who lives off infrastructure.",
  "mod-0.overview": "Before learning tools, you need to understand the game: what a DevOps person delivers day to day, how job postings are written today, and what work environment you need on your machine. This module delivers the workbench ready: Linux shell, Git configured with an SSH key, editor with extensions, Docker, Node, AWS CLI, Terraform, kubectl and Helm. In the end you'll have repositories created, a protected cloud budget and a technical journal where you'll log every decision — the artifact that impresses most in an interview.",
@@ -2714,4 +2712,4 @@ export const CONTENT_GEN_EN: Record<string, string> = {
  "interview.8.area": "GitOps",
  "interview.9.id": "iq-10",
  "interview.9.area": "SRE"
-};
+}

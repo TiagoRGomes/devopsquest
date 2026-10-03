@@ -12,8 +12,8 @@ export type ContentDict = Record<string, string>;
 
 const DICTS: Record<Lang, ContentDict> = {
   pt: {},
-  es: { ...CONTENT_GEN_ES, ...CONTENT_ES_A, ...CONTENT_ES_B, ...CONTENT_ES_C },
-  en: { ...CONTENT_GEN_EN, ...CONTENT_EN_A, ...CONTENT_EN_B, ...CONTENT_EN_C },
+  es: { ...CONTENT_ES_A, ...CONTENT_ES_B, ...CONTENT_ES_C, ...CONTENT_GEN_ES },
+  en: { ...CONTENT_EN_A, ...CONTENT_EN_B, ...CONTENT_EN_C, ...CONTENT_GEN_EN },
 };
 
 /** Retorna o texto editado na administração, o traduzido, ou o original em português. */

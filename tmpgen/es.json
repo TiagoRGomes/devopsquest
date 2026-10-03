@@ -1,6 +1,4 @@
-// Arquivo gerado automaticamente: traduções (ES) de todo o conteúdo do curso.
-// Chaves: `${id}.${campo}`. Listas usam " | " como separador.
-export const CONTENT_GEN_ES: Record<string, string> = {
+{
  "mod-0.title": "Bienvenida y Entorno",
  "mod-0.tagline": "Monta el banco de trabajo de quien vive de infraestructura.",
  "mod-0.overview": "Antes de aprender herramientas, hay que entender el juego: qué entrega una persona de DevOps en el día a día, cómo están escritas las vacantes hoy y qué entorno de trabajo necesitas en tu máquina. Este módulo entrega el banco listo: shell Linux, Git configurado con clave SSH, editor con extensiones, Docker, Node, AWS CLI, Terraform, kubectl y Helm. Al final tendrás repositorios creados, presupuesto de nube protegido y un diario técnico donde registrarás cada decisión: el artefacto que más impresiona en una entrevista.",
@@ -2714,4 +2712,4 @@ export const CONTENT_GEN_ES: Record<string, string> = {
  "l-11-4.q1": "¿Qué debe contener un ADR además de la decisión?",
  "l-11-4.q1opts": "Solo el código | Contexto, alternativas y consecuencias | Salarios | Contraseñas",
  "l-11-4.q1exp": "El valor del ADR está en explicar por qué se tomó la decisión."
-};
+}
