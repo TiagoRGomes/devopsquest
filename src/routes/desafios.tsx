@@ -9,12 +9,12 @@ import { tChallenge } from "@/lib/content-translate";
 export const Route = createFileRoute("/desafios")({
   head: () => ({
     meta: [
-      { title: "Desafios — DevOps Quest RPG" },
+      { title: "Desafios — DevOpsQuest" },
       {
         name: "description",
         content: "12 desafios técnicos de DevOps com critérios de aceitação, do runbook Linux ao SLO com postmortem.",
       },
-      { property: "og:title", content: "Desafios — DevOps Quest RPG" },
+      { property: "og:title", content: "Desafios — DevOpsQuest" },
       { property: "og:description", content: "Entregas avaliadas por critérios objetivos, como no trabalho real." },
     ],
   }),

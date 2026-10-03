@@ -11,12 +11,12 @@ import { contentText } from "@/lib/content-i18n";
 export const Route = createFileRoute("/mapa")({
   head: () => ({
     meta: [
-      { title: "Mapa da Jornada — DevOps Quest RPG" },
+      { title: "Mapa da Jornada — DevOpsQuest" },
       {
         name: "description",
         content: "As 10 regiões da jornada DevOps, da Vila do Terminal à Torre da Confiabilidade, com quests e chefes.",
       },
-      { property: "og:title", content: "Mapa da Jornada — DevOps Quest RPG" },
+      { property: "og:title", content: "Mapa da Jornada — DevOpsQuest" },
       { property: "og:description", content: "Explore as regiões, quests e Boss Battles da trilha DevOps." },
     ],
   }),

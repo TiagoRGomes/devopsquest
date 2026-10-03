@@ -15,13 +15,13 @@ export const Route = createFileRoute("/auth")({
 
   head: () => ({
     meta: [
-      { title: "Entrar — Jornada DevOps" },
+      { title: "Entrar — DevOpsQuest" },
       {
         name: "description",
         content:
-          "Crie sua conta na Jornada DevOps para salvar XP, aulas, laboratórios e conquistas em qualquer aparelho.",
+          "Crie sua conta na DevOpsQuest para salvar XP, aulas, laboratórios e conquistas em qualquer aparelho.",
       },
-      { property: "og:title", content: "Entrar — Jornada DevOps" },
+      { property: "og:title", content: "Entrar — DevOpsQuest" },
       {
         property: "og:description",
         content: "Sua jornada DevOps salva na nuvem: entre com e-mail ou Google.",

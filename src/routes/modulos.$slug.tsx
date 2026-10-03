@@ -24,9 +24,9 @@ export const Route = createFileRoute("/modulos/$slug")({
     }
     return {
       meta: [
-        { title: `${loaderData.title} — DevOps Quest RPG` },
+        { title: `${loaderData.title} — DevOpsQuest` },
         { name: "description", content: loaderData.tagline },
-        { property: "og:title", content: `${loaderData.title} — DevOps Quest RPG` },
+        { property: "og:title", content: `${loaderData.title} — DevOpsQuest` },
         { property: "og:description", content: loaderData.tagline },
       ],
     };

@@ -19,7 +19,7 @@ const STORAGE_KEY = "jornada-devops:lang";
 type Dict = Record<string, string>;
 
 const pt: Dict = {
-  "brand.name": "Jornada DevOps",
+  "brand.name": "DevOpsQuest",
   "brand.tagline": "do código à produção",
 
   "nav.dashboard": "Painel",
@@ -45,11 +45,11 @@ const pt: Dict = {
   "shell.days": "dias",
   "shell.signIn": "Entrar",
   "shell.profile": "Perfil",
-  "shell.footer": "Jornada DevOps — conteúdo original, baseado no que as vagas pedem hoje.",
+  "shell.footer": "DevOpsQuest — conteúdo original, baseado no que as vagas pedem hoje.",
   "shell.language": "Idioma",
 
   "landing.eyebrow": "Do zero ao nível Ninja",
-  "landing.title": "Jornada DevOps",
+  "landing.title": "DevOpsQuest",
   "landing.subtitle":
     "A trilha completa e gamificada para virar profissional de DevOps: aulas, laboratórios práticos, desafios, Boss Battles e um projeto real de portfólio.",
   "landing.ctaPrimary": "Criar conta grátis",
@@ -132,8 +132,8 @@ const pt: Dict = {
   "cert.module": "Certificado de conclusão de módulo",
   "cert.final": "Certificado de conclusão do curso",
   "cert.certifies": "Certificamos que",
-  "cert.moduleLine": "concluiu o módulo \"{module}\" da Jornada DevOps, com aproveitamento de {score}% no exame final do módulo.",
-  "cert.finalLine": "concluiu integralmente o programa Jornada DevOps — 12 módulos, {lessons} aulas, {labs} laboratórios e o projeto final CloudShop — sendo aprovado em todos os exames de módulo.",
+  "cert.moduleLine": "concluiu o módulo \"{module}\" da DevOpsQuest, com aproveitamento de {score}% no exame final do módulo.",
+  "cert.finalLine": "concluiu integralmente o programa DevOpsQuest — 12 módulos, {lessons} aulas, {labs} laboratórios e o projeto final CloudShop — sendo aprovado em todos os exames de módulo.",
   "cert.hours": "Carga horária total",
   "cert.hoursModule": "Carga horária do módulo",
   "cert.issued": "Emitido em",
@@ -144,7 +144,7 @@ const pt: Dict = {
   "cert.nameHint": "Coloque seu nome no perfil para aparecer no certificado.",
   "cert.finalLocked": "O certificado final é liberado quando os 12 exames estiverem aprovados ({done}/{total}).",
   "cert.score": "Aproveitamento",
-  "cert.signature": "Coordenação Jornada DevOps",
+  "cert.signature": "Coordenação DevOpsQuest",
   "profile.photo": "Sua foto",
   "profile.upload": "Enviar foto",
   "profile.uploading": "Enviando…",
@@ -155,7 +155,7 @@ const pt: Dict = {
 };
 
 const es: Dict = {
-  "brand.name": "Jornada DevOps",
+  "brand.name": "DevOpsQuest",
   "brand.tagline": "del código a producción",
 
   "nav.dashboard": "Panel",
@@ -181,11 +181,11 @@ const es: Dict = {
   "shell.days": "días",
   "shell.signIn": "Entrar",
   "shell.profile": "Perfil",
-  "shell.footer": "Jornada DevOps — contenido original, basado en lo que piden las vacantes hoy.",
+  "shell.footer": "DevOpsQuest — contenido original, basado en lo que piden las vacantes hoy.",
   "shell.language": "Idioma",
 
   "landing.eyebrow": "De cero a nivel Ninja",
-  "landing.title": "Jornada DevOps",
+  "landing.title": "DevOpsQuest",
   "landing.subtitle":
     "La ruta completa y gamificada para convertirte en profesional DevOps: clases, laboratorios prácticos, retos, batallas finales y un proyecto real de portafolio.",
   "landing.ctaPrimary": "Crear cuenta gratis",
@@ -269,8 +269,8 @@ const es: Dict = {
   "cert.module": "Certificado de finalización de módulo",
   "cert.final": "Certificado de finalización del curso",
   "cert.certifies": "Certificamos que",
-  "cert.moduleLine": "completó el módulo \"{module}\" de Jornada DevOps, con un {score}% de aprovechamiento en el examen final del módulo.",
-  "cert.finalLine": "completó íntegramente el programa Jornada DevOps — 12 módulos, {lessons} clases, {labs} laboratorios y el proyecto final CloudShop — aprobando todos los exámenes de módulo.",
+  "cert.moduleLine": "completó el módulo \"{module}\" de DevOpsQuest, con un {score}% de aprovechamiento en el examen final del módulo.",
+  "cert.finalLine": "completó íntegramente el programa DevOpsQuest — 12 módulos, {lessons} clases, {labs} laboratorios y el proyecto final CloudShop — aprobando todos los exámenes de módulo.",
   "cert.hours": "Carga horaria total",
   "cert.hoursModule": "Carga horaria del módulo",
   "cert.issued": "Emitido el",
@@ -281,7 +281,7 @@ const es: Dict = {
   "cert.nameHint": "Añade tu nombre en el perfil para que aparezca en el certificado.",
   "cert.finalLocked": "El certificado final se libera cuando apruebes los 12 exámenes ({done}/{total}).",
   "cert.score": "Aprovechamiento",
-  "cert.signature": "Coordinación Jornada DevOps",
+  "cert.signature": "Coordinación DevOpsQuest",
   "profile.photo": "Tu foto",
   "profile.upload": "Subir foto",
   "profile.uploading": "Subiendo…",
@@ -292,7 +292,7 @@ const es: Dict = {
 };
 
 const en: Dict = {
-  "brand.name": "Jornada DevOps",
+  "brand.name": "DevOpsQuest",
   "brand.tagline": "from code to production",
 
   "nav.dashboard": "Dashboard",
@@ -318,11 +318,11 @@ const en: Dict = {
   "shell.days": "days",
   "shell.signIn": "Sign in",
   "shell.profile": "Profile",
-  "shell.footer": "Jornada DevOps — original content, built around what job openings ask for today.",
+  "shell.footer": "DevOpsQuest — original content, built around what job openings ask for today.",
   "shell.language": "Language",
 
   "landing.eyebrow": "From zero to Ninja level",
-  "landing.title": "Jornada DevOps",
+  "landing.title": "DevOpsQuest",
   "landing.subtitle":
     "The complete, gamified path to becoming a DevOps professional: lessons, hands-on labs, challenges, boss battles and a real portfolio project.",
   "landing.ctaPrimary": "Create free account",
@@ -406,8 +406,8 @@ const en: Dict = {
   "cert.module": "Module completion certificate",
   "cert.final": "Course completion certificate",
   "cert.certifies": "This certifies that",
-  "cert.moduleLine": "completed the module \"{module}\" of Jornada DevOps, scoring {score}% on the module final exam.",
-  "cert.finalLine": "fully completed the Jornada DevOps program — 12 modules, {lessons} lessons, {labs} labs and the final CloudShop project — passing every module exam.",
+  "cert.moduleLine": "completed the module \"{module}\" of DevOpsQuest, scoring {score}% on the module final exam.",
+  "cert.finalLine": "fully completed the DevOpsQuest program — 12 modules, {lessons} lessons, {labs} labs and the final CloudShop project — passing every module exam.",
   "cert.hours": "Total course hours",
   "cert.hoursModule": "Module hours",
   "cert.issued": "Issued on",
@@ -418,7 +418,7 @@ const en: Dict = {
   "cert.nameHint": "Add your name in your profile so it shows on the certificate.",
   "cert.finalLocked": "The final certificate unlocks once all 12 exams are passed ({done}/{total}).",
   "cert.score": "Score",
-  "cert.signature": "Jornada DevOps Faculty",
+  "cert.signature": "DevOpsQuest Faculty",
   "profile.photo": "Your photo",
   "profile.upload": "Upload photo",
   "profile.uploading": "Uploading…",

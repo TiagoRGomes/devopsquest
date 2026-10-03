@@ -83,13 +83,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Jornada DevOps — carreira DevOps do zero ao Ninja" },
+      { title: "DevOpsQuest — carreira DevOps do zero ao Ninja" },
       {
         name: "description",
         content:
           "Plataforma gamificada em português para aprender DevOps do zero ao nível profissional, com labs, desafios e projeto real.",
       },
-      { property: "og:title", content: "Jornada DevOps" },
+      { property: "og:title", content: "DevOpsQuest" },
       {
         property: "og:description",
         content: "Trilha completa de DevOps com XP, níveis, laboratórios práticos e projeto de portfólio.",

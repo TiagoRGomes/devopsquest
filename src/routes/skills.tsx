@@ -11,12 +11,12 @@ import { tSkill } from "@/lib/content-translate";
 export const Route = createFileRoute("/skills")({
   head: () => ({
     meta: [
-      { title: "Skill Tree — DevOps Quest RPG" },
+      { title: "Skill Tree — DevOpsQuest" },
       {
         name: "description",
         content: "Árvore de habilidades DevOps: Linux, redes, containers, cloud, IaC, Kubernetes, GitOps, SRE e segurança.",
       },
-      { property: "og:title", content: "Skill Tree — DevOps Quest RPG" },
+      { property: "og:title", content: "Skill Tree — DevOpsQuest" },
       { property: "og:description", content: "Desbloqueie habilidades concluindo as aulas ligadas a cada nó." },
     ],
   }),

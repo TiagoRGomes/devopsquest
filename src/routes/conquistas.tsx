@@ -13,12 +13,12 @@ import { contentText, slugifyClassName } from "@/lib/content-i18n";
 export const Route = createFileRoute("/conquistas")({
   head: () => ({
     meta: [
-      { title: "Conquistas e certificado — DevOps Quest RPG" },
+      { title: "Conquistas e certificado — DevOpsQuest" },
       {
         name: "description",
-        content: "Badges conquistadas, níveis e o certificado de conclusão da jornada DevOps Quest RPG.",
+        content: "Badges conquistadas, níveis e o certificado de conclusão da jornada DevOpsQuest.",
       },
-      { property: "og:title", content: "Conquistas — DevOps Quest RPG" },
+      { property: "og:title", content: "Conquistas — DevOpsQuest" },
       { property: "og:description", content: "Acompanhe badges, classes de nível e requisitos do certificado." },
     ],
   }),

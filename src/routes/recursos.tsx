@@ -9,12 +9,12 @@ import { contentText } from "@/lib/content-i18n";
 export const Route = createFileRoute("/recursos")({
   head: () => ({
     meta: [
-      { title: "Recursos — DevOps Quest RPG" },
+      { title: "Recursos — DevOpsQuest" },
       {
         name: "description",
         content: "Documentações oficiais e ferramentas para estudar DevOps: Linux, Nginx, Docker, Terraform, Kubernetes, Prometheus e mais.",
       },
-      { property: "og:title", content: "Recursos — DevOps Quest RPG" },
+      { property: "og:title", content: "Recursos — DevOpsQuest" },
       { property: "og:description", content: "Fontes confiáveis para aprofundar cada tema da trilha." },
     ],
   }),

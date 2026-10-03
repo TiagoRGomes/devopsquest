@@ -17,13 +17,13 @@ import type { CodeBlock, ExamLevel, ExamQuestion, QuizQuestion } from "@/lib/typ
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Administração de conteúdo — Jornada DevOps" },
+      { title: "Administração de conteúdo — DevOpsQuest" },
       {
         name: "description",
         content:
-          "Área de administração da Jornada DevOps para editar módulos, aulas, quizzes e exames em português, espanhol e inglês.",
+          "Área de administração da DevOpsQuest para editar módulos, aulas, quizzes e exames em português, espanhol e inglês.",
       },
-      { property: "og:title", content: "Administração — Jornada DevOps" },
+      { property: "og:title", content: "Administração — DevOpsQuest" },
       { property: "og:description", content: "Edite módulos, aulas, quizzes e exames do curso em cada idioma." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

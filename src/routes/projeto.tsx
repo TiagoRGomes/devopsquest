@@ -10,12 +10,12 @@ import { contentText } from "@/lib/content-i18n";
 export const Route = createFileRoute("/projeto")({
   head: () => ({
     meta: [
-      { title: "Projeto CloudShop — DevOps Quest RPG" },
+      { title: "Projeto CloudShop — DevOpsQuest" },
       {
         name: "description",
         content: "Construa a CloudShop Platform em 24 etapas: containers, CI/CD, AWS, Terraform, Kubernetes, GitOps e observabilidade.",
       },
-      { property: "og:title", content: "Projeto CloudShop — DevOps Quest RPG" },
+      { property: "og:title", content: "Projeto CloudShop — DevOpsQuest" },
       { property: "og:description", content: "O projeto de portfólio que prova sua competência em DevOps." },
     ],
   }),

@@ -15,9 +15,9 @@ type Tab = "open" | "closed" | "chat";
 export const Route = createFileRoute("/comunidade/")({
   head: () => ({
     meta: [
-      { title: "Comunidade — fórum e bate-papo | Jornada DevOps" },
-      { name: "description", content: "Fórum de dúvidas e bate-papo ao vivo dos alunos da Jornada DevOps, com nick e nível de cada pessoa." },
-      { property: "og:title", content: "Comunidade Jornada DevOps" },
+      { title: "Comunidade — fórum e bate-papo | DevOpsQuest" },
+      { name: "description", content: "Fórum de dúvidas e bate-papo ao vivo dos alunos da DevOpsQuest, com nick e nível de cada pessoa." },
+      { property: "og:title", content: "Comunidade DevOpsQuest" },
       { property: "og:description", content: "Tópicos abertos e fechados, dúvidas solucionadas e bate-papo ao vivo entre alunos de DevOps." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -22,12 +22,12 @@ export const Route = createFileRoute("/exame/$slug")({
     }
     return {
       meta: [
-        { title: `Exame — ${loaderData.title} — Jornada DevOps` },
+        { title: `Exame — ${loaderData.title} — DevOpsQuest` },
         {
           name: "description",
           content: `Exame final do módulo ${loaderData.title}: 8 perguntas do fácil ao difícil, 70% para aprovação e certificado.`,
         },
-        { property: "og:title", content: `Exame — ${loaderData.title} — Jornada DevOps` },
+        { property: "og:title", content: `Exame — ${loaderData.title} — DevOpsQuest` },
         { property: "og:description", content: "Exame de módulo com aprovação mínima de 70%." },
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary_large_image" },
