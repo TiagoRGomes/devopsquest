@@ -6,8 +6,8 @@ export const ptE: Dict = {
   "rpg.badgeGuild": "Guilda e bate-papo",
   "rpg.badgeLangs": "3 idiomas",
   "rpg.heroKicker": "Campanha DevOps · do Recruta ao Ninja",
-  "rpg.heroTitle1": "Jornada",
-  "rpg.heroTitle2": "DevOps",
+  "rpg.heroTitle1": "DevOps",
+  "rpg.heroTitle2": "Quest",
   "rpg.heroLead":
     "Atravesse 10 reinos, derrote os chefes de produção e evolua do nível 1 ao 50 com aulas profundas, laboratórios reais e um projeto de portfólio.",
   "rpg.ctaCreate": "Criar personagem · grátis",
@@ -79,8 +79,8 @@ export const esE: Dict = {
   "rpg.badgeGuild": "Gremio y chat",
   "rpg.badgeLangs": "3 idiomas",
   "rpg.heroKicker": "Campaña DevOps · de Recluta a Ninja",
-  "rpg.heroTitle1": "Jornada",
-  "rpg.heroTitle2": "DevOps",
+  "rpg.heroTitle1": "DevOps",
+  "rpg.heroTitle2": "Quest",
   "rpg.heroLead":
     "Atraviesa 10 reinos, vence a los jefes de producción y evoluciona del nivel 1 al 50 con clases profundas, laboratorios reales y un proyecto de portafolio.",
   "rpg.ctaCreate": "Crear personaje · gratis",
@@ -152,8 +152,8 @@ export const enE: Dict = {
   "rpg.badgeGuild": "Guild and chat",
   "rpg.badgeLangs": "3 languages",
   "rpg.heroKicker": "DevOps campaign · Recruit to Ninja",
-  "rpg.heroTitle1": "Jornada",
-  "rpg.heroTitle2": "DevOps",
+  "rpg.heroTitle1": "DevOps",
+  "rpg.heroTitle2": "Quest",
   "rpg.heroLead":
     "Cross 10 realms, defeat the production bosses and climb from level 1 to 50 with deep lessons, real labs and a portfolio project.",
   "rpg.ctaCreate": "Create character · free",
