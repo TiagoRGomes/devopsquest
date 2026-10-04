@@ -205,6 +205,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Swords className="size-3.5 text-accent" />
               {t("shell.footer")}
             </p>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <Link to="/termos" className="hover:text-foreground">
+                {t("legal.terms.title")}
+              </Link>
+              <Link to="/privacidade" className="hover:text-foreground">
+                {t("legal.privacy.title")}
+              </Link>
+            </div>
           </footer>
         </div>
       </div>
