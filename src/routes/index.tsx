@@ -440,7 +440,17 @@ function Landing() {
       </main>
 
       <footer className="border-t border-border px-4 py-8 sm:px-6">
-        <p className="mx-auto w-full max-w-6xl text-xs text-muted-foreground">{t("shell.footer")}</p>
+        <div className="mx-auto w-full max-w-6xl space-y-2">
+          <p className="text-xs text-muted-foreground">{t("shell.footer")}</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <Link to="/termos" className="hover:text-foreground">
+              {t("legal.terms.title")}
+            </Link>
+            <Link to="/privacidade" className="hover:text-foreground">
+              {t("legal.privacy.title")}
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   );
