@@ -7,7 +7,7 @@ import { contentText } from "@/lib/content-i18n";
 import { STUDY_PLAN, type PlanItem } from "@/lib/study-plan";
 import { ALL_LESSONS, getModuleById } from "@/data/curriculum";
 import { LABS } from "@/data/labs";
-import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
+import { Chip, Panel, XpBar } from "@/components/ui-bits";
 
 export const Route = createFileRoute("/minha-trilha")({
   head: () => ({
@@ -118,20 +118,20 @@ function MinhaTrilhaPage() {
 
   return (
     <div className="space-y-6">
-      <Panel className="bg-hero">
+      <Panel className="bg-hero p-4 sm:p-5">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
           <CalendarRange className="mr-1 inline size-3.5" /> {t("path.eyebrow")}
         </p>
         <h1 className="mt-1.5 font-display text-2xl font-semibold text-foreground sm:text-3xl">
           {t("path.title")}
         </h1>
-        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{t("path.lead")}</p>
+        <p className="mt-2 hidden max-w-3xl text-sm text-muted-foreground sm:block">{t("path.lead")}</p>
         <p className="mt-4 text-sm text-foreground">
           {t("path.overall", { current: currentWeek?.index ?? 1, total: weeks.length, percent })}
         </p>
         <XpBar percent={percent} className="mt-2" />
         {nextItem && (
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="mt-3 hidden text-sm text-muted-foreground sm:block">
             {t("path.next")}: <span className="text-foreground">{itemLabel(nextItem)}</span>
           </p>
         )}
@@ -146,8 +146,6 @@ function MinhaTrilhaPage() {
         )}
       </Panel>
 
-      <SectionTitle eyebrow={`${weeks.length}`} title={t("path.title")} />
-
       <ul className="grid gap-4 lg:grid-cols-2">
         {weeks.map((w) => {
           const mod = getModuleById(w.moduleId);
@@ -159,7 +157,7 @@ function MinhaTrilhaPage() {
               key={w.index}
               className={isCurrent ? "border-primary/50 shadow-[0_0_0_1px_var(--primary)]" : ""}
             >
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
                 <span className="grid size-8 place-items-center rounded-lg bg-level font-mono text-xs font-semibold text-primary-foreground">
                   {w.index}
                 </span>
@@ -171,7 +169,7 @@ function MinhaTrilhaPage() {
                     {contentText(lang, w.moduleId, "title", mod?.title ?? w.moduleId)}
                   </p>
                 </div>
-                <span className="ml-auto flex items-center gap-1.5">
+                <span className="col-span-2 flex flex-wrap items-center gap-1.5 sm:col-span-1 sm:ml-auto">
                   {!unlocked && (
                     <Chip tone="warning">
                       <Lock className="mr-1 inline size-3" />
