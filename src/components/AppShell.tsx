@@ -34,6 +34,7 @@ import { GlobalSearch } from "@/components/GlobalSearch";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { contentText, slugifyClassName } from "@/lib/content-i18n";
 import { useIsAdmin } from "@/lib/admin";
+import { Button } from "@/components/ui/button";
 
 const NAV = [
   { to: "/dashboard", key: "nav.dashboard", icon: Gauge },
@@ -90,15 +91,15 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 function Brand() {
   const { t } = useI18n();
   return (
-    <Link to="/" className="flex items-center gap-2.5">
-      <span className="grid size-9 place-items-center rounded-lg bg-level text-primary-foreground">
+    <Link to="/" className="flex min-w-0 items-center gap-2.5">
+      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-level text-primary-foreground">
         <Terminal className="size-4.5" />
       </span>
-      <span className="leading-tight">
-        <span className="block font-display text-sm font-semibold tracking-tight text-foreground">
+      <span className="min-w-0 leading-tight">
+        <span className="block truncate font-display text-sm font-semibold tracking-tight text-foreground">
           {t("brand.name")}
         </span>
-        <span className="block font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
+        <span className="hidden truncate font-mono text-[10px] uppercase tracking-[0.16em] text-accent min-[360px]:block">
           {t("brand.tagline")}
         </span>
       </span>
@@ -116,7 +117,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   if (BARE_ROUTES.includes(pathname)) return <>{children}</>;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-clip bg-background">
       <div className="mx-auto flex w-full max-w-[1600px]">
         <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-6 border-r border-border bg-sidebar px-4 py-5 lg:flex">
           <Brand />
@@ -143,26 +144,28 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
-            <div className="flex items-center gap-3 px-4 py-3 sm:px-6">
-              <button
+            <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 py-3 sm:px-6 lg:flex lg:gap-3">
+              <Button
                 type="button"
                 onClick={() => setMobileOpen(true)}
                 aria-label={t("shell.openMenu")}
-                className="rounded-lg border border-border p-2 text-muted-foreground lg:hidden"
+                variant="outline"
+                size="icon"
+                className="shrink-0 text-muted-foreground lg:hidden"
               >
                 <Menu className="size-4" />
-              </button>
-              <div className="lg:hidden">
+              </Button>
+              <div className="min-w-0 lg:hidden">
                 <Brand />
               </div>
               <div className="ml-auto flex items-center gap-2 sm:gap-3">
-                <GlobalSearch />
-                <LanguageSwitcher />
+                <div className="hidden lg:block"><GlobalSearch /></div>
+                <div className="hidden lg:block"><LanguageSwitcher /></div>
                 <span className="hidden items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-2.5 py-2 text-xs text-foreground sm:inline-flex">
                   <Flame className="size-3.5 text-legendary" />
                   {hydrated ? progress.streak : 0} {t("shell.days")}
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/12 px-2.5 py-2 text-xs text-primary">
+                <span className="hidden items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/12 px-2.5 py-2 text-xs text-primary lg:inline-flex">
                   <Zap className="size-3.5" />
                   {hydrated ? progress.xp : 0} XP
                 </span>
@@ -185,13 +188,23 @@ export function AppShell({ children }: { children: ReactNode }) {
                 ) : (
                   <Link
                     to="/auth"
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+                    className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-3"
+                    aria-label={t("shell.signIn")}
                   >
                     <LogIn className="size-3.5" />
-                    {t("shell.signIn")}
+                    <span className="hidden sm:inline">{t("shell.signIn")}</span>
                   </Link>
                 )}
               </div>
+            </div>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] gap-2 px-4 pb-3 sm:px-6 lg:hidden">
+              <GlobalSearch className="w-full justify-start" showLabel />
+              <LanguageSwitcher />
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-primary/40 bg-primary/12 px-2.5 py-2 text-xs text-primary">
+                <Zap className="size-3.5" />
+                {hydrated ? progress.xp : 0}
+                <span className="sr-only"> XP</span>
+              </span>
             </div>
             <div className="px-4 pb-2 sm:px-6 lg:hidden">
               <XpBar percent={level.progress} />
@@ -219,22 +232,27 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <button
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
             className="absolute inset-0 bg-background/80 backdrop-blur-sm"
             aria-label={t("shell.closeMenu")}
             onClick={() => setMobileOpen(false)}
-          />
+              />
           <div className="relative h-full w-72 max-w-[85%] overflow-y-auto border-r border-border bg-sidebar px-4 py-5">
             <div className="mb-5 flex items-center justify-between">
               <Brand />
-              <button
+              <Button
                 type="button"
                 onClick={() => setMobileOpen(false)}
                 aria-label={t("shell.closeMenu")}
-                className="rounded-lg border border-border p-2 text-muted-foreground"
+                variant="outline"
+                size="icon"
+                className="text-muted-foreground"
               >
                 <X className="size-4" />
-              </button>
+              </Button>
             </div>
             <NavLinks onNavigate={() => setMobileOpen(false)} />
           </div>
