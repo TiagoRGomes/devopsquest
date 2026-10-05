@@ -236,7 +236,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 type="button"
                 variant="outline"
                 size="icon"
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+                className="absolute inset-0 h-full w-full rounded-none border-0 bg-background/80 backdrop-blur-sm"
             aria-label={t("shell.closeMenu")}
             onClick={() => setMobileOpen(false)}
               />
