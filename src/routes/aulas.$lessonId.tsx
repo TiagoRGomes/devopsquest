@@ -9,6 +9,7 @@ import { contentText, contentList, contentLinks } from "@/lib/content-i18n";
 import { RichText } from "@/lib/rich-text";
 import { CodeBlock } from "@/components/CodeBlock";
 import { tLesson } from "@/lib/content-translate";
+import questImage from "@/assets/medieval-quests.jpg";
 
 export const Route = createFileRoute("/aulas/$lessonId")({
   loader: ({ params }) => {
@@ -71,9 +72,8 @@ function LessonPage() {
 
   return (
     <article className="mx-auto max-w-4xl space-y-6">
-      <header className="panel relative overflow-hidden bg-hero p-6 shadow-elevated sm:p-8">
-        <div className="pointer-events-none absolute inset-0 bg-grid opacity-40" aria-hidden />
-        <div className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-level opacity-20 blur-3xl" aria-hidden />
+      <header className="learning-hero overflow-hidden p-6 sm:p-8">
+        <img src={questImage} width={1536} height={768} alt="" className="learning-art" />
         <div className="relative">
           {mod && (
             <Link

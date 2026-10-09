@@ -15,7 +15,8 @@ export function RealmAtlas() {
   const { level } = useProgress();
   const region = REGIONS[selected];
   if (!region) return null;
-  const module = getModuleById(region.moduleIds[0]);
+  const moduleId = region.moduleIds[0];
+  const module = moduleId ? getModuleById(moduleId) : undefined;
   return <div className="realm-atlas">
     <div className="realm-map">
       <img src={mapImage} width={1536} height={1024} loading="lazy" alt={t('map.title')} />
