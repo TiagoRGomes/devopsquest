@@ -19,6 +19,7 @@
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
+  --color-hero-muted: var(--hero-muted);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -63,72 +64,69 @@
 }
 
 :root {
-  --radius: 0.75rem;
+  --radius: 0.375rem;
 
-  --background: oklch(0.185 0.035 264);
-  --foreground: oklch(0.982 0.004 247);
-  --surface: oklch(0.235 0.033 265);
-  --surface-2: oklch(0.283 0.033 262);
+  --background: oklch(0.17 0.012 150);
+  --foreground: oklch(0.95 0.017 88);
+  --surface: oklch(0.215 0.014 150);
+  --surface-2: oklch(0.26 0.016 150);
 
-  --card: oklch(0.235 0.033 265);
-  --card-foreground: oklch(0.982 0.004 247);
-  --popover: oklch(0.235 0.033 265);
-  --popover-foreground: oklch(0.982 0.004 247);
+  --card: oklch(0.215 0.014 150);
+  --card-foreground: oklch(0.95 0.017 88);
+  --popover: oklch(0.215 0.014 150);
+  --popover-foreground: oklch(0.95 0.017 88);
 
-  --primary: oklch(0.685 0.145 232);
-  --primary-foreground: oklch(0.16 0.03 264);
-  --primary-glow: oklch(0.82 0.12 200);
+  --primary: oklch(0.79 0.13 85);
+  --primary-foreground: oklch(0.19 0.028 80);
+  --primary-glow: oklch(0.88 0.10 95);
 
-  --secondary: oklch(0.283 0.033 262);
+  --secondary: oklch(0.26 0.016 150);
   --secondary-foreground: oklch(0.94 0.01 247);
 
-  --muted: oklch(0.283 0.033 262);
-  --muted-foreground: oklch(0.7 0.03 255);
+  --muted: oklch(0.26 0.016 150);
+  --muted-foreground: oklch(0.73 0.018 105);
 
-  --accent: oklch(0.83 0.128 197);
-  --accent-foreground: oklch(0.16 0.03 264);
+  --accent: oklch(0.78 0.10 164);
+  --accent-foreground: oklch(0.19 0.028 80);
 
   --success: oklch(0.72 0.19 148);
-  --success-foreground: oklch(0.16 0.03 264);
+  --success-foreground: oklch(0.19 0.028 80);
   --warning: oklch(0.8 0.16 80);
-  --warning-foreground: oklch(0.16 0.03 264);
+  --warning-foreground: oklch(0.19 0.028 80);
   --destructive: oklch(0.63 0.22 25);
   --destructive-foreground: oklch(0.98 0.005 247);
 
   --epic: oklch(0.68 0.19 300);
   --legendary: oklch(0.79 0.17 65);
 
-  --border: oklch(1 0 0 / 10%);
+  --border: oklch(0.72 0.06 85 / 20%);
   --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.685 0.145 232);
+  --ring: oklch(0.79 0.13 85);
 
-  --chart-1: oklch(0.685 0.145 232);
+  --chart-1: oklch(0.79 0.13 85);
   --chart-2: oklch(0.83 0.128 197);
   --chart-3: oklch(0.72 0.19 148);
   --chart-4: oklch(0.79 0.17 65);
   --chart-5: oklch(0.68 0.19 300);
 
-  --sidebar: oklch(0.205 0.033 264);
+  --sidebar: oklch(0.185 0.017 150);
   --sidebar-foreground: oklch(0.93 0.01 247);
-  --sidebar-primary: oklch(0.685 0.145 232);
-  --sidebar-primary-foreground: oklch(0.16 0.03 264);
-  --sidebar-accent: oklch(0.283 0.033 262);
-  --sidebar-accent-foreground: oklch(0.982 0.004 247);
+  --sidebar-primary: oklch(0.79 0.13 85);
+  --sidebar-primary-foreground: oklch(0.19 0.028 80);
+  --sidebar-accent: oklch(0.26 0.016 150);
+  --sidebar-accent-foreground: oklch(0.95 0.017 88);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.685 0.145 232);
+  --sidebar-ring: oklch(0.79 0.13 85);
 
-  --gradient-hero: radial-gradient(
-      1200px 600px at 15% -10%,
-      color-mix(in oklab, var(--primary) 28%, transparent),
-      transparent 60%
-    ),
-    radial-gradient(
-      900px 500px at 90% 0%,
-      color-mix(in oklab, var(--epic) 20%, transparent),
-      transparent 60%
-    );
-  --gradient-xp: linear-gradient(90deg, var(--primary), var(--accent));
-  --gradient-level: linear-gradient(135deg, var(--primary), var(--epic));
+  --gradient-hero: linear-gradient(115deg, var(--surface), var(--background));
+  --gradient-xp: linear-gradient(90deg, var(--success), var(--accent));
+  --gradient-level: linear-gradient(135deg, var(--primary), var(--legendary));
+  --hero-foreground: oklch(0.98 0.014 88);
+  --hero-muted: oklch(0.87 0.023 90);
+  --hero-shade: oklch(0.10 0.025 150 / 84%);
+  --hero-clear: oklch(0.10 0.025 150 / 5%);
+  --crest-shadow: 0 3px 0 oklch(0.30 0.06 70);
+  --medieval-shadow: 0 10px 35px oklch(0.08 0.01 150 / 35%);
   --shadow-elevated: 0 24px 60px -24px oklch(0 0 0 / 60%);
   --shadow-glow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent),
     0 12px 40px -12px color-mix(in oklab, var(--primary) 45%, transparent);
@@ -156,7 +154,7 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 
   code,
@@ -233,42 +231,6 @@
   }
 }
 
-/* ===== DevOpsQuest gamer HUD layer ===== */
-body {
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 70%),
-    linear-gradient(color-mix(in oklab, var(--primary) 6%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklab, var(--primary) 6%, transparent) 1px, transparent 1px);
-  background-size: 100% 100%, 32px 32px, 32px 32px;
-  background-attachment: fixed;
-}
-h1, h2 {
-  text-shadow: 0 0 24px color-mix(in oklab, var(--primary) 35%, transparent);
-  letter-spacing: -0.01em;
-}
-[data-slot="card"], .hud-panel {
-  position: relative;
-  border-color: color-mix(in oklab, var(--primary) 25%, var(--border));
-  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--primary) 15%, transparent), 0 0 0 1px transparent;
-  transition: box-shadow .25s, border-color .25s, transform .25s;
-}
-[data-slot="card"]:hover, .hud-panel:hover {
-  border-color: color-mix(in oklab, var(--primary) 55%, var(--border));
-  box-shadow: 0 0 28px -8px color-mix(in oklab, var(--primary) 55%, transparent);
-}
-[data-slot="button"] { letter-spacing: .02em; }
-[data-slot="button"]:where(:not([data-variant="ghost"]):not([data-variant="link"])):hover {
-  box-shadow: 0 0 18px -4px color-mix(in oklab, var(--primary) 70%, transparent);
-}
-[data-slot="progress"] { box-shadow: 0 0 10px -2px color-mix(in oklab, var(--primary) 60%, transparent); }
-[data-slot="progress-indicator"] {
-  background-image: linear-gradient(90deg, var(--primary), var(--primary-glow), var(--primary));
-  background-size: 200% 100%;
-  animation: hud-shimmer 3s linear infinite;
-}
-@keyframes hud-shimmer { to { background-position: -200% 0; } }
-::selection { background: color-mix(in oklab, var(--primary) 45%, transparent); }
-
 /* Native app / notch safe areas */
 body {
   padding-top: env(safe-area-inset-top);
@@ -276,3 +238,125 @@ body {
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
+
+/* Medieval adventure system: stone, emerald, heraldic gold and crimson. */
+body { background-image: none; }
+h1, h2, h3, h4 { letter-spacing: 0; }
+.panel, [data-slot="card"] { border-radius: 6px; box-shadow: var(--medieval-shadow); }
+.panel { border-color: var(--border); }
+.bg-grid { background-image: none; }
+.bg-level { background-image: none; background-color: var(--primary); }
+.shadow-glow { box-shadow: var(--crest-shadow); }
+[data-slot="progress-indicator"] { background: var(--gradient-xp); }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+.brand-crest, .crest-small { display: grid; place-items: center; flex-shrink: 0; color: var(--primary); border: 1px solid var(--primary); background: var(--surface); }
+.brand-crest { width: 40px; height: 46px; clip-path: polygon(0 0,100% 0,100% 78%,50% 100%,0 78%); padding-bottom: 4px; }
+.brand-crest svg { width: 23px; height: 23px; }
+.crest-small { width: 42px; height: 46px; border-radius: 4px; }
+.landing-nav { background: var(--background); border-bottom: 1px solid var(--border); position: relative; z-index: 30; }
+.landing-nav nav a:hover { color: var(--primary); }
+.adventure-hero { position: relative; min-height: 570px; height: min(650px, 73vh); display: flex; align-items: center; isolation: isolate; overflow: hidden; }
+.hero-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -3; }
+.hero-shade { position: absolute; inset: 0; z-index: -2; background: linear-gradient(90deg,var(--hero-shade) 0%,var(--hero-shade) 18%,var(--hero-clear) 76%),linear-gradient(0deg,var(--background),transparent 20%); }
+.hero-copy { padding-top: 32px; padding-bottom: 50px; color: var(--hero-foreground); }
+.hero-kicker { display: flex; align-items: center; gap: 10px; font-size: 10px; font-weight: 700; letter-spacing: .18em; color: var(--primary); }
+.hero-kicker span { display: block; width: 22px; height: 1px; background: var(--primary); }
+.hero-copy h1 { font-size: 68px; line-height: 1.15; font-weight: 800; margin: 22px 0 13px; }
+.hero-copy h1 span { color: var(--primary); }
+.hero-copy h2 { font-size: 28px; line-height: 1.35; max-width: 520px; font-weight: 600; }
+.hero-lead { max-width: 440px; line-height: 1.8; font-size: 15px; margin-top: 18px; color: var(--hero-muted); }
+.adventure-cta { min-height: 48px; box-shadow: var(--crest-shadow); font-weight: 700; border: 1px solid var(--primary-glow); }
+.adventure-secondary { min-height: 48px; background: color-mix(in oklab,var(--background) 55%,transparent); color: var(--hero-foreground); border-color: color-mix(in oklab,var(--primary) 45%,transparent); }
+.hero-coordinate { position: absolute; right: 32px; bottom: 28px; font-size: 10px; letter-spacing: .16em; color: var(--hero-muted); }
+.campaign-stats { border-bottom: 1px solid var(--border); background: var(--surface); }
+.campaign-stat { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 86px; border-right: 1px solid var(--border); }
+.campaign-stat:last-child { border: 0; }
+.campaign-stat svg { width: 23px; color: var(--primary); }
+.campaign-stat strong { font-family: var(--font-display); font-size: 28px; }
+.campaign-stat span { font-size: 11px; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: .07em; }
+.adventure-section { padding-top: 70px; padding-bottom: 70px; }
+.section-heading { text-align: center; margin-bottom: 32px; }
+.section-symbol { display: grid; place-items: center; color: var(--primary); margin: 0 auto 13px; }
+.section-symbol svg { width: 27px; height: 27px; }
+.section-kicker { font-size: 10px; letter-spacing: .16em; color: var(--primary); text-transform: uppercase; font-weight: 700; }
+.section-heading h2, .guild-section h2, .final-adventure h2 { font-size: 30px; font-weight: 700; line-height: 1.35; margin-top: 12px; }
+.section-heading > p:last-child { color: var(--muted-foreground); font-size: 14px; margin-top: 12px; }
+.realm-atlas { overflow: hidden; border: 1px solid var(--border); border-radius: 6px; }
+.realm-map { position: relative; aspect-ratio: 2.2; overflow: hidden; }
+.realm-map > img { width: 100%; height: 100%; object-fit: cover; }
+.map-compass { position: absolute; bottom: 18px; right: 18px; color: var(--hero-foreground); }
+.map-compass svg { width: 42px; height: 42px; }
+.realm-pin { position: absolute; transform: translate(-50%,-50%); border-radius: 50%; width: 34px; height: 34px; background: var(--background); color: var(--hero-foreground); border: 2px solid var(--primary); box-shadow: var(--medieval-shadow); font-size: 12px; font-weight: 800; }
+.realm-pin.is-selected { background: var(--primary); color: var(--primary-foreground); outline: 4px solid color-mix(in oklab,var(--primary) 30%,transparent); }
+.realm-caption { background: var(--surface); display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 24px; }
+.quest-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.quest-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; }
+.quest-card { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--background); transition: transform .2s,border-color .2s; }
+.quest-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+.quest-art { height: 215px; overflow: hidden; position: relative; }
+.quest-art img { width: 300%; max-width: none; height: 100%; object-fit: fill; position: absolute; top: 0; }
+.quest-art-0 img { left: 0; } .quest-art-1 img { left: -100%; } .quest-art-2 img { left: -200%; }
+.quest-body { padding: 24px; position: relative; min-height: 180px; }
+.quest-category { display: flex; gap: 8px; align-items: center; color: var(--primary); font-size: 11px; }
+.quest-category svg { width: 16px; height: 16px; }
+.quest-body h3 { margin-top: 14px; font-size: 19px; font-weight: 700; }
+.quest-body p { margin-top: 10px; font-size: 13px; line-height: 1.8; max-width: 92%; color: var(--muted-foreground); }
+.quest-arrow { position: absolute; right: 18px; bottom: 20px; color: var(--primary); }
+.quest-arrow svg { width: 18px; }
+.guild-section { padding-top: 65px; padding-bottom: 65px; }
+.guild-emblem { display: grid; place-items: center; width: 110px; height: 110px; border: 1px solid var(--border); background: var(--surface); clip-path: polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); color: var(--accent); }
+.guild-emblem svg { width: 42px; height: 42px; }
+.final-adventure { text-align: center; padding: 65px 20px; border-top: 1px solid var(--border); background: var(--surface); }
+.landing-footer { padding: 30px 0; border-top: 1px solid var(--border); }
+.adventure-sidebar { background: var(--sidebar); }
+.adventure-sidebar nav a { border-radius: 3px; min-height: 39px; font-size: 12px; }
+.adventure-sidebar nav a:hover { color: var(--primary); }
+.adventure-sidebar nav a[aria-current="page"] { border: 1px solid var(--border); }
+.adventure-sidebar .sidebar-player { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 16px 4px; }
+.app-masthead { position: relative; height: 120px; overflow: hidden; border-bottom: 1px solid var(--border); }
+.app-masthead img { width: 100%; height: 100%; object-fit: cover; object-position: center 44%; }
+.app-masthead:after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg,var(--hero-shade),var(--hero-clear)); }
+.app-masthead-label { position: absolute; z-index: 1; left: 32px; top: 28px; color: var(--hero-foreground); }
+.app-masthead-label p { font-size: 10px; letter-spacing: .13em; color: var(--primary); }
+.app-masthead-label strong { display: block; font-family: var(--font-display); font-size: 23px; margin-top: 10px; }
+.learning-hero { border-radius: 0; border: 0; background: var(--background); box-shadow: none; position: relative; isolation: isolate; }
+.learning-hero > .learning-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; opacity: .25; }
+.learning-hero:before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg,var(--background),transparent); }
+.learning-hero .panel { background: var(--background); border: 1px solid var(--border); box-shadow: none; }
+@media (max-width: 767px) {
+ .landing-nav > div { gap: 8px; padding: 12px 16px; }
+ .landing-nav .brand-crest { width: 30px; height: 36px; }
+ .landing-nav .font-display { font-size: 16px; }
+ .landing-nav .nav-login { font-size: 11px; padding: 0 9px; }
+ .landing-nav select { font-size: 10px; }
+ .adventure-hero { height: auto; min-height: 580px; align-items: end; }
+ .hero-art { object-position: 62% center; }
+ .hero-shade { background: linear-gradient(0deg,var(--background) 0%,var(--hero-shade) 48%,var(--hero-clear) 100%); }
+ .hero-copy { padding-top: 220px; padding-bottom: 40px; }
+ .hero-copy h1 { font-size: 42px; margin-top: 16px; }
+ .hero-copy h2 { font-size: 23px; }
+ .hero-lead { font-size: 13px; line-height: 1.7; }
+ .hero-coordinate { display: none; }
+ .adventure-cta,.adventure-secondary { padding: 0 16px; font-size: 12px; }
+ .campaign-stat { gap: 9px; min-height: 67px; }
+ .campaign-stat:nth-child(2) { border-right: 0; }
+ .campaign-stat:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+ .campaign-stat strong { font-size: 22px; }
+ .campaign-stat span { font-size: 9px; }
+ .campaign-stat svg { width: 18px; }
+ .adventure-section { padding-top: 42px; padding-bottom: 42px; }
+ .section-heading h2,.guild-section h2,.final-adventure h2 { font-size: 24px; }
+ .realm-map { aspect-ratio: 1.35; }
+ .realm-pin { width: 29px; height: 29px; font-size: 10px; }
+ .realm-caption { flex-direction: column; align-items: start; padding: 18px; gap: 18px; }
+ .realm-caption h3 { font-size: 17px; }
+ .quest-grid { grid-template-columns: 1fr; gap: 18px; }
+ .quest-art { height: 205px; }
+ .quest-body { min-height: 160px; }
+ .guild-section { padding-top: 42px; padding-bottom: 42px; gap: 20px; }
+ .guild-emblem { width: 75px; height: 75px; }
+ .app-masthead { height: 95px; }
+ .app-masthead-label { left: 20px; top: 18px; }
+ .app-masthead-label strong { font-size: 19px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *:before, *:after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
