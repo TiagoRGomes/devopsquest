@@ -7,6 +7,7 @@ import { getBoss } from "@/data/challenges";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
 import { contentText } from "@/lib/content-i18n";
+import { RealmAtlas } from "@/components/RealmAtlas";
 
 export const Route = createFileRoute("/mapa")({
   head: () => ({
@@ -35,7 +36,8 @@ function MapaPage() {
         description={t("map.desc")}
       />
 
-      <ol className="space-y-4">
+      <RealmAtlas />
+      <ol className="grid gap-4 xl:grid-cols-2">
         {REGIONS.map((region) => {
           const unlocked = level.level >= region.requiredLevel;
           const percent = regionProgress(region.moduleIds);

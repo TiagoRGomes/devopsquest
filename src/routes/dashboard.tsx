@@ -9,6 +9,7 @@ import { REGIONS, XP_RULES } from "@/data/world";
 import { Chip, Panel, SectionTitle, StatTile, XpBar } from "@/components/ui-bits";
 import { useI18n } from "@/lib/i18n";
 import { contentText, slugifyClassName } from "@/lib/content-i18n";
+import kingdomImage from "@/assets/medieval-kingdom.jpg";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -36,9 +37,8 @@ function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <section className="panel relative overflow-hidden bg-hero p-6 shadow-elevated sm:p-8">
-        <div className="pointer-events-none absolute inset-0 bg-grid opacity-40" aria-hidden />
-        <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-level opacity-20 blur-3xl" aria-hidden />
+      <section className="learning-hero overflow-hidden p-6 sm:p-8">
+        <img src={kingdomImage} width={1920} height={1024} alt="" className="learning-art" />
         <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
@@ -75,7 +75,6 @@ function Dashboard() {
             )}
           </div>
           <div className="relative">
-            <div className="absolute -inset-3 rounded-[2rem] bg-level opacity-20 blur-2xl" aria-hidden />
             <div className="panel relative p-5">
               <div className="flex items-center gap-3">
                 <span className="relative grid size-14 shrink-0 place-items-center rounded-xl bg-level text-primary-foreground shadow-glow">

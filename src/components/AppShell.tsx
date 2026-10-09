@@ -35,6 +35,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { contentText, slugifyClassName } from "@/lib/content-i18n";
 import { useIsAdmin } from "@/lib/admin";
 import { Button } from "@/components/ui/button";
+import kingdomImage from "@/assets/medieval-kingdom.jpg";
 
 const NAV = [
   { to: "/dashboard", key: "nav.dashboard", icon: Gauge },
@@ -92,8 +93,8 @@ function Brand() {
   const { t } = useI18n();
   return (
     <Link to="/" className="flex min-w-0 items-center gap-2.5">
-      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-level text-primary-foreground">
-        <Terminal className="size-4.5" />
+      <span className="grid size-9 shrink-0 place-items-center rounded-lg brand-crest">
+        <Swords className="size-4.5" />
       </span>
       <span className="min-w-0 leading-tight">
         <span className="block truncate font-display text-sm font-semibold tracking-tight text-foreground">
@@ -119,9 +120,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen overflow-x-clip bg-background">
       <div className="mx-auto flex w-full max-w-[1600px]">
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-6 border-r border-border bg-sidebar px-4 py-5 lg:flex">
+        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-6 border-r border-border bg-sidebar px-4 py-5 lg:flex adventure-sidebar">
           <Brand />
-          <div className="rounded-xl border border-border bg-surface-2 p-3.5">
+          <div className="sidebar-player">
             <div className="flex items-baseline justify-between">
               <p className="font-display text-sm font-semibold text-foreground">
                 {t("shell.level")} {level.level}
@@ -211,6 +212,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </header>
 
+          <div className="app-masthead"><img src={kingdomImage} width={1920} height={1024} alt="" /><div className="app-masthead-label"><p>DEVOPSQUEST</p><strong>{t(NAV.find((item) => pathname.startsWith(item.to))?.key ?? "nav.path")}</strong></div></div>
           <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
 
           <footer className="border-t border-border px-4 py-6 sm:px-6 lg:px-8">

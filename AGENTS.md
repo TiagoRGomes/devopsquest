@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Native Android/iOS apps use Capacitor loading the hosted web app via server.url — one codebase and one backend for web and apps.
+- Share the medieval visual system through global semantic tokens and the app shell; keep learning and account logic unchanged so all screens stay consistent without duplicating behavior.
