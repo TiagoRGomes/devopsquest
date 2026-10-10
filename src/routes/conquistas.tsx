@@ -13,6 +13,8 @@ import { contentText, slugifyClassName } from "@/lib/content-i18n";
 export const Route = createFileRoute("/conquistas")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Conquistas e certificado — DevOpsQuest" },
       {
         name: "description",

@@ -11,6 +11,8 @@ import { tBoss } from "@/lib/content-translate";
 export const Route = createFileRoute("/boss-battles")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Boss Battles — DevOpsQuest" },
       {
         name: "description",

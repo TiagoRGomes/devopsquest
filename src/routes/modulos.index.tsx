@@ -10,6 +10,8 @@ import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
 export const Route = createFileRoute("/modulos/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Módulos — DevOpsQuest" },
       {
         name: "description",

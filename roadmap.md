@@ -1,5 +1,5 @@
 # Medieval RPG redesign
-- [ ] Replace generic landing with an illustrated medieval adventure.
-- [ ] Apply cohesive medieval visual language to navigation and learning screens.
-- [ ] Verify key screens, navigation, mobile sizing and metadata.
-- [ ] Review the three public-read security findings without removing intended public access.
+- [x] Replace generic landing with an illustrated medieval adventure.
+- [x] Apply cohesive medieval visual language to navigation and learning screens.
+- [x] Verify key screens, navigation, mobile sizing and metadata.
+- [ ] Public course content, shared chat and avatars were verified as intentionally public; dismissing their three alerts awaits user approval.

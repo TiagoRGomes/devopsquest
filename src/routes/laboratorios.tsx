@@ -12,6 +12,8 @@ import { tLab } from "@/lib/content-translate";
 export const Route = createFileRoute("/laboratorios")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Laboratórios — DevOpsQuest" },
       {
         name: "description",
