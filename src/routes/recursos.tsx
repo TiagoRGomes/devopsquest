@@ -9,6 +9,8 @@ import { contentText } from "@/lib/content-i18n";
 export const Route = createFileRoute("/recursos")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Recursos — DevOpsQuest" },
       {
         name: "description",

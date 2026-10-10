@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Loader2, LogIn, Mail, ShieldCheck, Terminal } from "lucide-react";
+import { ArrowLeft, Loader2, LogIn, Mail, ShieldCheck, Swords } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { Panel } from "@/components/ui-bits";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Button } from "@/components/ui/button";
+import kingdomImage from "@/assets/medieval-kingdom.jpg";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>): { mode?: "signup" } =>
@@ -14,6 +16,8 @@ export const Route = createFileRoute("/auth")({
 
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Entrar — DevOpsQuest" },
       {
         name: "description",
@@ -100,8 +104,9 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background px-4 py-8">
-      <div className="mx-auto max-w-md">
+    <div className="auth-adventure min-h-screen px-4 py-8">
+      <img src={kingdomImage} width={1920} height={1024} className="auth-art" alt="" />
+      <div className="auth-sheet mx-auto max-w-md">
         <div className="mb-5 flex items-center justify-between gap-3">
           <Link
             to="/"
@@ -115,7 +120,7 @@ function AuthPage() {
 
         <div className="mb-6 flex items-center gap-3">
           <span className="grid size-11 place-items-center rounded-xl bg-level text-primary-foreground">
-            <Terminal className="size-5" />
+            <Swords className="size-5" />
           </span>
           <div>
             <h1 className="font-display text-xl font-semibold text-foreground">
@@ -134,14 +139,15 @@ function AuthPage() {
             </div>
           ) : (
             <>
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={handleGoogle}
                 disabled={busy}
                 className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface disabled:opacity-60"
               >
                 <LogIn className="size-4" /> {t("auth.google")}
-              </button>
+              </Button>
 
               <div className="my-5 flex items-center gap-3">
                 <span className="h-px flex-1 bg-border" />
@@ -189,23 +195,24 @@ function AuthPage() {
                   />
                 </label>
 
-                <button
+                <Button
                   type="submit"
                   disabled={busy}
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
                 >
                   {busy && <Loader2 className="size-4 animate-spin" />}
                   {mode === "signin" ? t("auth.signin") : t("auth.signup")}
-                </button>
+                </Button>
               </form>
 
-              <button
+              <Button
                 type="button"
+                variant="link"
                 onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
                 className="mt-4 w-full text-center text-sm text-accent hover:underline"
               >
                 {mode === "signin" ? t("auth.toSignup") : t("auth.toSignin")}
-              </button>
+              </Button>
             </>
           )}
         </Panel>

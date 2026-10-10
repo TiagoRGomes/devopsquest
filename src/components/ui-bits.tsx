@@ -44,7 +44,7 @@ export function SectionTitle({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="section-title flex flex-wrap items-end justify-between gap-4">
       <div className="max-w-2xl">
         {eyebrow && (
           <p className="mb-1 font-mono text-xs uppercase tracking-[0.18em] text-accent">{eyebrow}</p>
@@ -79,7 +79,7 @@ export function Chip({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium",
+        "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] font-medium",
         tones[tone],
         className,
       )}

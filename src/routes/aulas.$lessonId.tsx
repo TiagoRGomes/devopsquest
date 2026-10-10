@@ -23,6 +23,8 @@ export const Route = createFileRoute("/aulas/$lessonId")({
     }
     return {
       meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
         { title: `${loaderData.title} — DevOpsQuest` },
         { name: "description", content: loaderData.description },
         { property: "og:title", content: `${loaderData.title} — DevOpsQuest` },

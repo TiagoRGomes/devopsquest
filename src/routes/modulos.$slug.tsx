@@ -24,6 +24,8 @@ export const Route = createFileRoute("/modulos/$slug")({
     }
     return {
       meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
         { title: `${loaderData.title} — DevOpsQuest` },
         { name: "description", content: loaderData.tagline },
         { property: "og:title", content: `${loaderData.title} — DevOpsQuest` },

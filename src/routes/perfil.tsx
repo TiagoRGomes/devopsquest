@@ -18,6 +18,8 @@ const YEAR_SECONDS = 60 * 60 * 24 * 365;
 export const Route = createFileRoute("/perfil")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Meu perfil — DevOpsQuest" },
       {
         name: "description",

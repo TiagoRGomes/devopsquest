@@ -360,3 +360,12 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
  .app-masthead-label strong { font-size: 19px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *:before, *:after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+.auth-adventure { position: relative; isolation: isolate; display: grid; align-items: center; }
+.auth-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.auth-adventure:before { content: ''; position: absolute; inset: 0; background: var(--hero-shade); z-index: -1; }
+.auth-sheet { width: 100%; background: var(--background); border: 1px solid var(--border); padding: 28px; box-shadow: var(--medieval-shadow); border-radius: 6px; }
+.auth-sheet .panel { padding: 0; background: transparent; border: none; box-shadow: none; }
+.section-title > div > p:first-child { color: var(--primary); }
+.learning-hero h1 { font-size: 34px; line-height: 1.3; }
+@media (max-width:767px) { .learning-hero { padding: 16px 0; } .learning-hero h1 { font-size: 26px; } .learning-hero > .learning-art { opacity: .13; } .auth-sheet { padding: 22px; } }
