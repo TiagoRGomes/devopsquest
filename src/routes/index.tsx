@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ArrowRight, BookOpen, Crown, FlaskConical, MessagesSquare, Skull, Swords, Compass } from 'lucide-react';
-import heroImage from '@/assets/medieval-kingdom.jpg';
+import { ArrowRight, BookOpen, Castle, Crown, FlaskConical, MessagesSquare, Skull, Swords, Compass, Shield } from 'lucide-react';
+import heroImage from '@/assets/night-kingdom.jpg';
 import questsImage from '@/assets/medieval-quests.jpg';
 import { ALL_LESSONS } from '@/data/curriculum';
 import { LABS } from '@/data/labs';
@@ -21,8 +21,8 @@ function Landing() {
  const {t,lang} = useI18n(); const {session} = useAuth(); const c = copy[lang];
  const activities = [{to:'/modulos',icon:BookOpen,title:c.learn,description:c.learnDesc},{to:'/laboratorios',icon:FlaskConical,title:c.forge,description:c.forgeDesc},{to:'/boss-battles',icon:Skull,title:c.battle,description:c.battleDesc}] as const;
  return <div className="medieval-landing">
-  <header className="landing-nav"><div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-4 lg:px-8">
-   <Link to="/" className="flex min-w-0 items-center gap-3"><span className="brand-crest"><Swords /></span><span className="font-display text-lg font-extrabold sm:text-xl">DevOps<span className="text-primary">Quest</span></span></Link>
+   <header className="landing-nav"><div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-4 lg:px-8">
+    <Link to="/" className="flex min-w-0 items-center gap-3"><span className="brand-crest"><Shield /></span><span className="font-display text-lg font-extrabold sm:text-xl">DevOps<span className="text-primary">Quest</span></span></Link>
    <nav className="ml-10 hidden items-center gap-7 text-sm text-muted-foreground lg:flex" aria-label={t('nav.aria')}><Link to="/mapa">{t('nav.map')}</Link><Link to="/modulos">{t('nav.modules')}</Link><Link to="/comunidade">{t('nav.community')}</Link></nav>
    <div className="ml-auto flex items-center gap-3"><LanguageSwitcher /><Button asChild variant="outline" className="nav-login"><Link to={session ? '/dashboard' : '/auth'}>{session ? t('rpg.ctaContinue') : t('shell.signIn')}<ArrowRight className="hidden sm:block" /></Link></Button></div>
   </div></header>
@@ -31,9 +31,9 @@ function Landing() {
     <img src={heroImage} width={1920} height={1024} alt="" className="hero-art" />
     <div className="hero-shade" />
     <div className="hero-copy mx-auto w-full max-w-7xl px-5 lg:px-8"><p className="hero-kicker"><span />{c.kicker}</p><h1>DevOps<span>Quest</span></h1><h2>{c.title}</h2><p className="hero-lead">{c.lead}</p><div className="mt-7 flex flex-wrap gap-3"><Button asChild size="lg" className="adventure-cta"><Link to={session ? '/dashboard' : '/auth'} search={session ? {} : {mode:'signup'}}><Swords />{session ? t('rpg.ctaContinue') : t('rpg.ctaCreate')}</Link></Button><Button asChild variant="outline" size="lg" className="adventure-secondary"><Link to="/mapa"><Compass />{c.explore}</Link></Button></div><p className="mt-5 text-xs text-hero-muted">{t('rpg.badgeLangs')}</p></div>
-    <span className="hero-coordinate" aria-hidden>◆ DEVOPSQUEST · I</span>
+    <div className="hero-corner hero-corner-left" aria-hidden /><div className="hero-corner hero-corner-right" aria-hidden />
    </section>
-   <section className="campaign-stats"><div className="mx-auto grid max-w-7xl grid-cols-2 px-5 sm:grid-cols-4 lg:px-8">{[{icon:Crown,value:REGIONS.length,label:t('rpg.hudRealms')},{icon:BookOpen,value:ALL_LESSONS.length,label:t('rpg.hudQuests')},{icon:FlaskConical,value:LABS.length,label:t('rpg.hudLabs')},{icon:Skull,value:BOSSES.length,label:t('rpg.hudBosses')}].map(({icon:Icon,value,label})=><div key={label} className="campaign-stat"><Icon /><strong>{value}</strong><span>{label}</span></div>)}</div></section>
+   <section className="campaign-stats"><p className="campaign-label">{lang === 'es' ? 'Estado de la aventura' : lang === 'en' ? 'Adventure status' : 'Status da aventura'}</p><div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 px-5 sm:grid-cols-4 lg:px-8">{[{icon:Castle,value:REGIONS.length,label:t('rpg.hudRealms')},{icon:Swords,value:ALL_LESSONS.length,label:t('rpg.hudQuests')},{icon:FlaskConical,value:LABS.length,label:t('rpg.hudLabs')},{icon:Skull,value:BOSSES.length,label:t('rpg.hudBosses')}].map(({icon:Icon,value,label})=><div key={label} className="campaign-stat"><span className="stat-emblem"><Icon /></span><strong>{value}</strong><span>{label}</span></div>)}</div></section>
    <section className="adventure-section mx-auto max-w-7xl px-5 lg:px-8"><div className="section-heading"><span className="section-symbol"><Compass /></span><p className="section-kicker">{t('rpg.mapTitle')}</p><h2>{c.world}</h2><p>{c.worldLead}</p></div><RealmAtlas /></section>
    <section className="quest-section"><div className="adventure-section mx-auto max-w-7xl px-5 lg:px-8"><div className="section-heading"><span className="section-symbol"><Swords /></span><p className="section-kicker">{t('rpg.hudQuests')}</p><h2>{c.quests}</h2><p>{c.questsLead}</p></div><div className="quest-grid">{activities.map(({to,icon:Icon,title,description},i)=><Link to={to} className="quest-card group" key={to}><div className={`quest-art quest-art-${i}`}><img src={questsImage} width={1536} height={768} loading="lazy" alt="" /></div><div className="quest-body"><span className="quest-category"><Icon />0{i+1}</span><h3>{title}</h3><p>{description}</p><span className="quest-arrow"><ArrowRight /></span></div></Link>)}</div></div></section>
    <section className="guild-section mx-auto grid max-w-7xl items-center gap-8 px-5 lg:grid-cols-[auto_1fr_auto] lg:px-8"><div className="guild-emblem"><MessagesSquare /></div><div><p className="section-kicker">{t('nav.community')}</p><h2>{c.guild}</h2><p className="mt-3 max-w-xl text-sm text-muted-foreground">{c.guildLead}</p></div><Button asChild variant="outline" size="lg"><Link to="/comunidade">{c.join}<ArrowRight /></Link></Button></section>
