@@ -66,27 +66,27 @@
 :root {
   --radius: 0.375rem;
 
-  --background: oklch(0.17 0.012 150);
+  --background: oklch(0.16 0.016 245);
   --foreground: oklch(0.95 0.017 88);
-  --surface: oklch(0.215 0.014 150);
-  --surface-2: oklch(0.26 0.016 150);
+  --surface: oklch(0.225 0.018 245);
+  --surface-2: oklch(0.285 0.020 245);
 
-  --card: oklch(0.215 0.014 150);
+  --card: var(--surface);
   --card-foreground: oklch(0.95 0.017 88);
-  --popover: oklch(0.215 0.014 150);
+  --popover: var(--surface);
   --popover-foreground: oklch(0.95 0.017 88);
 
-  --primary: oklch(0.79 0.13 85);
+  --primary: oklch(0.82 0.14 78);
   --primary-foreground: oklch(0.19 0.028 80);
   --primary-glow: oklch(0.88 0.10 95);
 
-  --secondary: oklch(0.26 0.016 150);
+  --secondary: var(--surface-2);
   --secondary-foreground: oklch(0.94 0.01 247);
 
-  --muted: oklch(0.26 0.016 150);
+  --muted: var(--surface-2);
   --muted-foreground: oklch(0.73 0.018 105);
 
-  --accent: oklch(0.78 0.10 164);
+  --accent: oklch(0.79 0.11 207);
   --accent-foreground: oklch(0.19 0.028 80);
 
   --success: oklch(0.72 0.19 148);
@@ -109,11 +109,11 @@
   --chart-4: oklch(0.79 0.17 65);
   --chart-5: oklch(0.68 0.19 300);
 
-  --sidebar: oklch(0.185 0.017 150);
+  --sidebar: var(--background);
   --sidebar-foreground: oklch(0.93 0.01 247);
   --sidebar-primary: oklch(0.79 0.13 85);
   --sidebar-primary-foreground: oklch(0.19 0.028 80);
-  --sidebar-accent: oklch(0.26 0.016 150);
+  --sidebar-accent: var(--surface-2);
   --sidebar-accent-foreground: oklch(0.95 0.017 88);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.79 0.13 85);
@@ -123,9 +123,18 @@
   --gradient-level: linear-gradient(135deg, var(--primary), var(--legendary));
   --hero-foreground: oklch(0.98 0.014 88);
   --hero-muted: oklch(0.87 0.023 90);
-  --hero-shade: oklch(0.10 0.025 150 / 84%);
-  --hero-clear: oklch(0.10 0.025 150 / 5%);
+  --hero-shade: oklch(0.105 0.018 245 / 88%);
+  --hero-clear: oklch(0.105 0.018 245 / 4%);
   --crest-shadow: 0 3px 0 oklch(0.30 0.06 70);
+  --metal-light: oklch(0.48 0.025 245);
+  --metal-dark: oklch(0.21 0.025 245);
+  --metal-edge: oklch(0.65 0.025 85);
+  --gold-top: oklch(0.93 0.12 88);
+  --gold-bottom: oklch(0.65 0.18 47);
+  --gold-outline: oklch(0.47 0.08 70);
+  --gold-shine: 0 0 22px color-mix(in oklab,var(--primary) 24%,transparent);
+  --metal-gradient: linear-gradient(135deg,var(--surface-2),var(--surface));
+  --gold-gradient: linear-gradient(180deg,var(--gold-top),var(--primary) 40%,var(--gold-bottom));
   --medieval-shadow: 0 10px 35px oklch(0.08 0.01 150 / 35%);
   --shadow-elevated: 0 24px 60px -24px oklch(0 0 0 / 60%);
   --shadow-glow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent),
@@ -369,3 +378,70 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .section-title > div > p:first-child { color: var(--primary); }
 .learning-hero h1 { font-size: 34px; line-height: 1.3; }
 @media (max-width:767px) { .learning-hero { padding: 16px 0; } .learning-hero h1 { font-size: 26px; } .learning-hero > .learning-art { opacity: .13; } .auth-sheet { padding: 22px; } }
+
+/* Moonlit RPG reference: real controls over a clean illustrated backdrop. */
+.medieval-landing .landing-nav { background: linear-gradient(90deg,var(--background),var(--surface)); border-bottom-color: var(--metal-dark); }
+.medieval-landing .landing-nav > div { min-height: 76px; }
+.medieval-landing .brand-crest { width: 38px; height: 48px; background: var(--metal-gradient); border: 2px solid var(--metal-edge); clip-path: polygon(50% 0,100% 17%,93% 71%,50% 100%,7% 71%,0 17%); }
+.medieval-landing .brand-crest svg { width: 23px; height: 29px; }
+.medieval-landing .nav-login { border-color: var(--gold-outline); color: var(--hero-muted); box-shadow: inset 0 0 0 2px var(--background),0 0 0 1px var(--metal-dark); border-radius: 5px; }
+.medieval-landing .adventure-hero { min-height: 460px; height: min(570px,65vh); overflow: visible; }
+.medieval-landing .hero-art { object-position: center; }
+.medieval-landing .hero-shade { background: linear-gradient(90deg,var(--hero-shade),color-mix(in oklab,var(--hero-shade) 60%,transparent) 38%,var(--hero-clear) 67%),linear-gradient(0deg,var(--background),transparent 25%); }
+.medieval-landing .hero-copy { padding-top: 20px; padding-bottom: 75px; }
+.medieval-landing .hero-kicker { display: inline-flex; padding: 5px 8px; border: 1px solid var(--border); border-radius: 3px; background: color-mix(in oklab,var(--surface) 65%,transparent); letter-spacing: 0; font-size: 11px; color: var(--foreground); }
+.medieval-landing .hero-kicker span { width: 7px; height: 7px; transform: rotate(45deg); }
+.medieval-landing .hero-copy h1 { font-size: 68px; margin: 12px 0 8px; }
+.medieval-landing .hero-copy h1 span { color: transparent; background: var(--gold-gradient); background-clip: text; }
+.medieval-landing .hero-copy h2 { font-size: 29px; max-width: 600px; }
+.medieval-landing .hero-lead { line-height: 1.65; margin-top: 12px; max-width: 475px; }
+.medieval-landing .adventure-cta { position: relative; border: 2px solid var(--metal-edge); border-radius: 3px; color: var(--primary-foreground); background: var(--gold-gradient); box-shadow: inset 0 0 0 2px var(--gold-outline),inset 0 4px 0 color-mix(in oklab,var(--gold-top) 60%,transparent),var(--gold-shine); min-height: 49px; padding-inline: 27px; }
+.medieval-landing .adventure-cta:before,.medieval-landing .adventure-cta:after { content: ''; position: absolute; width: 9px; height: 9px; top: calc(50% - 4px); background: var(--gold-gradient); border: 1px solid var(--metal-edge); transform: rotate(45deg); }
+.medieval-landing .adventure-cta:before { left: -6px; } .medieval-landing .adventure-cta:after { right: -6px; }
+.medieval-landing .adventure-cta:hover { filter: brightness(1.1); }
+.medieval-landing .adventure-secondary { border-color: var(--gold-outline); border-radius: 4px; color: var(--primary); position: relative; box-shadow: inset 0 0 0 2px var(--background); padding-inline: 24px; }
+.hero-corner { position: absolute; bottom: -65px; width: 48px; height: 105px; border: 2px solid var(--metal-edge); z-index: 2; background: var(--metal-gradient); clip-path: polygon(0 0,24% 18%,30% 77%,100% 100%,0 100%); pointer-events: none; }
+.hero-corner:after { content: ''; position: absolute; bottom: 7px; left: 4px; width: 7px; height: 7px; transform: rotate(45deg); background: var(--primary); }
+.hero-corner-left { left: 0; } .hero-corner-right { right: 0; transform: scaleX(-1); }
+.medieval-landing .campaign-stats { position: relative; background: var(--surface); border-block: 1px solid var(--metal-dark); padding: 0 0 26px; }
+.campaign-label { text-align: center; position: relative; margin-top: -45px; margin-bottom: 13px; color: var(--hero-muted); font-size: 13px; font-weight: 700; }
+.medieval-landing .campaign-stat { position: relative; z-index: 2; min-height: 82px; justify-content: start; column-gap: 13px; row-gap: 0; padding: 14px 18px; margin-top: 0; background: var(--metal-gradient); border: 1px solid var(--metal-light); border-radius: 7px; box-shadow: inset 0 1px 0 color-mix(in oklab,var(--metal-edge) 15%,transparent),var(--medieval-shadow); display: grid; grid-template-columns: 43px 1fr; grid-template-rows: 29px 19px; }
+.medieval-landing .campaign-stat .stat-emblem { grid-row: 1 / 3; width: 43px; height: 47px; display: grid; place-items: center; border-radius: 6px; background: var(--background); border: 1px solid var(--metal-dark); }
+.medieval-landing .campaign-stat .stat-emblem svg { width: 29px; height: 29px; color: var(--primary); filter: drop-shadow(0 2px 1px var(--metal-dark)); }
+.medieval-landing .campaign-stat:nth-child(2) .stat-emblem svg { color: var(--hero-muted); }
+.medieval-landing .campaign-stat:nth-child(3) .stat-emblem svg { color: var(--legendary); }
+.medieval-landing .campaign-stat:nth-child(4) .stat-emblem svg { color: var(--accent); }
+.medieval-landing .campaign-stat strong { font-size: 27px; line-height: 1; color: var(--hero-muted); }
+.medieval-landing .campaign-stat > span:last-child { font-size: 11px; letter-spacing: 0; text-transform: none; }
+.medieval-landing .realm-atlas,.medieval-landing .quest-card { border-color: var(--metal-light); box-shadow: inset 0 0 0 2px var(--metal-dark),var(--medieval-shadow); }
+.medieval-landing .realm-caption,.medieval-landing .quest-body { background: var(--metal-gradient); }
+@media (min-width:768px) and (max-width:1050px) {
+ .medieval-landing .hero-copy h1 { font-size: 58px; }
+ .medieval-landing .hero-copy h2 { font-size: 25px; max-width: 520px; }
+ .medieval-landing .hero-lead { max-width: 435px; }
+}
+@media (max-width:767px) {
+ .medieval-landing .landing-nav > div { min-height: 64px; }
+ .medieval-landing .brand-crest { width: 29px; height: 37px; }
+ .medieval-landing .landing-nav .font-display { font-size: 15px; }
+ .medieval-landing .landing-nav > div > div { gap: 8px; }
+ .medieval-landing .adventure-hero { min-height: 0; height: auto; }
+ .medieval-landing .hero-art { object-position: 70% top; }
+ .medieval-landing .hero-shade { background: linear-gradient(0deg,var(--background) 0%,var(--hero-shade) 45%,color-mix(in oklab,var(--hero-shade) 15%,transparent) 100%); }
+ .medieval-landing .hero-copy { padding-top: 175px; padding-bottom: 62px; }
+ .medieval-landing .hero-copy h1 { font-size: 40px; line-height: 1.1; margin-top: 14px; }
+ .medieval-landing .hero-copy h2 { font-size: 22px; line-height: 1.3; margin-top: 12px; }
+ .medieval-landing .hero-lead { font-size: 12px; margin-top: 12px; }
+ .medieval-landing .hero-copy .mt-7 { margin-top: 22px; }
+ .medieval-landing .adventure-cta,.medieval-landing .adventure-secondary { min-height: 44px; font-size: 11px; padding-inline: 15px; }
+ .medieval-landing .hero-copy > p:last-child { margin-top: 15px; }
+ .hero-corner { bottom: -75px; width: 23px; height: 75px; }
+ .campaign-label { font-size: 12px; margin-top: -35px; margin-bottom: 13px; }
+ .medieval-landing .campaign-stats { padding-bottom: 22px; }
+ .medieval-landing .campaign-stat { min-height: 68px; padding: 10px; gap: 0 9px; grid-template-columns: 36px 1fr; grid-template-rows: 25px 18px; }
+ .medieval-landing .campaign-stat strong { font-size: 23px; }
+ .medieval-landing .campaign-stat .stat-emblem { width: 36px; height: 40px; }
+ .medieval-landing .campaign-stat .stat-emblem svg { width: 25px; height: 25px; }
+ .medieval-landing .campaign-stat > span:last-child { font-size: 10px; }
+}
+@media (max-width:360px) { .medieval-landing .hero-copy h1 { font-size: 35px; } .medieval-landing .adventure-secondary { padding-inline: 12px; } .medieval-landing .hero-copy { padding-top: 145px; } }
