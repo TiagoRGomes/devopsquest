@@ -35,7 +35,11 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { contentText, slugifyClassName } from "@/lib/content-i18n";
 import { useIsAdmin } from "@/lib/admin";
 import { Button } from "@/components/ui/button";
-import kingdomImage from "@/assets/medieval-kingdom.jpg";
+import kingdomImage from "@/assets/night-kingdom.jpg";
+import libraryImage from "@/assets/quest-library.jpg";
+import forgeImage from "@/assets/quest-forge.jpg";
+import dragonImage from "@/assets/quest-dragon.jpg";
+import { BrandLogo } from "@/components/BrandLogo";
 
 const NAV = [
   { to: "/dashboard", key: "nav.dashboard", icon: Gauge },
@@ -93,14 +97,12 @@ function Brand() {
   const { t } = useI18n();
   return (
     <Link to="/" className="flex min-w-0 items-center gap-2.5">
-      <span className="grid size-9 shrink-0 place-items-center rounded-lg brand-crest">
-        <Swords className="size-4.5" />
-      </span>
+      <BrandLogo />
       <span className="min-w-0 leading-tight">
-        <span className="block truncate font-display text-sm font-semibold tracking-tight text-foreground">
+        <span className="block truncate font-display text-sm font-semibold text-foreground">
           {t("brand.name")}
         </span>
-        <span className="hidden truncate font-mono text-[10px] uppercase tracking-[0.16em] text-accent min-[360px]:block">
+        <span className="hidden truncate font-mono text-[10px] uppercase tracking-normal text-accent min-[360px]:block">
           {t("brand.tagline")}
         </span>
       </span>
@@ -114,6 +116,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { user, profile } = useAuth();
   const { t, lang } = useI18n();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const mastheadImage = pathname.startsWith("/boss-battles") || pathname.startsWith("/desafios") ? dragonImage : pathname.startsWith("/laboratorios") || pathname.startsWith("/projeto") ? forgeImage : pathname.startsWith("/aulas") || pathname.startsWith("/modulos") || pathname.startsWith("/recursos") ? libraryImage : kingdomImage;
 
   if (BARE_ROUTES.includes(pathname)) return <>{children}</>;
 
@@ -212,7 +216,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </header>
 
-          <div className="app-masthead"><img src={kingdomImage} width={1920} height={1024} alt="" /><div className="app-masthead-label"><p>DEVOPSQUEST</p><strong>{t(NAV.find((item) => pathname.startsWith(item.to))?.key ?? "nav.path")}</strong></div></div>
+          <div className="app-masthead"><img src={mastheadImage} width={1920} height={1024} alt="" /><div className="app-masthead-label"><p>DEVOPSQUEST</p><strong>{t(NAV.find((item) => pathname.startsWith(item.to))?.key ?? "nav.path")}</strong></div></div>
           <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
 
           <footer className="border-t border-border px-4 py-6 sm:px-6 lg:px-8">
