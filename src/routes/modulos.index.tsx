@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Award, Lock } from "lucide-react";
+import { ArrowRight, Award, Lock } from "lucide-react";
 import { useProgress } from "@/lib/progress";
 import { useI18n } from "@/lib/i18n";
 import { contentText } from "@/lib/content-i18n";
 import { MODULES, TOTAL_MODULE_XP, TOTAL_WEEKS } from "@/data/curriculum";
 import { labsByModule } from "@/data/labs";
+import { moduleRealmArt } from "@/lib/realm-art";
+import { Button } from "@/components/ui/button";
 import { Chip, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
 
 export const Route = createFileRoute("/modulos/")({
@@ -38,6 +40,8 @@ function ModulosPage() {
 
       <ul className="grid gap-4 lg:grid-cols-2">
         {MODULES.map((m) => {
+          const art = moduleRealmArt(m.id);
+          const RealmIcon = art.icon;
           const p = moduleProgress(m.id);
           const labs = labsByModule(m.id);
           const unlocked = isModuleUnlocked(m.id);
@@ -46,7 +50,9 @@ function ModulosPage() {
           const tagline = contentText(lang, m.id, "tagline", m.tagline);
           const overview = contentText(lang, m.id, "overview", m.overview);
           return (
-            <Panel as="li" key={m.id}>
+            <Panel as="li" key={m.id} className="module-card">
+              <div className="module-art"><img src={art.image} width={422} height={491} loading="lazy" alt="" /><span className={`realm-choice-icon realm-tone-${art.tone}`}><RealmIcon /></span></div>
+              <div className="module-body">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="grid size-8 place-items-center rounded-lg bg-level font-mono text-xs font-semibold text-primary-foreground">
                   {m.index}
@@ -74,14 +80,9 @@ function ModulosPage() {
               <p className="mt-2 text-xs text-muted-foreground">
                 {t("mod.lessonsLabsWeeksXp", { lessons: m.lessons.length, labs: labs.length, weeks: m.weeks, xp: m.xp, percent: p.percent })}
               </p>
-              <Link
-                to="/modulos/$slug"
-                params={{ slug: m.slug }}
-                className="mt-4 inline-flex rounded-lg border border-primary/50 bg-primary/12 px-3.5 py-2 text-sm font-medium text-primary hover:bg-primary/20"
-              >
-                {t("mod.openModule")}
-              </Link>
+              <Button asChild variant="outline" className="mt-4"><Link to="/modulos/$slug" params={{ slug: m.slug }}>{t("mod.openModule")}<ArrowRight /></Link></Button>
               {!unlocked && <p className="mt-2 text-xs text-muted-foreground">{t("exam.lockedText")}</p>}
+              </div>
             </Panel>
           );
         })}

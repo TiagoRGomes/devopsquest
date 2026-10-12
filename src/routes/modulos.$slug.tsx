@@ -9,6 +9,7 @@ import { PASS_SCORE, getExam } from "@/data/exams";
 import { getModule } from "@/data/curriculum";
 import { labsByModule } from "@/data/labs";
 import { getBoss } from "@/data/challenges";
+import { moduleRealmArt } from "@/lib/realm-art";
 import { BADGES } from "@/data/world";
 import { Chip, DifficultyChip, EmptyState, InsightBox, Panel, SectionTitle, XpBar } from "@/components/ui-bits";
 
@@ -51,6 +52,7 @@ function ModuloDetail() {
     return <EmptyState title={t("mod.notFoundTitle")} description={t("mod.notFoundDescPick")} />;
   }
 
+  const art = moduleRealmArt(mod.id);
   const labs = labsByModule(mod.id).map((l) => tLab(lang, l));
   const p = moduleProgress(mod.id);
   const rawBoss = mod.bossId ? getBoss(mod.bossId) : undefined;
@@ -69,7 +71,8 @@ function ModuloDetail() {
 
   return (
     <div className="space-y-6">
-      <Panel className="bg-hero">
+      <Panel className="learning-hero module-detail-hero">
+        <img src={art.image} width={422} height={491} alt="" className="learning-art" />
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">{t("mod.moduleIndex", { index: mod.index })}</p>
         <h1 className="mt-1.5 font-display text-2xl font-semibold text-foreground sm:text-3xl">{modTitle}</h1>
         <RichText value={modOverview} className="mt-2 max-w-3xl text-sm text-muted-foreground" />
