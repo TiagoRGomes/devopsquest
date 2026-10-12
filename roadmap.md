@@ -8,3 +8,8 @@
 - [x] Verify key screens, navigation, mobile sizing and metadata.
 - [x] Public course content, shared chat and avatars were verified as intentionally public; their three alerts were dismissed through the approval tool.
 - [x] Match the supplied reference with a moonlit castle, metallic frames, ornamental gold buttons and RPG status tiles; verify mobile sizing, languages and signup navigation.
+
+# Android native package
+- [ ] Prepare Android native project using the public hosted app and existing brand icon.
+- [ ] Generate and verify an installable test APK.
+- [ ] Deliver clean native source and Portuguese physical-device installation instructions.
