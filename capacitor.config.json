@@ -3,7 +3,7 @@
   "appName": "DevOpsQuest",
   "webDir": "native/web",
   "server": {
-    "url": "https://devopsquest.lovable.app",
+    "url": "https://devopsquests.pages.dev",
     "cleartext": false
   },
   "backgroundColor": "#070b18"
