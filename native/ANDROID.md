@@ -13,11 +13,11 @@ Não desative o Play Protect: se o Android bloquear, anote a mensagem antes de p
 
 ## O que esta versão faz
 
-É um aplicativo Android real, compilado com Capacitor 8.5.2 e assinado com chave de desenvolvimento. Carrega **https://devopsquest.lovable.app** — não a prévia privada do editor. Utiliza o site e as mesmas contas, progresso e comunidade desse endereço, sem criar outro banco.
+É um aplicativo Android real, compilado com Capacitor 8.5.2 e assinado com chave de desenvolvimento. A versão corrigida 1.0.1 carrega **https://devopsquests.pages.dev**, onde foi verificado o visual medieval atual — não a prévia privada do editor. Utiliza o site e as mesmas contas, progresso e comunidade desse endereço, sem criar outro banco.
 
 O endereço público respondeu HTTP 200 durante a verificação. A aparência e o conteúdo são os que estiverem publicados nele, não necessariamente as últimas alterações vistas no editor. Não houve publicação ou alteração do backend neste pedido.
 
-**Importante se você usa Cloudflare:** este APK não carrega devopsquests.pages.dev. Para carregar seu site da Cloudflare, altere `server.url` em `capacitor.config.json` para o endereço público desejado, sincronize e gere outro APK. As contas e o progresso serão os do backend configurado nesse site; não há transferência de dados entre sites neste pacote.
+**Correção do visual:** o primeiro APK apontava para devopsquest.lovable.app, que ainda exibia o layout anterior. O endereço foi corrigido para o site atual na Cloudflare. As contas e o progresso serão os do backend configurado nesse site; não há transferência de dados entre sites neste pacote. No celular, a disposição se adapta à largura da tela, mas usa as mesmas cores, imagens e estilos do site.
 
 ## Limitações importantes
 
