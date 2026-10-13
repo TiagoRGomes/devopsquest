@@ -10,6 +10,6 @@
 - [x] Match the supplied reference with a moonlit castle, metallic frames, ornamental gold buttons and RPG status tiles; verify mobile sizing, languages and signup navigation.
 
 # Android native package
-- [ ] Prepare Android native project using the public hosted app and existing brand icon.
-- [ ] Generate and verify an installable test APK.
-- [ ] Deliver clean native source and Portuguese physical-device installation instructions.
+- [x] Prepare Android native project using the public hosted app and existing brand icon.
+- [x] Generate and verify an installable test APK (compiled and signature verified; no physical-device test available).
+- [x] Deliver clean native source and Portuguese physical-device installation instructions, including Google login and production-release limitations.
