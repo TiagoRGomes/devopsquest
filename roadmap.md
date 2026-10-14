@@ -10,7 +10,7 @@
 - [x] Match the supplied reference with a moonlit castle, metallic frames, ornamental gold buttons and RPG status tiles; verify mobile sizing, languages and signup navigation.
 
 # Android native package
-- [ ] Correct the Android hosted URL to the verified current medieval Cloudflare site, rebuild the test APK and verify its packaged URL.
+- [x] Correct the Android hosted URL to the verified current medieval Cloudflare site, rebuild the test APK and verify its packaged URL; mobile web images render without horizontal overflow. Physical Android verification remains unavailable.
 - [x] Prepare Android native project using the public hosted app and existing brand icon.
 - [x] Generate and verify an installable test APK (compiled and signature verified; no physical-device test available).
 - [x] Deliver clean native source and Portuguese physical-device installation instructions, including Google login and production-release limitations.
