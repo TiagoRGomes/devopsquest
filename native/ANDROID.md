@@ -2,6 +2,12 @@
 
 ## Instalar diretamente no celular (sem computador)
 
+### Atualização corrigida (v2)
+
+Baixe `DevOpsQuest-Android-teste-v2.apk`. Esta versão abre o site medieval atual da Cloudflare. A assinatura de teste é diferente da versão anterior: não pode ser instalada por cima dela. Antes de remover o app antigo, confirme seu progresso na conta do site; a remoção apaga dados locais não sincronizados. Em seguida, desinstale a versão de teste anterior e instale a v2. Pode ser necessário entrar novamente na conta usada no site da Cloudflare. Nenhum dado foi migrado entre os dois sites.
+
+A compilação, a assinatura e o endereço dentro do APK foram verificados. O site foi conferido em largura de celular: imagens carregadas e sem conteúdo estourando na horizontal. O APK ainda não foi testado em aparelho físico; o login Google continua com as limitações descritas abaixo. Mantenha Chrome e Android System WebView atualizados.
+
 1. Baixe `DevOpsQuest-Android-teste.apk` no seu Android.
 2. Abra **Arquivos / Meus arquivos → Downloads** e toque no APK.
 3. Se solicitado, abra **Configurações → Permitir desta fonte** para o navegador ou gerenciador de arquivos utilizado. O nome varia por fabricante.
