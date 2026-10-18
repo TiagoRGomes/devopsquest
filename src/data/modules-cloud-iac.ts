@@ -774,6 +774,321 @@ aws s3 rm s3://cloudshop-web-dev --recursive && aws s3api delete-bucket --bucket
           },
         ],
       },
+      {
+        "id": "l-6-6",
+        "moduleId": "mod-6",
+        "title": "IAM na prática: diagnosticar acesso sem ampliar privilégios",
+        "duration": 55,
+        "difficulty": "Intermediário",
+        "tools": [
+          "AWS CLI",
+          "IAM Policy Simulator",
+          "CloudTrail"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Identificar a identidade efetiva de uma chamada",
+          "Separar confiança de role e autorização de recursos",
+          "Investigar AccessDenied com evidências",
+          "Validar permissões positivas e negativas",
+          "Entender limites de políticas e criptografia"
+        ],
+        "body": [
+          "Uma role já foi criada para a API, mas o upload falha com `AccessDenied`. Nesta aula, o foco é **diagnosticar autorização**, não criar outra identidade. Comece anotando ação, recurso, horário e identidade envolvida; sem isso, qualquer alteração de política vira tentativa e erro.",
+          "A primeira pergunta é **quem está chamando a AWS**. Execute `aws sts get-caller-identity` no mesmo contexto da aplicação ou do pipeline. O perfil do seu notebook pode funcionar enquanto a role da aplicação falha; testar com outra identidade não comprova a correção.",
+          "A **política de confiança** define quem pode assumir uma role, enquanto a política de permissões define o que ela pode fazer depois. Se `sts:AssumeRole` falha, investigue a confiança e as permissões do chamador antes de alterar acesso ao S3.",
+          "Uma autorização considera mais que a política anexada à role. **SCPs**, permissions boundaries, políticas de sessão e políticas de recurso também participam da avaliação; um `Deny` explícito aplicável prevalece sobre um Allow. Adicionar outra política permissiva não remove essa negação.",
+          "No S3, diferencie **bucket de objeto**: `s3:ListBucket` usa o ARN do bucket e pode ser limitado por prefixo; `s3:GetObject` usa o ARN com caminho do objeto. Uma aplicação que lê uma chave conhecida pode não precisar listar todo o bucket.",
+          "Use o **simulador como diagnóstico**, não como prova definitiva. `simulate-principal-policy` ajuda a comparar ações e recursos, mas não reproduz todos os cenários de políticas de recurso, sessão e organização. Confirme com uma chamada real controlada e examine a mensagem de erro.",
+          "Criptografia pode acrescentar outra camada: ler objeto protegido por **SSE-KMS** pode exigir `kms:Decrypt`, além da autorização no S3. Verifique a key policy e a região da chave, sem substituir criptografia por acesso público para destravar o teste.",
+          "Feche a mudança com **testes negativos**: o arquivo permitido deve ser lido e outro prefixo deve continuar negado. Registre evidências no PR e consulte CloudTrail quando houver eventos disponíveis; para operações de objetos S3, os `data events` precisam ser habilitados e podem gerar custo."
+        ],
+        "code": [
+          {
+            "label": "Confirmar identidade e simular leitura de objeto",
+            "language": "bash",
+            "code": "# Execute com o perfil autorizado a diagnosticar IAM; troque conta e bucket.\naws sts get-caller-identity\naws iam simulate-principal-policy \\\n  --policy-source-arn arn:aws:iam::123456789012:role/cloudshop-api \\\n  --action-names s3:GetObject \\\n  --resource-arns arn:aws:s3:::cloudshop-assets/uploads/teste.txt \\\n  --query 'EvaluationResults[].{Acao:EvalActionName,Decisao:EvalDecision}'\n# A simulação exige permissão IAM própria; não a conceda à aplicação."
+          },
+          {
+            "label": "Validar acesso permitido e acesso proibido",
+            "language": "bash",
+            "code": "# Execute no contexto da role da API, com objetos de teste existentes.\naws s3api get-object --bucket cloudshop-assets \\\n  --key uploads/teste.txt /tmp/cloudshop-permitido.txt\n# Este comando deve retornar AccessDenied, não o conteúdo financeiro.\naws s3api get-object --bucket cloudshop-assets \\\n  --key financeiro/teste.txt /tmp/cloudshop-proibido.txt\n# Se o segundo funcionar, revise as políticas antes de publicar."
+          }
+        ],
+        "whyItMatters": "Diagnosticar a causa de uma negação evita transformar um problema operacional em exposição permanente.",
+        "commonMistake": "Adicionar AdministratorAccess sem identificar a ação e o recurso que falharam.",
+        "productionTip": "Mantenha uma matriz de ações permitidas e negadas por role e repita os testes após mudanças.",
+        "securityAlert": "Não copie tokens temporários ou objetos sensíveis para tickets e logs; use dados sintéticos nos testes.",
+        "interviewQuestion": "Uma role tem Allow para GetObject, mas a chamada falha: quais camadas você investigaria?",
+        "glossary": [
+          {
+            "term": "política de confiança",
+            "definition": "Documento que define quais identidades podem assumir uma role."
+          },
+          {
+            "term": "permissions boundary",
+            "definition": "Limite das permissões que políticas de identidade podem conceder."
+          },
+          {
+            "term": "SCP",
+            "definition": "Política de organização que limita permissões nas contas abrangidas."
+          },
+          {
+            "term": "negação explícita",
+            "definition": "Regra Deny aplicável que prevalece sobre permissões Allow."
+          },
+          {
+            "term": "SSE-KMS",
+            "definition": "Criptografia no S3 integrada ao serviço de gerenciamento de chaves KMS."
+          }
+        ],
+        "printQuestLink": "Adicionar ao CloudShop evidências de leitura autorizada em uploads/ e negação em financeiro/, usando a role da API.",
+        "quiz": [
+          {
+            "question": "Qual verificação confirma a identidade efetiva da CLI?",
+            "options": [
+              "aws s3 ls",
+              "aws sts get-caller-identity",
+              "terraform validate",
+              "aws configure list-profiles"
+            ],
+            "answerIndex": 1,
+            "explanation": "STS informa a conta e o ARN da identidade usada pela chamada."
+          },
+          {
+            "question": "Um Deny explícito aplicável pode ser superado por outro Allow?",
+            "options": [
+              "Sim, com uma policy mais nova",
+              "Sim, anexando duas policies",
+              "Não; a negação precisa ser resolvida",
+              "Sim, mudando o nome da role"
+            ],
+            "answerIndex": 2,
+            "explanation": "Deny explícito prevalece na avaliação de autorização."
+          },
+          {
+            "question": "Por que testar um prefixo proibido?",
+            "options": [
+              "Para conceder acesso global",
+              "Para desativar logs",
+              "Para validar apenas latência",
+              "Para comprovar que o escopo continua restrito"
+            ],
+            "answerIndex": 3,
+            "explanation": "Teste negativo verifica que a correção não ampliou permissões indevidamente."
+          }
+        ]
+      },
+      {
+        "id": "l-6-7",
+        "moduleId": "mod-6",
+        "title": "Redes na prática: rastrear o caminho de uma conexão",
+        "duration": 55,
+        "difficulty": "Intermediário",
+        "tools": [
+          "AWS VPC",
+          "VPC Flow Logs",
+          "AWS CLI"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Descrever o fluxo ALB, aplicação e banco",
+          "Distinguir falha de DNS, rota e filtragem",
+          "Inspecionar associações de tabelas de rotas",
+          "Usar Flow Logs sem concluir além da evidência",
+          "Planejar saída privada e endpoints"
+        ],
+        "body": [
+          "Agora que VPC e Security Groups já existem, vamos **investigar o caminho do pacote**. No CloudShop, o navegador chega ao ALB, o ALB abre outra conexão com a API e a API inicia uma conexão com o banco em `5432`. Cada trecho tem origem e destino próprios.",
+          "Comece por **resolução de nome**. Se `getent hosts` não resolve o endpoint do banco dentro da aplicação, revisar o SG não é o primeiro passo. Confira DNS da VPC, nome configurado e resolvedores; nunca fixe o IP do RDS, que pode mudar após failover.",
+          "Depois investigue **rota e associação**. Uma subnet usa a tabela associada explicitamente ou, na ausência dela, a tabela principal da VPC. Consulte `describe-route-tables` e confirme qual é efetiva, em vez de confiar no nome da subnet ou na etiqueta private.",
+          "A rota **local da VPC** permite o caminho entre suas subnets, mas não autoriza portas por si só. Para a API acessar o banco, o SG do RDS deve permitir origem no SG da API e a saída da API precisa permitir o destino. Referências de SG não criam rotas nem transferem todas as regras do grupo de origem.",
+          "Um **Security Group é stateful**: respostas a conexões autorizadas são reconhecidas. Uma NACL é stateless e precisa permitir também o retorno, incluindo portas efêmeras adequadas. Se `nc -vz` expira mesmo com os SGs corretos, investigue NACL e caminho de retorno.",
+          "**Timeout não identifica sozinho a causa**: pode indicar descarte, rota ausente ou destino indisponível. Já uma recusa imediata costuma apontar ausência de listener ou rejeição ativa. Compare o resultado de `nc` com saúde do serviço e logs, sem tratar a mensagem como diagnóstico definitivo.",
+          "**VPC Flow Logs** registram metadados como interfaces, endereços, portas e ACCEPT/REJECT; não registram o corpo da requisição. Um `ACCEPT` não comprova autenticação no PostgreSQL e um REJECT exige correlacionar regras e direção para localizar o bloqueio.",
+          "Por fim, separe **tráfego interno de saída externa**. A API não precisa de NAT para falar com um RDS na mesma VPC; para S3, um gateway endpoint pode evitar NAT nesse caminho. Avalie políticas do endpoint, DNS e custo; endpoints de interface têm cobrança e SGs próprios."
+        ],
+        "code": [
+          {
+            "label": "Checar DNS e porta no host da aplicação",
+            "language": "bash",
+            "code": "# Defina o endpoint real do RDS; execute de dentro da rede da API.\nexport DB_HOST=\"cloudshop-dev.exemplo.us-east-1.rds.amazonaws.com\"\ngetent hosts \"$DB_HOST\"\n# Testa TCP, não senha nem permissões do PostgreSQL.\nnc -vz -w 5 \"$DB_HOST\" 5432\n# A ausência de resposta ICMP não prova falha de TCP."
+          },
+          {
+            "label": "Inspecionar rota explícita e tabela principal",
+            "language": "bash",
+            "code": "# Informe a VPC e a subnet da API antes da execução.\n: \"${VPC_ID:?Defina VPC_ID}\" \"${SUBNET_ID:?Defina SUBNET_ID}\"\naws ec2 describe-route-tables \\\n  --filters \"Name=association.subnet-id,Values=$SUBNET_ID\" \\\n  --query 'RouteTables[].{ID:RouteTableId,Rotas:Routes}'\n# Sem associação explícita, a tabela efetiva é a principal da VPC.\naws ec2 describe-route-tables \\\n  --filters \"Name=vpc-id,Values=$VPC_ID\" \"Name=association.main,Values=true\" \\\n  --query 'RouteTables[].{ID:RouteTableId,Rotas:Routes}' "
+          }
+        ],
+        "whyItMatters": "Um roteiro por camadas reduz indisponibilidade e evita abrir portas aleatoriamente durante incidentes.",
+        "commonMistake": "Adicionar NAT para corrigir uma conexão interna com o RDS sem verificar DNS e SG.",
+        "productionTip": "Documente origem, destino, porta e evidência de cada salto; habilite Flow Logs com retenção e acesso definidos.",
+        "securityAlert": "Não abra 5432 para 0.0.0.0/0 como teste; use a origem restrita da API e registre a alteração.",
+        "interviewQuestion": "O DNS resolve, mas a conexão API–RDS expira: como você organiza a investigação?",
+        "glossary": [
+          {
+            "term": "porta efêmera",
+            "definition": "Porta temporária usada pelo cliente e necessária no caminho de retorno."
+          },
+          {
+            "term": "Flow Logs",
+            "definition": "Registros de metadados do tráfego em interfaces da VPC."
+          },
+          {
+            "term": "tabela principal",
+            "definition": "Tabela usada por subnets sem associação explícita a outra tabela."
+          },
+          {
+            "term": "gateway endpoint",
+            "definition": "Destino de rota privado para serviços compatíveis, como S3 e DynamoDB."
+          },
+          {
+            "term": "listener",
+            "definition": "Processo ou configuração que aceita conexões em uma porta."
+          }
+        ],
+        "printQuestLink": "Produzir o mapa de conectividade ALB–API–RDS do CloudShop e anexar testes de DNS, TCP e rotas.",
+        "quiz": [
+          {
+            "question": "A API precisa de NAT para acessar RDS privado na mesma VPC?",
+            "options": [
+              "Sempre",
+              "Somente na porta 5432",
+              "Não; o caminho interno usa as rotas da VPC",
+              "Sim, se o banco usa TLS"
+            ],
+            "answerIndex": 2,
+            "explanation": "NAT não é necessário para o caminho privado interno da VPC."
+          },
+          {
+            "question": "Flow Logs com ACCEPT garantem login no banco?",
+            "options": [
+              "Não; registram tráfego, não sucesso da autenticação",
+              "Sim, inclusive a senha",
+              "Sim, se a porta for 5432",
+              "Apenas com NAT"
+            ],
+            "answerIndex": 0,
+            "explanation": "Aceitação de tráfego não comprova a camada de aplicação."
+          },
+          {
+            "question": "Sem associação explícita, qual tabela uma subnet usa?",
+            "options": [
+              "A do ALB",
+              "A principal da VPC",
+              "A do Security Group",
+              "Nenhuma"
+            ],
+            "answerIndex": 1,
+            "explanation": "A tabela principal atende subnets sem associação explícita."
+          }
+        ]
+      },
+      {
+        "id": "l-6-8",
+        "moduleId": "mod-6",
+        "title": "FinOps na prática: custo por pedido e decisões com evidências",
+        "duration": 55,
+        "difficulty": "Intermediário",
+        "tools": [
+          "Cost Explorer",
+          "AWS Budgets",
+          "Planilha de custos"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Calcular custo unitário por pedido",
+          "Distinguir custo fixo, variável e compartilhado",
+          "Consultar custos por tag ativada",
+          "Priorizar economia sem comprometer serviço",
+          "Definir ciclo de revisão com responsáveis"
+        ],
+        "body": [
+          "Budgets e limpeza já protegem o laboratório; agora o objetivo é **relacionar custo ao valor entregue**. No CloudShop, uma métrica útil é `custo mensal / pedidos concluídos`. Ela ajuda a distinguir crescimento saudável de desperdício sem tratar toda alta de fatura como erro.",
+          "Defina primeiro o **perímetro da conta**: quais serviços, ambientes, impostos e créditos entram na análise? Compare períodos equivalentes usando a mesma métrica, como `UnblendedCost`. Misturar valores líquidos de um mês com brutos de outro gera conclusões enganosas.",
+          "Separe **custo fixo de variável**. Um ALB ou NAT ligado pode cobrar com pouco uso; armazenamento e transferência acompanham volume de formas diferentes. Reduzir tamanho de EC2 não resolve um gasto dominado por `DataTransfer`, então agrupe por serviço antes de escolher uma ação.",
+          "As **tags de alocação de custo** precisam ser ativadas no faturamento para aparecerem como dimensões de análise. Ter `project=cloudshop` no recurso não garante disponibilidade imediata no Cost Explorer; há atraso de processamento e nem todo item de cobrança aceita atribuição direta por tag.",
+          "Despesas compartilhadas exigem uma **regra explícita de rateio**. Você pode distribuir observabilidade por volume de logs ou rede por consumo medido. Documente a aproximação e mantenha a parcela não alocada visível, em vez de fingir que uma divisão arbitrária é precisão contábil.",
+          "Calcule a **economia com hipótese verificável**. Se o ambiente de dev fica ocioso à noite, estime horas evitadas, confirme quais serviços podem ser desligados e meça depois. Parar EC2 não elimina cobrança de volumes EBS; `stop` não significa custo zero.",
+          "**Compromissos de uso** exigem estabilidade. Antes de Savings Plans ou reservas, faça rightsizing e observe a base de consumo; compromisso pode continuar sendo cobrado mesmo se a aplicação diminuir. Compare economia esperada com prazo e risco, não só com o desconto anunciado.",
+          "Feche um ciclo **informar, decidir e medir**: responsável, ação, prazo e indicador antes/depois. Alertas de `AWS Budgets` não são um teto automático nem chegam necessariamente em tempo real. Preserve backups, criptografia e SLOs; economia que causa incidente pode custar mais que a infraestrutura."
+        ],
+        "code": [
+          {
+            "label": "Consultar custo do projeto em um período fechado",
+            "language": "bash",
+            "code": "# Ajuste as datas; End é exclusivo. A tag project deve estar ativada para custos.\naws ce get-cost-and-usage \\\n  --time-period Start=2026-08-01,End=2026-09-01 \\\n  --granularity MONTHLY --metrics UnblendedCost \\\n  --filter '{\"Tags\":{\"Key\":\"project\",\"Values\":[\"cloudshop\"]}}' \\\n  --group-by Type=DIMENSION,Key=SERVICE\n# Confira a moeda e itens sem alocação antes de consolidar o relatório."
+          },
+          {
+            "label": "Calcular custo por pedido e meta de economia",
+            "language": "python",
+            "code": "# Dados fictícios: substitua por custo e pedidos do mesmo período/perímetro.\ncusto_mensal = 420.0\npedidos_concluidos = 12000\ncusto_dev_ocioso = 60.0\nif pedidos_concluidos <= 0:\n    raise ValueError(\"Não há pedidos suficientes para calcular custo unitário\")\nprint(f\"Custo por pedido: USD {custo_mensal / pedidos_concluidos:.4f}\")\n# Estimativa, não garantia: valide cobranças residuais após executar a ação.\nprint(f\"Custo projetado após economia: USD {custo_mensal - custo_dev_ocioso:.2f}\")"
+          }
+        ],
+        "whyItMatters": "Custo unitário permite discutir eficiência com produto e finanças sem penalizar crescimento de receita.",
+        "commonMistake": "Comprar compromisso de longo prazo antes de eliminar ociosidade e medir a carga real.",
+        "productionTip": "Revise semanalmente as maiores variações com um responsável técnico e verifique a economia realizada no mês seguinte.",
+        "securityAlert": "Não reduza retenção de auditoria ou proteção de backups sem avaliação de risco e exigências de conformidade.",
+        "interviewQuestion": "A fatura cresceu 20%, mas os pedidos dobraram: como você avaliaria a eficiência?",
+        "glossary": [
+          {
+            "term": "custo unitário",
+            "definition": "Custo atribuído a uma unidade de resultado, como pedido concluído."
+          },
+          {
+            "term": "rateio",
+            "definition": "Distribuição documentada de custos compartilhados entre produtos ou equipes."
+          },
+          {
+            "term": "rightsizing",
+            "definition": "Ajuste de capacidade ao consumo medido e aos requisitos de serviço."
+          },
+          {
+            "term": "UnblendedCost",
+            "definition": "Métrica de custo que usa as tarifas não combinadas dos itens de cobrança."
+          },
+          {
+            "term": "Savings Plans",
+            "definition": "Compromissos de gasto por período em troca de descontos em uso elegível."
+          }
+        ],
+        "printQuestLink": "Acrescentar ao orçamento do CloudShop custo por pedido, regra de rateio e uma ação de economia com validação posterior.",
+        "quiz": [
+          {
+            "question": "Custo sobe 20% e pedidos dobram; o custo por pedido tende a:",
+            "options": [
+              "Dobrar",
+              "Ficar igual",
+              "Cair, mantendo o mesmo perímetro",
+              "Ser impossível de calcular sempre"
+            ],
+            "answerIndex": 2,
+            "explanation": "1,2 dividido por 2 resulta em 0,6 do custo unitário anterior."
+          },
+          {
+            "question": "Uma tag no recurso aparece imediatamente como filtro de custo?",
+            "options": [
+              "Sim, sempre",
+              "Não; depende de ativação e processamento",
+              "Somente se for Name",
+              "Sim, com AdministratorAccess"
+            ],
+            "answerIndex": 1,
+            "explanation": "Tags para alocação precisam ser ativadas e os dados podem demorar a aparecer."
+          },
+          {
+            "question": "Um alerta de Budget bloqueia automaticamente toda cobrança?",
+            "options": [
+              "Sim, no limite exato",
+              "Sim, em todas as regiões",
+              "Sim, inclusive impostos",
+              "Não; alerta não é um teto automático"
+            ],
+            "answerIndex": 3,
+            "explanation": "Budget monitora e notifica; ações específicas são separadas e não garantem teto rígido."
+          }
+        ]
+      },
     ],
   },
   {
@@ -1725,6 +2040,321 @@ hostnames:
               "State e credenciais expõem dados e exigem uma fronteira explícita de confiança.",
           },
         ],
+      },
+      {
+        "id": "l-7-6",
+        "moduleId": "mod-7",
+        "title": "Módulos reutilizáveis: contratos, validação e evolução segura",
+        "duration": 55,
+        "difficulty": "Avançado",
+        "tools": [
+          "Terraform",
+          "HCL",
+          "Git"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Desenhar uma interface pequena de módulo",
+          "Validar entradas antes do provisionamento",
+          "Expor outputs sem acoplar consumidores",
+          "Planejar mudanças de endereço com moved",
+          "Versionar e revisar atualizações de módulo"
+        ],
+        "body": [
+          "O módulo de rede já demonstrou reuso; agora vamos tratar um módulo como **produto interno com contrato**. Quem o consome precisa entender entradas, saídas e garantias sem ler todos os recursos. Um módulo que exige conhecer sua implementação apenas moveu a complexidade para outra pasta.",
+          "Escolha uma **responsabilidade coesa**. Neste exercício, `modules/private-subnet` cria uma subnet sem IP público automático e devolve seu ID. Ele não cria VPC, NAT ou banco escondidos; a composição dessas peças fica no módulo raiz, onde o ambiente é decidido.",
+          "**Valide o que puder antes da API**. Uma variável `cidr` com validation evita um erro básico de formato, mas não comprova ausência de sobreposição nem capacidade futura de endereçamento. Documente essas limitações e revise o desenho de rede junto com o plano.",
+          "Use **outputs estáveis** como interface: o consumidor depende de `subnet_id`, não de caminhos internos de recursos. Evite exportar objetos inteiros quando um ID basta. Isso reduz acoplamento e permite reorganizar a implementação sem obrigar cada ambiente a mudar.",
+          "O **provider deve ser configurado no módulo raiz** e recebido pelo filho, que declara seus requisitos. Assim dev e staging podem usar contas e regiões distintas sem credenciais embutidas no módulo. `required_providers` especifica compatibilidade, não autenticação.",
+          "Uma mudança de nome interno pode alterar o **endereço no state** sem alterar o recurso desejado. Um bloco `moved` informa a migração de endereço; não o use para esconder substituições reais. O plano deve mostrar a movimentação esperada e ausência de recriação indevida.",
+          "**Versão fixa é decisão de atualização**, não abandono de manutenção. Para módulo remoto, use versão de registry ou referência Git imutável revisada; para módulo local, a versão acompanha o commit do repositório. `.terraform.lock.hcl` fixa providers, não versões de módulos remotos.",
+          "Valide o **contrato em um ambiente descartável**: formato, validate, plano e saída esperada. Depois execute um segundo plano para conferir convergência. Antes de publicar uma mudança incompatível em `subnet_id` ou nas entradas obrigatórias, documente migração e combine a atualização com os consumidores."
+        ],
+        "code": [
+          {
+            "label": "Contrato e implementação de modules/private-subnet/main.tf",
+            "language": "hcl",
+            "code": "# O provider será herdado do módulo raiz.\nterraform {\n  required_providers {\n    aws = { source = \"hashicorp/aws\" }\n  }\n}\nvariable \"vpc_id\" {\n  type = string\n}\nvariable \"az\" {\n  type = string\n}\nvariable \"cidr\" {\n  type = string\n  validation {\n    condition     = can(cidrnetmask(var.cidr))\n    error_message = \"Informe um CIDR IPv4 válido.\"\n  }\n}\nresource \"aws_subnet\" \"this\" {\n  vpc_id                  = var.vpc_id\n  availability_zone       = var.az\n  cidr_block              = var.cidr\n  map_public_ip_on_launch = false\n  # Privacidade também depende da tabela de rotas associada pelo módulo raiz.\n}\noutput \"subnet_id\" {\n  description = \"ID da subnet para composição no módulo raiz.\"\n  value       = aws_subnet.this.id\n}"
+          },
+          {
+            "label": "Migração de nome dentro do módulo",
+            "language": "hcl",
+            "code": "# Inclua apenas se uma versão anterior usava aws_subnet.private.\n# Requer Terraform >= 1.1; mantenha o bloco durante a janela de migração.\nmoved {\n  from = aws_subnet.private\n  to   = aws_subnet.this\n}\n# Rode plan em cada consumidor e confira que não há destruição inesperada."
+          }
+        ],
+        "whyItMatters": "Interfaces previsíveis permitem atualizar infraestrutura de vários ambientes sem multiplicar correções manuais.",
+        "commonMistake": "Renomear um resource sem migração e aceitar um plano de destruição por parecer apenas uma refatoração.",
+        "productionTip": "Publique exemplos mínimos de consumo e uma lista de mudanças incompatíveis por versão do módulo.",
+        "securityAlert": "Não coloque access_key, secret_key ou credenciais de backend em módulos; autentique a execução por role.",
+        "interviewQuestion": "Como renomear um recurso dentro de um módulo sem recriá-lo nos ambientes consumidores?",
+        "glossary": [
+          {
+            "term": "contrato de módulo",
+            "definition": "Entradas, saídas e garantias públicas para os consumidores."
+          },
+          {
+            "term": "módulo raiz",
+            "definition": "Configuração executada diretamente, que compõe módulos filhos e providers."
+          },
+          {
+            "term": "moved",
+            "definition": "Bloco declarativo de migração entre endereços de recursos no state."
+          },
+          {
+            "term": "acoplamento",
+            "definition": "Dependência de um consumidor em detalhes internos de outra parte."
+          },
+          {
+            "term": "mudança incompatível",
+            "definition": "Alteração que exige adaptação dos consumidores existentes."
+          }
+        ],
+        "printQuestLink": "Evoluir o módulo de rede do CloudShop com entradas validadas, outputs documentados e plano de migração sem recriação.",
+        "quiz": [
+          {
+            "question": "O que .terraform.lock.hcl fixa?",
+            "options": [
+              "Todo módulo Git",
+              "Os nomes de recursos",
+              "As seleções e checksums de providers",
+              "As credenciais AWS"
+            ],
+            "answerIndex": 2,
+            "explanation": "O lockfile de dependências registra providers, não fixa versões dos módulos remotos."
+          },
+          {
+            "question": "Qual recurso ajuda em uma renomeação de endereço no state?",
+            "options": [
+              "moved",
+              "destroy automático",
+              "ignore_changes em tudo",
+              "Um novo backend"
+            ],
+            "answerIndex": 0,
+            "explanation": "moved declara a migração de endereço preservando o vínculo com o recurso."
+          },
+          {
+            "question": "Um módulo com map_public_ip_on_launch=false garante subnet privada?",
+            "options": [
+              "Sim, sem condições",
+              "Não; é necessário avaliar também as rotas",
+              "Sim, se tiver output",
+              "Somente com tag private"
+            ],
+            "answerIndex": 1,
+            "explanation": "A classificação pública ou privada depende do caminho de roteamento, não só de IP automático."
+          }
+        ]
+      },
+      {
+        "id": "l-7-7",
+        "moduleId": "mod-7",
+        "title": "State remoto: migração, contenção de concorrência e recuperação",
+        "duration": 55,
+        "difficulty": "Avançado",
+        "tools": [
+          "Terraform",
+          "Amazon S3",
+          "AWS CLI"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Migrar state local sem perder vínculos",
+          "Configurar lock nativo no S3",
+          "Distinguir permissões do state e do lockfile",
+          "Investigar locks antes de removê-los",
+          "Planejar recuperação com versionamento"
+        ],
+        "body": [
+          "O backend já foi apresentado; esta aula aprofunda **operação segura do state**. Migrar não é simplesmente copiar um arquivo para S3: o Terraform precisa passar a usar a localização correta sem criar um segundo inventário independente. Faça a mudança em janela controlada, sem outros plans ou applies.",
+          "Prepare o **backend antes da migração**. O bucket precisa existir com versionamento, bloqueio público, criptografia e acesso restrito. Use uma configuração de bootstrap separada ou infraestrutura corporativa existente; não dependa do backend que ainda está tentando criar.",
+          "O **lockfile nativo do S3** exige Terraform `>= 1.10` e `use_lockfile = true`. Padronize essa versão em todas as máquinas e pipelines que acessam o state. Uma configuração compatível não protege contra clientes antigos que não adotam o mesmo mecanismo de lock.",
+          "As **permissões são distintas**: a role precisa ler e gravar o objeto de state e listar o prefixo necessário no bucket; no objeto `.tflock`, precisa também excluir o lock ao terminar. Se houver SSE-KMS, as permissões da chave entram na análise. Não conceda DeleteObject ao state sem necessidade operacional.",
+          "Execute `init -migrate-state` após configurar o backend e confirme a migração solicitada. **Não confunda com reconfigure**: `-reconfigure` aceita uma configuração de backend sem migrar o state anterior. Compare inventário antes/depois e só prossiga quando estiver certo de conta, bucket e chave.",
+          "Com concorrência legítima, **aguarde o lock**, não o desative. `-lock-timeout=5m` dá tempo para outra operação terminar. O lock coordena um state específico; não serializa automaticamente stacks diferentes que alteram o mesmo recurso por desenho incorreto.",
+          "Um lock aparentemente preso exige **investigação de execução ativa**: confira job, operador, horário e logs. Só use `force-unlock` após confirmar que o dono não está mais escrevendo e preservar evidências. Destravar um apply ainda vivo pode permitir duas gravações concorrentes.",
+          "**Recuperação é procedimento ensaiado**, não restauração impulsiva de versão. Pare os escritores, preserve state atual, identifique a versão boa e reconcilie o que mudou na AWS desde então. Após recuperar sob controle, execute plan e revise; restaurar um state antigo não desfaz recursos já criados ou removidos."
+        ],
+        "code": [
+          {
+            "label": "Backend parcial e configuração do ambiente",
+            "language": "hcl",
+            "code": "# backend.tf no módulo raiz; o bucket é criado por bootstrap separado.\nterraform {\n  required_version = \">= 1.10, < 2.0\"\n  backend \"s3\" {}\n}\n# Salve o conteúdo abaixo em dev.s3.tfbackend, sem credenciais.\n# bucket       = \"cloudshop-tfstate-CONTA\"\n# key          = \"dev/infra.tfstate\"\n# region       = \"us-east-1\"\n# encrypt      = true\n# use_lockfile = true\n# Troque CONTA pelo identificador do bucket privado já provisionado."
+          },
+          {
+            "label": "Janela de migração e validação do inventário",
+            "language": "bash",
+            "code": "# Execute no diretório raiz correto, sem outros escritores ativos.\nset -euo pipefail\numask 077\n# Backup sensível fora do repositório; aplique a política de retenção do time.\nterraform state pull > /tmp/cloudshop-before-migration.tfstate\nterraform state list > /tmp/cloudshop-before-migration.txt\nterraform init -migrate-state -backend-config=dev.s3.tfbackend\nterraform state list > /tmp/cloudshop-after-migration.txt\ndiff -u /tmp/cloudshop-before-migration.txt /tmp/cloudshop-after-migration.txt\n# Revise qualquer diferença; este comando não aplica mudanças.\nterraform plan -lock-timeout=5m\n# Não use -lock=false para contornar outro job."
+          }
+        ],
+        "whyItMatters": "Procedimentos de migração e recuperação evitam perder o vínculo entre código e infraestrutura durante incidentes.",
+        "commonMistake": "Usar -reconfigure achando que ele transfere automaticamente o state local para o backend remoto.",
+        "productionTip": "Teste recuperação em ambiente isolado e registre responsáveis, permissões de emergência e tempo de restauração.",
+        "securityAlert": "Backups de state contêm dados sensíveis: restrinja acesso, criptografe o armazenamento durável e nunca publique em artifacts abertos.",
+        "interviewQuestion": "Como migrar state local para S3 e comprovar que nenhum recurso perdeu seu vínculo?",
+        "glossary": [
+          {
+            "term": "bootstrap",
+            "definition": "Etapa inicial que provisiona dependências necessárias à infraestrutura principal."
+          },
+          {
+            "term": "lockfile S3",
+            "definition": "Objeto .tflock usado pelo backend para coordenar operações sobre o state."
+          },
+          {
+            "term": "migrate-state",
+            "definition": "Opção do init que conduz a transferência do state ao mudar o backend."
+          },
+          {
+            "term": "reconfigure",
+            "definition": "Opção do init que descarta a configuração anterior de backend sem migrar o state."
+          },
+          {
+            "term": "versionamento S3",
+            "definition": "Manutenção de versões de objetos para recuperação e auditoria."
+          }
+        ],
+        "printQuestLink": "Migrar o state de dev do CloudShop em janela controlada, comparar inventários e documentar investigação de lock órfão.",
+        "quiz": [
+          {
+            "question": "Qual versão mínima suporta use_lockfile no backend S3?",
+            "options": [
+              "0.12",
+              "1.1",
+              "1.10",
+              "Qualquer versão"
+            ],
+            "answerIndex": 2,
+            "explanation": "O lock nativo S3 foi introduzido no Terraform 1.10."
+          },
+          {
+            "question": "Antes de force-unlock, o que é indispensável?",
+            "options": [
+              "Apagar o bucket",
+              "Confirmar que não existe escritor ativo",
+              "Desativar versionamento",
+              "Executar destroy"
+            ],
+            "answerIndex": 1,
+            "explanation": "Remover lock com escritor ativo pode causar concorrência e corrupção lógica do state."
+          },
+          {
+            "question": "Restaurar uma versão antiga de state desfaz mudanças na AWS?",
+            "options": [
+              "Não; é preciso reconciliar state e recursos reais",
+              "Sim, imediatamente",
+              "Sim, se houver criptografia",
+              "Apenas para bancos"
+            ],
+            "answerIndex": 0,
+            "explanation": "State é inventário, não um backup dos próprios recursos nem um rollback das APIs."
+          }
+        ]
+      },
+      {
+        "id": "l-7-8",
+        "moduleId": "mod-7",
+        "title": "Pipeline de IaC: plano aprovado, apply rastreável e drift triado",
+        "duration": 55,
+        "difficulty": "Avançado",
+        "tools": [
+          "GitHub Actions",
+          "Terraform",
+          "AWS OIDC"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Separar credenciais de plan e apply",
+          "Aplicar o mesmo plano aprovado",
+          "Interpretar códigos de saída sem mascarar falhas",
+          "Distinguir mudanças esperadas de possível drift",
+          "Definir limites de confiança em workflows"
+        ],
+        "body": [
+          "O pipeline anterior conectou ferramentas; agora o foco é **garantir o que foi aprovado**. Um plano é uma proposta calculada para código, variáveis, providers e state específicos. Rodar outro `plan` silenciosamente no job de apply pode executar algo diferente do que a revisão autorizou.",
+          "Separe **validação sem credenciais** de acesso à nuvem. `fmt` e verificações estáticas podem rodar em PRs não confiáveis; planos autenticados ficam restritos a código revisado e origens confiáveis. Nunca combine checkout de código de fork com segredos usando um gatilho privilegiado como atalho.",
+          "Autentique com **OIDC e roles distintas**. A trust policy deve restringir repositório, branch ou environment e audience. A role de plan lê recursos, lê state e, quando necessário, escreve o lockfile; isso não significa conceder alteração dos recursos de produção.",
+          "No **plan persistido**, fixe a revisão e salve `plan.tfplan`. O job de apply recebe esse mesmo arquivo, usa a mesma versão do Terraform e providers compatíveis e depende de aprovação do environment. Se outro apply alterar o state, o plano pode ficar obsoleto: gere outro e solicite nova aprovação.",
+          "**Artifacts são sensíveis**: o plano binário e sua representação JSON podem conter valores que a interface normalmente oculta. Restrinja acesso, retenção e origem do artifact. Não publique o plano completo em comentários abertos; apresente um resumo revisável sem segredos.",
+          "Trate **exit codes como protocolo**: com `-detailed-exitcode`, `0` indica ausência de mudanças, `1` indica erro e `2` indica mudanças propostas. O shell de CI pode encerrar no código 2 antes de você classificá-lo; capture o resultado explicitamente sem converter um erro real em sucesso.",
+          "Para **drift detection**, rode um plano agendado sobre a revisão implantada e as mesmas entradas aprovadas. Um código 2 apenas sinaliza diferença: ela também pode vir de alteração de código, variáveis ou provider. Correlacione o plano com histórico de deploy e auditoria antes de chamar tudo de drift.",
+          "O fluxo seguro é **detectar, triar e aprovar**, não corrigir automaticamente qualquer diferença. Abra um incidente ou tarefa com responsável e prazo; decida se a alteração externa deve virar código ou ser revertida. Use concorrência por ambiente no CI e mantenha o lock do backend como proteção adicional."
+        ],
+        "code": [
+          {
+            "label": "Capturar o resultado do plano em um job autenticado",
+            "language": "yaml",
+            "code": "# Trecho de steps após checkout confiável, setup-terraform com\n# terraform_wrapper: false, autenticação OIDC e terraform init.\n- name: Gerar plano e classificar resultado\n  id: plan\n  shell: bash\n  working-directory: infra/envs/dev\n  run: |\n    set +e\n    terraform plan -input=false -lock-timeout=5m -detailed-exitcode -out=plan.tfplan\n    rc=$?\n    set -e\n    case \"$rc\" in\n      0) echo \"changes=false\" >> \"$GITHUB_OUTPUT\" ;;\n      2) echo \"changes=true\" >> \"$GITHUB_OUTPUT\" ;;\n      *) echo \"Falha ao calcular plano\" >&2; exit \"$rc\" ;;\n    esac\n# No fluxo completo, envie o plano como artifact privado de curta retenção.\n# O job de apply protegido baixa exclusivamente o artifact desta execução."
+          },
+          {
+            "label": "Aplicar o plano revisado no job protegido",
+            "language": "bash",
+            "code": "# Pré-condições: aprovação de environment, checkout do mesmo commit,\n# role de apply via OIDC e plano íntegro baixado desta mesma execução.\nset -euo pipefail\ncd infra/envs/dev\nterraform init -input=false -lockfile=readonly\n# Não executar um novo plan neste job: aplique o arquivo já aprovado.\nterraform apply -input=false -lock-timeout=5m plan.tfplan\n# Se o plano estiver obsoleto, interrompa e reinicie plan + aprovação.\n# Em execução separada, valide convergência e notifique diferenças."
+          }
+        ],
+        "whyItMatters": "Vincular revisão, plano e execução reduz mudanças inesperadas e permite reconstruir quem aprovou cada alteração.",
+        "commonMistake": "Capturar qualquer falha de plan com || true e publicar o job como sucesso sem distinguir código 1 de 2.",
+        "productionTip": "Use environment protegido, concorrência por ambiente sem cancelar apply em andamento e retenção curta de artifacts.",
+        "securityAlert": "Código de PR pode executar comandos arbitrários: não dê credenciais de plan ou acesso ao state a contribuições não confiáveis.",
+        "interviewQuestion": "Como garantir que o apply executa exatamente a mudança revisada e como tratar um plano obsoleto?",
+        "glossary": [
+          {
+            "term": "plano persistido",
+            "definition": "Arquivo produzido por plan -out para aplicação posterior da mesma proposta."
+          },
+          {
+            "term": "OIDC",
+            "definition": "Protocolo usado para trocar identidade do job por credenciais temporárias na nuvem."
+          },
+          {
+            "term": "environment protegido",
+            "definition": "Contexto de implantação com restrições e aprovação antes da execução autorizada."
+          },
+          {
+            "term": "artifact",
+            "definition": "Arquivo preservado por uma execução de CI para uso controlado em outros jobs."
+          },
+          {
+            "term": "drift detection",
+            "definition": "Verificação periódica de divergências que exige triagem de causa e intenção."
+          }
+        ],
+        "printQuestLink": "Fortalecer o pipeline do CloudShop com plano persistido, aprovação, roles separadas e triagem de diferenças agendadas.",
+        "quiz": [
+          {
+            "question": "O plan retorna 2 com -detailed-exitcode. Isso significa:",
+            "options": [
+              "Falha de autenticação",
+              "Mudanças propostas que precisam ser classificadas",
+              "Nenhuma mudança",
+              "Permissão para aplicar sem revisão"
+            ],
+            "answerIndex": 1,
+            "explanation": "O código 2 indica diferenças, não necessariamente erro nem drift confirmado."
+          },
+          {
+            "question": "O state mudou após a aprovação e o plano ficou obsoleto. O que fazer?",
+            "options": [
+              "Forçar o apply sem lock",
+              "Editar o arquivo binário",
+              "Gerar novo plano e obter nova aprovação",
+              "Destruir e recriar"
+            ],
+            "answerIndex": 2,
+            "explanation": "A aprovação anterior não cobre uma proposta recalculada para outro estado."
+          },
+          {
+            "question": "Quem pode receber acesso ao state em um workflow de PR?",
+            "options": [
+              "Qualquer fork",
+              "Todo usuário que abrir issue",
+              "Qualquer job com checkout",
+              "Somente execuções confiáveis autorizadas pela política do time"
+            ],
+            "answerIndex": 3,
+            "explanation": "State e credenciais expõem dados e exigem uma fronteira explícita de confiança."
+          }
+        ]
       },
     ],
   },
