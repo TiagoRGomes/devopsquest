@@ -14,3 +14,7 @@
 - [x] Prepare Android native project using the public hosted app and existing brand icon.
 - [x] Generate and verify an installable test APK (compiled and signature verified; no physical-device test available).
 - [x] Deliver clean native source and Portuguese physical-device installation instructions, including Google login and production-release limitations.
+# Mais aulas didáticas
+- [ ] Adicionar 3 aulas novas por módulo (36 no total), mais didáticas e explicadas, nos 6 arquivos de módulos (6 agentes em paralelo).
+- [ ] Traduzir as novas aulas para espanhol e inglês.
+- [ ] Typecheck/build OK e verificação de uma aula nova na interface.

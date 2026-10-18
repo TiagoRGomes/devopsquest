@@ -8,7 +8,7 @@ export const CONTAINERS_CICD_MODULES: Module[] = [
     title: "Docker e Compose",
     tagline: "Empacote a aplicação para rodar igual em qualquer lugar.",
     weeks: 3,
-    xp: 2000,
+    xp: 2075,
     badge: "container-architect",
     regionId: "vale-containers",
     bossId: "boss-crashloop-container",
@@ -22,8 +22,20 @@ export const CONTAINERS_CICD_MODULES: Module[] = [
       "Subir o stack completo com Compose e healthchecks",
     ],
     prerequisites: ["Módulo 1 e 3 concluídos"],
-    topics: ["Imagens", "Containers", "Dockerfile", "Cache", "Registry", "Volumes", "Networks", "Compose", "Multi-stage", "Segurança"],
-    delivery: "docker-compose.yml subindo Vue + API Node + PostgreSQL, com imagem final sem root e menor que 200 MB.",
+    topics: [
+      "Imagens",
+      "Containers",
+      "Dockerfile",
+      "Cache",
+      "Registry",
+      "Volumes",
+      "Networks",
+      "Compose",
+      "Multi-stage",
+      "Segurança",
+    ],
+    delivery:
+      "docker-compose.yml subindo Vue + API Node + PostgreSQL, com imagem final sem root e menor que 200 MB.",
     checklist: [
       "Dockerfile multi-stage com .dockerignore",
       "Container roda com usuário não-root",
@@ -38,7 +50,8 @@ export const CONTAINERS_CICD_MODULES: Module[] = [
       "Como você reduziria uma imagem de 1,2 GB para menos de 200 MB?",
       "Por que rodar container como root é problema?",
     ],
-    printQuest: "Containerizar o CloudShop inteiro e subir o ambiente de desenvolvimento com um comando.",
+    printQuest:
+      "Containerizar o CloudShop inteiro e subir o ambiente de desenvolvimento com um comando.",
     lessons: [
       {
         id: "l-4-1",
@@ -48,7 +61,11 @@ export const CONTAINERS_CICD_MODULES: Module[] = [
         difficulty: "Iniciante",
         tools: ["Docker"],
         xp: 25,
-        objectives: ["Distinguir imagem, container e registry", "Operar o ciclo de vida do container", "Inspecionar o que está rodando"],
+        objectives: [
+          "Distinguir imagem, container e registry",
+          "Operar o ciclo de vida do container",
+          "Inspecionar o que está rodando",
+        ],
         body: [
           "Imagem é um modelo somente-leitura, formado por layers empilhados; container é uma instância em execução desse modelo, com uma camada de escrita própria e efêmera. Registry é onde as imagens ficam guardadas (Docker Hub, GHCR, ECR). Entender isso explica por que dado gravado dentro do container desaparece ao recriá-lo — e por que volumes existem.",
           "Container não é máquina virtual: ele compartilha o kernel do host e isola processos por namespaces e cgroups. Isso o torna leve e rápido, mas também significa que ele não é fronteira de segurança perfeita — daí a importância de não rodar como root e de limitar recursos.",
@@ -72,21 +89,37 @@ docker system prune -f             # limpar recursos nao usados`,
               "docker exec com --user root em produção deve ser exceção auditada; prefira depurar por logs e métricas.",
           },
         ],
-        whyItMatters: "Todo o resto (CI/CD, Kubernetes, GitOps) assume que você entende container. Modelo mental errado aqui contamina tudo.",
-        commonMistake: "Guardar dados importantes na camada de escrita do container e perdê-los no próximo deploy.",
-        productionTip: "Trate containers como descartáveis: nada essencial dentro, tudo em volume ou serviço externo.",
+        whyItMatters:
+          "Todo o resto (CI/CD, Kubernetes, GitOps) assume que você entende container. Modelo mental errado aqui contamina tudo.",
+        commonMistake:
+          "Guardar dados importantes na camada de escrita do container e perdê-los no próximo deploy.",
+        productionTip:
+          "Trate containers como descartáveis: nada essencial dentro, tudo em volume ou serviço externo.",
         interviewQuestion: "Por que um container para imediatamente após iniciar?",
         glossary: [
-          { term: "layer", definition: "Camada imutável da imagem, reaproveitada em cache e entre imagens." },
-          { term: "cgroups", definition: "Mecanismo do kernel que limita CPU, memória e I/O de um grupo de processos." },
+          {
+            term: "layer",
+            definition: "Camada imutável da imagem, reaproveitada em cache e entre imagens.",
+          },
+          {
+            term: "cgroups",
+            definition:
+              "Mecanismo do kernel que limita CPU, memória e I/O de um grupo de processos.",
+          },
         ],
         printQuestLink: "Rodar a API do CloudShop em container pela primeira vez.",
         quiz: [
           {
             question: "O que acontece com os dados escritos dentro do container ao removê-lo?",
-            options: ["Ficam no host", "São perdidos, salvo se estiverem em volume", "Vão para a imagem", "Vão para o registry"],
+            options: [
+              "Ficam no host",
+              "São perdidos, salvo se estiverem em volume",
+              "Vão para a imagem",
+              "Vão para o registry",
+            ],
             answerIndex: 1,
-            explanation: "A camada de escrita é descartada com o container; persistência exige volume ou bind mount.",
+            explanation:
+              "A camada de escrita é descartada com o container; persistência exige volume ou bind mount.",
           },
         ],
       },
@@ -98,7 +131,11 @@ docker system prune -f             # limpar recursos nao usados`,
         difficulty: "Intermediário",
         tools: ["Docker", "Dockerfile"],
         xp: 25,
-        objectives: ["Escrever Dockerfile ordenado para cache", "Usar .dockerignore", "Reduzir tamanho da imagem"],
+        objectives: [
+          "Escrever Dockerfile ordenado para cache",
+          "Usar .dockerignore",
+          "Reduzir tamanho da imagem",
+        ],
         body: [
           "Cada instrução do Dockerfile cria uma layer, e o Docker reaproveita a layer se a entrada não mudou. Daí a regra de ouro: copie primeiro os arquivos de dependência (package.json e lock), instale, e só depois copie o código. Invertendo essa ordem, qualquer alteração de uma linha de código invalida a instalação e o build volta a levar minutos.",
           ".dockerignore é tão importante quanto o Dockerfile: sem ele, node_modules local, .git e arquivos .env vão para o contexto de build, deixando tudo lento e podendo vazar segredo dentro da imagem.",
@@ -143,16 +180,28 @@ docker-compose*.yml
 **/*.md`,
           },
         ],
-        whyItMatters: "Build de 8 minutos vira 40 segundos com ordenação correta — impacto direto no tempo de entrega do time.",
+        whyItMatters:
+          "Build de 8 minutos vira 40 segundos com ordenação correta — impacto direto no tempo de entrega do time.",
         commonMistake: "COPY . . antes de npm ci, destruindo o cache em toda alteração de código.",
-        productionTip: "Fixe a versão da base (node:22.11-alpine) em vez de tag móvel para builds reprodutíveis.",
-        securityAlert: "Rode scan de vulnerabilidades na imagem no CI e atualize a base periodicamente.",
-        interviewQuestion: "Como você diagnostica um build de Docker que ficou lento após uma mudança pequena?",
+        productionTip:
+          "Fixe a versão da base (node:22.11-alpine) em vez de tag móvel para builds reprodutíveis.",
+        securityAlert:
+          "Rode scan de vulnerabilidades na imagem no CI e atualize a base periodicamente.",
+        interviewQuestion:
+          "Como você diagnostica um build de Docker que ficou lento após uma mudança pequena?",
         glossary: [
-          { term: "contexto de build", definition: "Conjunto de arquivos enviados ao daemon Docker durante o build." },
-          { term: "distroless", definition: "Imagem sem shell nem gerenciador de pacotes, contendo só o runtime necessário." },
+          {
+            term: "contexto de build",
+            definition: "Conjunto de arquivos enviados ao daemon Docker durante o build.",
+          },
+          {
+            term: "distroless",
+            definition:
+              "Imagem sem shell nem gerenciador de pacotes, contendo só o runtime necessário.",
+          },
         ],
-        printQuestLink: "Escrever o Dockerfile definitivo da API do CloudShop com usuário não-root.",
+        printQuestLink:
+          "Escrever o Dockerfile definitivo da API do CloudShop com usuário não-root.",
         quiz: [
           {
             question: "Por que copiar package.json antes do código-fonte?",
@@ -163,7 +212,8 @@ docker-compose*.yml
               "Para evitar erro de permissão",
             ],
             answerIndex: 1,
-            explanation: "A layer de instalação só é invalidada quando os arquivos de dependência mudam.",
+            explanation:
+              "A layer de instalação só é invalidada quando os arquivos de dependência mudam.",
           },
         ],
       },
@@ -175,7 +225,11 @@ docker-compose*.yml
         difficulty: "Intermediário",
         tools: ["Docker", "PostgreSQL"],
         xp: 25,
-        objectives: ["Persistir dados corretamente", "Conectar containers por rede e DNS interno", "Injetar configuração sem recompilar"],
+        objectives: [
+          "Persistir dados corretamente",
+          "Conectar containers por rede e DNS interno",
+          "Injetar configuração sem recompilar",
+        ],
         body: [
           "Volume nomeado é a forma correta de persistir dados de banco: gerenciado pelo Docker, portável e com performance adequada. Bind mount aponta um diretório do host e é ideal em desenvolvimento para ver alterações de código na hora — mas expõe caminhos do host e, em produção, gera acoplamento indesejado.",
           "Toda rede criada pelo Docker traz DNS interno: containers se encontram pelo nome do serviço. Por isso a API acessa o banco em db:5432, não em localhost. Manter o banco em rede interna, sem publicar porta no host, é boa prática de segurança elementar.",
@@ -204,20 +258,35 @@ docker run --rm -v cloudshop-pgdata:/data alpine ls -la /data | head`,
               "Evite -e SENHA=valor: a variável fica visível em docker inspect e no histórico do shell. Use arquivo de secret montado.",
           },
         ],
-        whyItMatters: "Perder o volume do banco em um deploy é o tipo de erro que custa emprego. Entender persistência é obrigação.",
+        whyItMatters:
+          "Perder o volume do banco em um deploy é o tipo de erro que custa emprego. Entender persistência é obrigação.",
         commonMistake: "Usar localhost para falar com outro container e receber ECONNREFUSED.",
-        productionTip: "Não publique a porta do banco no host; acesso administrativo via túnel SSH ou bastion.",
-        securityAlert: "Volume com dados pessoais precisa de política de backup e de descarte, não só de existência.",
+        productionTip:
+          "Não publique a porta do banco no host; acesso administrativo via túnel SSH ou bastion.",
+        securityAlert:
+          "Volume com dados pessoais precisa de política de backup e de descarte, não só de existência.",
         interviewQuestion: "Quando você usaria bind mount e quando volume nomeado?",
         glossary: [
-          { term: "volume nomeado", definition: "Área de armazenamento gerenciada pelo Docker, independente do ciclo do container." },
-          { term: "DNS interno", definition: "Resolução automática de nomes de serviço dentro de uma rede Docker." },
+          {
+            term: "volume nomeado",
+            definition:
+              "Área de armazenamento gerenciada pelo Docker, independente do ciclo do container.",
+          },
+          {
+            term: "DNS interno",
+            definition: "Resolução automática de nomes de serviço dentro de uma rede Docker.",
+          },
         ],
         printQuestLink: "Garantir persistência dos pedidos do CloudShop em volume dedicado.",
         quiz: [
           {
             question: "Dentro de um container, a que localhost se refere?",
-            options: ["Ao host", "Ao próprio container", "Ao gateway da rede", "Ao container do banco"],
+            options: [
+              "Ao host",
+              "Ao próprio container",
+              "Ao gateway da rede",
+              "Ao container do banco",
+            ],
             answerIndex: 1,
             explanation: "Cada container tem seu próprio namespace de rede; localhost é ele mesmo.",
           },
@@ -231,7 +300,11 @@ docker run --rm -v cloudshop-pgdata:/data alpine ls -la /data | head`,
         difficulty: "Intermediário",
         tools: ["Docker Compose", "Vue", "Node", "PostgreSQL"],
         xp: 25,
-        objectives: ["Declarar múltiplos serviços", "Usar healthcheck e depends_on condicionado", "Separar configuração por ambiente"],
+        objectives: [
+          "Declarar múltiplos serviços",
+          "Usar healthcheck e depends_on condicionado",
+          "Separar configuração por ambiente",
+        ],
         body: [
           "Compose descreve o ambiente inteiro em YAML: serviços, redes, volumes e dependências. O ganho real não é digitar menos, é reprodutibilidade: qualquer pessoa clona o repositório, roda um comando e tem o mesmo ambiente — fim do onboarding de dois dias.",
           "depends_on sozinho apenas ordena a inicialização; ele não espera o serviço ficar pronto. Para isso existe healthcheck combinado com condition: service_healthy. Sem isso, a API sobe antes do PostgreSQL aceitar conexões e entra em laço de reinício — o erro mais comum de quem está começando.",
@@ -315,14 +388,24 @@ docker compose down            # mantem volumes
 docker compose down -v         # remove volumes: apaga o banco`,
           },
         ],
-        whyItMatters: "Compose é o ambiente de desenvolvimento padrão de times que entregam containers — e o degrau natural para Kubernetes.",
+        whyItMatters:
+          "Compose é o ambiente de desenvolvimento padrão de times que entregam containers — e o degrau natural para Kubernetes.",
         commonMistake: "Confiar em depends_on sem healthcheck e culpar a aplicação pelo CrashLoop.",
-        productionTip: "Rode docker compose config no CI para detectar YAML inválido antes do merge.",
-        securityAlert: "docker compose down -v apaga volumes. Nunca digite isso em ambiente com dado real.",
-        interviewQuestion: "Como você garante que a API só inicia depois que o banco aceita conexões?",
+        productionTip:
+          "Rode docker compose config no CI para detectar YAML inválido antes do merge.",
+        securityAlert:
+          "docker compose down -v apaga volumes. Nunca digite isso em ambiente com dado real.",
+        interviewQuestion:
+          "Como você garante que a API só inicia depois que o banco aceita conexões?",
         glossary: [
-          { term: "healthcheck", definition: "Comando periódico que determina se o container está saudável." },
-          { term: "override", definition: "Arquivo Compose complementar que ajusta a configuração por ambiente." },
+          {
+            term: "healthcheck",
+            definition: "Comando periódico que determina se o container está saudável.",
+          },
+          {
+            term: "override",
+            definition: "Arquivo Compose complementar que ajusta a configuração por ambiente.",
+          },
         ],
         printQuestLink: "Entregar o ambiente completo do CloudShop com um docker compose up.",
         quiz: [
@@ -335,7 +418,8 @@ docker compose down -v         # remove volumes: apaga o banco`,
               "Publica a porta apenas se saudável",
             ],
             answerIndex: 1,
-            explanation: "A dependência precisa reportar healthy para o serviço dependente iniciar.",
+            explanation:
+              "A dependência precisa reportar healthy para o serviço dependente iniciar.",
           },
         ],
       },
@@ -347,7 +431,11 @@ docker compose down -v         # remove volumes: apaga o banco`,
         difficulty: "Avançado",
         tools: ["Docker", "Trivy", "BuildKit"],
         xp: 25,
-        objectives: ["Separar build de runtime", "Rodar como usuário não-root com filesystem read-only", "Escanear vulnerabilidades"],
+        objectives: [
+          "Separar build de runtime",
+          "Rodar como usuário não-root com filesystem read-only",
+          "Escanear vulnerabilidades",
+        ],
         body: [
           "Multi-stage build resolve um conflito antigo: para compilar você precisa de compilador, dependências de dev e ferramentas; para rodar, precisa apenas do artefato. Com estágios separados, o resultado final contém somente o necessário — imagem menor, build mais rápido e superfície de ataque reduzida.",
           "Segurança de container tem uma lista curta e obrigatória: usuário não-root, sem segredo embutido, base atualizada e fixada, filesystem read-only quando possível, capabilities descartadas e limites de recurso definidos. Cada item desses aparece em checklist de auditoria real.",
@@ -391,16 +479,27 @@ docker history cloudshop-web:v1 | head   # confirme que nao ha segredo`,
               "docker history revela comandos de build. Se um segredo passou por ARG, considere-o comprometido e rotacione.",
           },
         ],
-        whyItMatters: "Imagem grande custa tempo de pipeline e dinheiro de registry; imagem insegura custa incidente.",
+        whyItMatters:
+          "Imagem grande custa tempo de pipeline e dinheiro de registry; imagem insegura custa incidente.",
         commonMistake: "Deixar devDependencies e ferramentas de build na imagem final.",
-        productionTip: "Use BuildKit com cache mount para dependências e mantenha a imagem final abaixo de 200 MB.",
-        securityAlert: "Rodar como root com filesystem gravável permite que uma RCE na aplicação se torne persistente.",
-        interviewQuestion: "Quais são as cinco medidas que você aplica para endurecer uma imagem de container?",
+        productionTip:
+          "Use BuildKit com cache mount para dependências e mantenha a imagem final abaixo de 200 MB.",
+        securityAlert:
+          "Rodar como root com filesystem gravável permite que uma RCE na aplicação se torne persistente.",
+        interviewQuestion:
+          "Quais são as cinco medidas que você aplica para endurecer uma imagem de container?",
         glossary: [
-          { term: "multi-stage", definition: "Dockerfile com vários FROM, copiando apenas artefatos entre estágios." },
-          { term: "SBOM", definition: "Inventário dos componentes de software presentes no artefato." },
+          {
+            term: "multi-stage",
+            definition: "Dockerfile com vários FROM, copiando apenas artefatos entre estágios.",
+          },
+          {
+            term: "SBOM",
+            definition: "Inventário dos componentes de software presentes no artefato.",
+          },
         ],
-        printQuestLink: "Reduzir a imagem do frontend do CloudShop e bloquear o build em vulnerabilidade crítica.",
+        printQuestLink:
+          "Reduzir a imagem do frontend do CloudShop e bloquear o build em vulnerabilidade crítica.",
         quiz: [
           {
             question: "Qual o principal benefício do multi-stage build?",
@@ -411,7 +510,332 @@ docker history cloudshop-web:v1 | head   # confirme que nao ha segredo`,
               "Substituir o .dockerignore",
             ],
             answerIndex: 1,
-            explanation: "Ferramentas de build ficam em estágios descartados, reduzindo tamanho e risco.",
+            explanation:
+              "Ferramentas de build ficam em estágios descartados, reduzindo tamanho e risco.",
+          },
+        ],
+      },
+      {
+        id: "l-4-6",
+        moduleId: "mod-4",
+        title: "Compose na prática: ambientes isolados e tarefas de execução única",
+        duration: 50,
+        difficulty: "Intermediário",
+        tools: ["Docker Compose", "PostgreSQL"],
+        xp: 25,
+        objectives: [
+          "Isolar stacks com nomes de projeto",
+          "Combinar arquivos Compose de forma explícita",
+          "Executar migrações como tarefa de execução única",
+          "Investigar falhas sem destruir o ambiente",
+          "Validar a configuração antes de subir serviços",
+        ],
+        body: [
+          "**Compose na prática** começa pela organização do trabalho: duas branches do CloudShop podem precisar de bancos independentes. O nome de projeto, definido com `-p`, agrupa serviços, redes e volumes para que um ambiente não reutilize os recursos do outro por acidente.",
+          "**Isolamento tem limites**: projetos diferentes separam recursos gerenciados pelo Compose, mas não tornam exclusiva uma porta do host. Se ambos publicarem `8080:80`, haverá conflito; use portas distintas ou publicação dinâmica para executar os dois ao mesmo tempo.",
+          "**Arquivos complementares** permitem manter uma definição base e acrescentar necessidades locais. Informe os arquivos com `-f` na ordem desejada: o último ajusta o anterior. Use `docker compose config` para enxergar o resultado, porque listas e caminhos têm regras de mesclagem que merecem conferência.",
+          "**Profiles** habilitam ferramentas opcionais, como uma interface administrativa ou um serviço de diagnóstico. Um serviço com `profiles: [tools]` não inicia no fluxo padrão; `--profile tools` o inclui. Isso evita gastar recursos com ferramentas de uso ocasional.",
+          "**Tarefas de execução única** não devem ficar presas a um servidor permanente. Uma migração pode reutilizar a imagem da API e executar outro comando com `docker compose run --rm`: o container é removido ao terminar, mas o efeito no banco permanece.",
+          "**Migração exige coordenação**: execute-a uma vez por release e interrompa o processo se ela falhar. O exemplo assume que a API já possui `npm run migrate` e as credenciais necessárias; executar várias migrações concorrentes pode causar disputa por locks e mudanças parciais.",
+          "**Diagnóstico antes de reconstrução** preserva evidências. Consulte `ps -a`, os logs recentes e o estado de saúde antes de tentar outro build. `up --wait` espera serviços em execução ou saudáveis quando há healthchecks; não substitui um teste funcional de compra.",
+          "**Encerramento seguro** distingue ambiente descartável de dados persistentes. `down` remove containers e redes do projeto, mas preserva volumes nomeados por padrão. Não acrescente `-v` por hábito: confirme primeiro qual banco e qual projeto serão afetados.",
+        ],
+        code: [
+          {
+            label: "Operar dois ambientes a partir do Compose existente",
+            language: "bash",
+            code: "# Pré-requisito: compose.yaml define os serviços api e db, com healthchecks.\n# Cada ambiente usa seus próprios volumes; evite container_name e portas fixas.\ndocker compose -p cloudshop-pr42 -f compose.yaml config --quiet\ndocker compose -p cloudshop-pr42 -f compose.yaml up -d --wait db\n# A imagem da API deve implementar o script migrate e receber as credenciais.\ndocker compose -p cloudshop-pr42 -f compose.yaml run --rm api npm run migrate\ndocker compose -p cloudshop-pr42 -f compose.yaml up -d --wait\ndocker compose -p cloudshop-pr42 -f compose.yaml ps -a\ndocker compose -p cloudshop-pr42 -f compose.yaml logs --tail=100 api\n# Preserva volumes nomeados para a próxima execução.\ndocker compose -p cloudshop-pr42 -f compose.yaml down",
+          },
+          {
+            label: "compose.tools.yaml: diagnóstico opcional sem publicar porta",
+            language: "yaml",
+            code: 'services:\n  diagnostico:\n    image: busybox:1.37\n    profiles: [tools] # Só participa quando solicitado.\n    command: ["nslookup", "db"]\n    networks: [backend] # Rede já declarada no arquivo base.\n# Execute: docker compose -f compose.yaml -f compose.tools.yaml run --rm diagnostico',
+          },
+        ],
+        whyItMatters:
+          "Operar ambientes paralelos e migrações controladas torna o onboarding e a revisão de PRs previsíveis, sem misturar dados.",
+        commonMistake:
+          "Fixar container_name ou portas do host e esperar que apenas -p elimine todos os conflitos.",
+        productionTip:
+          "Padronize a combinação de arquivos e o nome de projeto em scripts documentados; registre o resultado de cada migração.",
+        securityAlert:
+          "docker compose config pode revelar valores interpolados; não publique sua saída completa se houver credenciais.",
+        interviewQuestion:
+          "Como você prepararia dois ambientes do mesmo projeto no mesmo host sem compartilhar dados ou disputar portas?",
+        glossary: [
+          {
+            term: "projeto Compose",
+            definition: "Agrupamento lógico que identifica e separa recursos de um stack.",
+          },
+          {
+            term: "profile",
+            definition: "Seleção opcional de serviços que não precisam iniciar no fluxo padrão.",
+          },
+          {
+            term: "one-off",
+            definition: "Tarefa executada em um container temporário até seu processo terminar.",
+          },
+          {
+            term: "mesclagem",
+            definition:
+              "Combinação das definições de vários arquivos Compose em uma configuração final.",
+          },
+        ],
+        printQuestLink:
+          "Criar um ambiente isolado de revisão do CloudShop e executar sua migração antes de iniciar a API.",
+        quiz: [
+          {
+            question: "O que -p cloudshop-pr42 ajuda a separar?",
+            options: [
+              "Portas fixas do host automaticamente",
+              "Recursos Compose associados ao projeto",
+              "O kernel do host",
+              "As versões do Docker",
+            ],
+            answerIndex: 1,
+            explanation:
+              "O projeto separa recursos como redes e volumes, mas portas fixas ainda podem colidir.",
+          },
+          {
+            question: "Qual comando é apropriado para uma migração pontual?",
+            options: [
+              "docker compose pause",
+              "docker compose logs",
+              "docker compose run --rm api npm run migrate",
+              "docker compose down -v",
+            ],
+            answerIndex: 2,
+            explanation:
+              "run cria um container para o comando e --rm remove esse container ao término.",
+          },
+          {
+            question: "Antes de aplicar vários arquivos Compose, como conferir sua combinação?",
+            options: [
+              "docker compose config",
+              "docker image prune",
+              "docker network disconnect",
+              "docker stop",
+            ],
+            answerIndex: 0,
+            explanation: "config resolve e valida a configuração combinada antes da execução.",
+          },
+        ],
+      },
+      {
+        id: "l-4-7",
+        moduleId: "mod-4",
+        title: "Volumes e redes: recuperação de dados e diagnóstico de conectividade",
+        duration: 50,
+        difficulty: "Intermediário",
+        tools: ["Docker", "PostgreSQL"],
+        xp: 25,
+        objectives: [
+          "Diferenciar persistência de backup recuperável",
+          "Produzir e testar um backup lógico do PostgreSQL",
+          "Diagnosticar DNS, porta e autenticação separadamente",
+          "Inspecionar redes sem expor o banco",
+          "Planejar descarte seguro de dados de laboratório",
+        ],
+        body: [
+          "**Persistência não é recuperação**: um volume mantém os arquivos após recriar o container, mas também mantém uma exclusão acidental. O volume `pgdata` não oferece, sozinho, histórico nem cópia independente; um backup precisa sobreviver à falha que afetou o original.",
+          "**Consistência vem antes da cópia**. Copiar os arquivos de um PostgreSQL em execução com `tar` pode gerar um conjunto inconsistente. Para este laboratório, use `pg_dump`, que produz um backup lógico consistente de um banco enquanto ele continua atendendo.",
+          "**Escopo importa**: `pg_dump` cobre os objetos de um banco, não todas as roles globais do cluster. Registre versão do PostgreSQL, extensões e requisitos de acesso; sem isso, o arquivo pode existir e ainda assim não ser suficiente para reconstruir o serviço.",
+          "**Restauração é o teste do backup**. Crie um banco vazio separado, restaure com `pg_restore --exit-on-error` e confira tabelas e registros esperados. Não use o banco original como destino de um exercício, pois uma tentativa de recuperação não deve destruir a fonte.",
+          "**DNS é uma etapa da conexão**, não a conexão inteira. Resolver `db` confirma que o nome existe na rede, mas não que a porta esteja aberta ou que a senha funcione. Investigue na ordem: rede compartilhada, resolução, prontidão do servidor e autenticação.",
+          "**O namespace muda o endereço**: um container cliente na mesma rede usa `db:5432`; uma ferramenta no host só acessa uma porta publicada ou um túnel configurado. Publicar a porta apenas para depurar pode abrir uma exposição desnecessária.",
+          "**Inspeção deve ser direcionada**. Use `docker network inspect` para identificar membros e `pg_isready` para verificar se o servidor aceita conexões. Essa verificação de prontidão não valida a senha da aplicação; uma consulta autenticada é uma etapa posterior.",
+          "**Recuperação precisa de metas**: defina quanto dado pode ser perdido e quanto tempo o serviço pode ficar indisponível. Execute exercícios periódicos, armazene cópias fora do host e proteja arquivos `.dump` como dados de produção, não como simples logs.",
+        ],
+        code: [
+          {
+            label: "Backup e restauração em banco separado no stack existente",
+            language: "bash",
+            code: "set -euo pipefail\numask 077 # Novos arquivos ficam acessíveis somente ao proprietário.\n# Ajuste usuário e banco ao Compose; autenticação deve estar configurada.\ndocker compose exec -T db pg_dump -U cloudshop -d cloudshop -Fc > cloudshop.dump\n# Destino exclusivo para teste: o comando falha se ele já existir.\ndocker compose exec -T db createdb -U cloudshop cloudshop_restore\n# -T evita TTY ao encaminhar o arquivo binário pela entrada padrão.\ndocker compose exec -T db pg_restore -U cloudshop -d cloudshop_restore --exit-on-error < cloudshop.dump\n# Confira tabelas e depois execute consultas de validação de negócio.\ndocker compose exec -T db psql -U cloudshop -d cloudshop_restore -c '\\dt'",
+          },
+          {
+            label: "Investigar rede sem publicar a porta do banco",
+            language: "bash",
+            code: "# Descubra o nome real da rede do projeto antes de usar o cliente temporário.\ndocker network ls\ndocker network inspect cloudshop_backend\n# O cliente está na mesma rede do banco; não requer -p 5432:5432.\ndocker run --rm --network cloudshop_backend postgres:16-alpine \\\n  pg_isready -h db -p 5432\n# pg_isready não comprova que as credenciais da aplicação funcionam.",
+          },
+        ],
+        whyItMatters:
+          "Backups restauráveis reduzem perda de pedidos, enquanto diagnóstico em camadas evita alterar firewall ou credenciais sem necessidade.",
+        commonMistake:
+          "Considerar um arquivo de backup válido sem nunca restaurá-lo ou copiar arquivos do banco ativo sem um método consistente.",
+        productionTip:
+          "Automatize restaurações isoladas, registre a duração e valide dados de negócio, não apenas a existência das tabelas.",
+        securityAlert:
+          "Backups podem conter dados pessoais e credenciais de aplicações; use criptografia, acesso mínimo e retenção definida.",
+        interviewQuestion:
+          "O banco responde ao pg_isready, mas a API não conecta: quais etapas você investigaria e por quê?",
+        glossary: [
+          {
+            term: "backup lógico",
+            definition:
+              "Exportação dos objetos e dados em formato que permite reconstruir um banco.",
+          },
+          {
+            term: "restore",
+            definition: "Processo de reconstruir dados a partir de uma cópia de segurança.",
+          },
+          {
+            term: "RPO",
+            definition: "Limite aceitável de perda de dados medido em tempo.",
+          },
+          {
+            term: "RTO",
+            definition: "Prazo-alvo para restaurar a operação após uma interrupção.",
+          },
+          {
+            term: "namespace de rede",
+            definition: "Isolamento que dá a um container suas próprias interfaces e rotas.",
+          },
+        ],
+        printQuestLink:
+          "Restaurar um backup do CloudShop em banco separado e documentar a investigação de uma conexão com falha.",
+        quiz: [
+          {
+            question: "Qual evidência demonstra melhor que o backup é utilizável?",
+            options: [
+              "O nome do arquivo",
+              "A existência do volume",
+              "Uma restauração isolada com validação dos dados",
+              "Um container em execução",
+            ],
+            answerIndex: 2,
+            explanation:
+              "Somente restaurar e conferir o resultado exercita o caminho real de recuperação.",
+          },
+          {
+            question: "O que pg_isready verifica?",
+            options: [
+              "A senha da API",
+              "A prontidão do servidor PostgreSQL",
+              "O conteúdo de todas as tabelas",
+              "A retenção de backup",
+            ],
+            answerIndex: 1,
+            explanation:
+              "O comando verifica se o servidor aceita conexões, não se a autenticação da aplicação é válida.",
+          },
+          {
+            question:
+              "Por que não copiar com tar os arquivos de um banco ativo sem procedimento próprio?",
+            options: [
+              "Pode produzir uma cópia inconsistente",
+              "Volumes não permitem leitura",
+              "tar sempre altera o banco",
+              "Docker impede qualquer backup",
+            ],
+            answerIndex: 0,
+            explanation:
+              "Arquivos mudam durante a cópia; use backup lógico ou um procedimento físico consistente.",
+          },
+        ],
+      },
+      {
+        id: "l-4-8",
+        moduleId: "mod-4",
+        title: "Imagens confiáveis: secrets de build, digest e redução de privilégios",
+        duration: 50,
+        difficulty: "Avançado",
+        tools: ["Docker BuildKit", "Docker"],
+        xp: 25,
+        objectives: [
+          "Fornecer segredos temporários ao build sem incorporá-los à imagem",
+          "Diferenciar tag móvel de referência por digest",
+          "Aplicar restrições de execução de forma incremental",
+          "Testar permissões e diretórios graváveis",
+          "Definir um processo de atualização das bases",
+        ],
+        body: [
+          "**Confiança é um processo**, não uma propriedade de imagens pequenas. Uma imagem de poucos megabytes pode conter código malicioso; confira origem da base, dependências e permissões. O identificador `sha256` permite associar a execução ao conteúdo aprovado.",
+          "**Tags são referências mutáveis**: `node:22-alpine` pode apontar para uma base diferente amanhã. Registrar o digest evita mudanças silenciosas, mas também congela vulnerabilidades; a equipe precisa abrir atualizações regulares e executar testes novamente.",
+          "**Segredos de build têm vida curta**. Se uma dependência privada exige token, passe um arquivo por `--secret` e consuma-o em `RUN --mount=type=secret`. Diferentemente de `ARG` e `ENV`, o arquivo montado não é incluído automaticamente nas layers.",
+          "**A montagem não impede vazamento deliberado**: um comando ainda pode copiar o segredo para outro caminho ou imprimi-lo. Revise scripts de instalação e logs; o exemplo usa um `.npmrc` temporário, sem executar `cat` e sem copiá-lo ao estágio final.",
+          "**Privilégios de execução são outra camada**. Um processo com `USER node` continua sujeito às permissões de arquivos e às configurações do runtime. Combine usuário não-root com `--cap-drop ALL` e `no-new-privileges` quando o comportamento da aplicação permitir.",
+          "**Filesystem somente leitura exige planejamento**. A aplicação pode precisar escrever temporários em `/tmp`; forneça um `tmpfs` limitado em vez de liberar toda a raiz. Logs devem ir para saída padrão e dados persistentes para um volume ou serviço explícito.",
+          "**Teste negativo também ensina**: confirme que a API responde e que escrever em `/app` falha. Não remova proteções ao primeiro erro de permissão; localize a escrita, entenda sua necessidade e conceda acesso apenas ao caminho apropriado.",
+          "**Atualização fecha o ciclo**. Faça rebuild periódico com bases corrigidas, execute testes e scan, registre o novo digest e promova esse artefato. Um digest aprovado é rastreável; ele não representa uma promessa de segurança eterna.",
+        ],
+        code: [
+          {
+            label: "Dockerfile: dependências privadas com secret de BuildKit",
+            language: "dockerfile",
+            code: '# syntax=docker/dockerfile:1\nFROM node:22-alpine AS deps\nWORKDIR /app\nCOPY package.json package-lock.json ./\n# O arquivo existe apenas durante este RUN; não imprima seu conteúdo.\nRUN --mount=type=secret,id=npmrc,target=/root/.npmrc,required=true \\\n    npm ci --omit=dev --ignore-scripts\n\nFROM node:22-alpine AS runtime\nWORKDIR /app\nENV NODE_ENV=production\nCOPY --from=deps --chown=node:node /app/node_modules ./node_modules\nCOPY --chown=node:node package.json ./\nCOPY --chown=node:node src ./src\nUSER node\n# Pré-requisito: API JavaScript pronta, ouvindo em 0.0.0.0:3000.\nCMD ["node", "src/server.js"]',
+          },
+          {
+            label: "Construir e executar com restrições explícitas",
+            language: "bash",
+            code: '# Pré-requisito: .npmrc fora do repositório, com acesso mínimo ao registry.\n# .dockerignore deve excluir .npmrc, .env*, .git e node_modules.\ndocker build --secret id=npmrc,src="$HOME/.npmrc" -t cloudshop-api:hardening .\n# Temporários são voláteis; ajuste o limite à necessidade real da API.\ndocker run -d --name cloudshop-hardening \\\n  --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \\\n  --cap-drop ALL --security-opt no-new-privileges \\\n  --memory 256m --cpus 0.5 -p 127.0.0.1:3000:3000 \\\n  cloudshop-api:hardening\n# Verifique identidade e comportamento; a segunda execução deve falhar.\ndocker exec cloudshop-hardening id\ndocker exec cloudshop-hardening touch /app/nao-deveria-existir',
+          },
+        ],
+        whyItMatters:
+          "A combinação reduz vazamento de tokens durante o build e limita o impacto de uma execução remota de código no runtime.",
+        commonMistake:
+          "Acreditar que secret mount impede qualquer vazamento ou que fixar digest dispensa atualizações.",
+        productionTip:
+          "Teste o hardening em staging e mantenha uma rotina automatizada de atualização de base com revisão e validação.",
+        securityAlert:
+          "Scripts de instalação executam código de terceiros; --ignore-scripts reduz esse vetor, mas dependências com compilação nativa podem exigir um processo revisado específico.",
+        interviewQuestion:
+          "Como instalar uma dependência privada durante o build sem deixar seu token na imagem final?",
+        glossary: [
+          {
+            term: "secret mount",
+            definition:
+              "Arquivo temporário disponibilizado pelo BuildKit para uma instrução de build.",
+          },
+          {
+            term: "digest",
+            definition: "Hash do conteúdo usado para identificar de forma imutável uma imagem.",
+          },
+          {
+            term: "capability",
+            definition: "Privilégio granular do kernel que pode ser retirado de um processo.",
+          },
+          {
+            term: "tmpfs",
+            definition:
+              "Filesystem temporário em memória, sem persistência após a remoção do container.",
+          },
+          {
+            term: "hardening",
+            definition: "Redução de permissões e superfícies de ataque de um ambiente.",
+          },
+        ],
+        printQuestLink:
+          "Construir a API do CloudShop sem incorporar tokens e comprovar sua execução com filesystem somente leitura.",
+        quiz: [
+          {
+            question: "Qual recurso fornece um token temporário durante o build?",
+            options: ["ENV TOKEN", "COPY .npmrc", "BuildKit secret mount", "Uma label OCI"],
+            answerIndex: 2,
+            explanation: "O secret mount oferece o arquivo apenas à instrução que o solicita.",
+          },
+          {
+            question: "Fixar a base por digest elimina qual necessidade?",
+            options: [
+              "Nenhuma necessidade de atualizar e testar correções",
+              "A necessidade de armazenamento",
+              "Todos os testes de runtime",
+              "Toda revisão de dependências",
+            ],
+            answerIndex: 0,
+            explanation:
+              "Digest dá previsibilidade, mas a base precisa continuar recebendo atualizações controladas.",
+          },
+          {
+            question: "A API precisa escrever arquivos temporários; qual ajuste é mais restrito?",
+            options: [
+              "Executar com --privileged",
+              "Liberar escrita em toda a raiz",
+              "Voltar a executar como root",
+              "Montar tmpfs apenas no diretório necessário",
+            ],
+            answerIndex: 3,
+            explanation:
+              "Uma área temporária específica preserva a proteção do restante do filesystem.",
           },
         ],
       },
@@ -424,7 +848,7 @@ docker history cloudshop-web:v1 | head   # confirme que nao ha segredo`,
     title: "CI/CD com GitHub Actions",
     tagline: "Nada chega à produção sem passar pela fortaleza.",
     weeks: 3,
-    xp: 2000,
+    xp: 2075,
     badge: "pipeline-builder",
     regionId: "fortaleza-cicd",
     bossId: "boss-pipeline-quebrado",
@@ -438,8 +862,21 @@ docker history cloudshop-web:v1 | head   # confirme que nao ha segredo`,
       "Executar rollback rápido e confiável",
     ],
     prerequisites: ["Módulo 3 e 4 concluídos"],
-    topics: ["Workflows", "Triggers", "Jobs", "Cache", "Lint", "Testes", "Build", "Secrets", "Registry", "Releases", "Rollback"],
-    delivery: "CI obrigatório em PR e publicação de imagens com tag imutável no GHCR, com job de rollback disponível.",
+    topics: [
+      "Workflows",
+      "Triggers",
+      "Jobs",
+      "Cache",
+      "Lint",
+      "Testes",
+      "Build",
+      "Secrets",
+      "Registry",
+      "Releases",
+      "Rollback",
+    ],
+    delivery:
+      "CI obrigatório em PR e publicação de imagens com tag imutável no GHCR, com job de rollback disponível.",
     checklist: [
       "Workflow de PR rodando lint, testes e build em menos de 5 minutos",
       "Cache de dependências ativo e efetivo",
@@ -464,7 +901,11 @@ docker history cloudshop-web:v1 | head   # confirme que nao ha segredo`,
         difficulty: "Intermediário",
         tools: ["GitHub Actions", "YAML"],
         xp: 25,
-        objectives: ["Escolher triggers adequados", "Estruturar jobs paralelos e dependentes", "Usar matriz de versões"],
+        objectives: [
+          "Escolher triggers adequados",
+          "Estruturar jobs paralelos e dependentes",
+          "Usar matriz de versões",
+        ],
         body: [
           "Um workflow reage a eventos: push, pull_request, schedule, workflow_dispatch (manual) e release. A escolha do trigger define o custo e a utilidade: validar em pull_request protege a main; publicar em push de tag garante que só versões marcadas geram artefato.",
           "Jobs rodam em paralelo por padrão e em máquinas separadas, o que significa que nada é compartilhado automaticamente entre eles — use needs para ordenar e artifacts para transportar arquivos. Steps dentro de um job compartilham o mesmo runner e diretório.",
@@ -522,18 +963,28 @@ jobs:
         ],
         whyItMatters: "Pipeline é o que dá confiança para entregar várias vezes ao dia sem medo.",
         commonMistake: "Assumir que arquivos gerados em um job estarão disponíveis em outro.",
-        productionTip: "Fixe actions por versão maior e evite referências a branch (@main) de terceiros.",
-        securityAlert: "pull_request_target com checkout do código do PR é um vetor clássico de exfiltração de secrets.",
+        productionTip:
+          "Fixe actions por versão maior e evite referências a branch (@main) de terceiros.",
+        securityAlert:
+          "pull_request_target com checkout do código do PR é um vetor clássico de exfiltração de secrets.",
         interviewQuestion: "Qual a diferença entre job e step, e o que é compartilhado entre eles?",
         glossary: [
           { term: "runner", definition: "Máquina que executa um job do workflow." },
-          { term: "concurrency", definition: "Regra que limita execuções simultâneas e pode cancelar as anteriores." },
+          {
+            term: "concurrency",
+            definition: "Regra que limita execuções simultâneas e pode cancelar as anteriores.",
+          },
         ],
         printQuestLink: "Tornar o CI obrigatório para merge no cloudshop-app.",
         quiz: [
           {
             question: "Como transportar arquivos entre dois jobs?",
-            options: ["Variável de ambiente", "Artifacts ou cache", "Arquivo no /tmp do runner", "Secrets"],
+            options: [
+              "Variável de ambiente",
+              "Artifacts ou cache",
+              "Arquivo no /tmp do runner",
+              "Secrets",
+            ],
             answerIndex: 1,
             explanation: "Jobs rodam em runners distintos; use upload/download de artifacts.",
           },
@@ -547,7 +998,11 @@ jobs:
         difficulty: "Intermediário",
         tools: ["GitHub Actions", "cache", "service containers"],
         xp: 25,
-        objectives: ["Configurar cache com chave correta", "Rodar testes de integração com service container", "Manter o pipeline abaixo de cinco minutos"],
+        objectives: [
+          "Configurar cache com chave correta",
+          "Rodar testes de integração com service container",
+          "Manter o pipeline abaixo de cinco minutos",
+        ],
         body: [
           "Pipeline lento é pipeline ignorado: as pessoas param de esperar e passam a burlar. Cache de dependências, baseado no hash do lockfile, é a otimização de maior retorno. Chave errada gera dois problemas opostos — cache nunca reaproveitado ou cache velho reaproveitado indevidamente.",
           "Testes de integração precisam de dependências reais: no GitHub Actions, service containers sobem PostgreSQL ou Redis ao lado do job, com healthcheck. Isso é infinitamente mais fiel que mock quando o objetivo é validar migração e consulta.",
@@ -591,12 +1046,20 @@ jobs:
           },
         ],
         whyItMatters: "Tempo de feedback é a métrica DORA mais sentida no dia a dia do time.",
-        commonMistake: "Usar chave de cache fixa e receber dependências desatualizadas silenciosamente.",
+        commonMistake:
+          "Usar chave de cache fixa e receber dependências desatualizadas silenciosamente.",
         productionTip: "Meça a duração de cada job e trate pipeline lento como bug com prioridade.",
         interviewQuestion: "Como você reduziria um pipeline de 22 minutos para menos de 5?",
         glossary: [
-          { term: "service container", definition: "Container auxiliar iniciado pelo runner para dependências de teste." },
-          { term: "chave de cache", definition: "Identificador derivado de arquivos que determina reaproveitamento do cache." },
+          {
+            term: "service container",
+            definition: "Container auxiliar iniciado pelo runner para dependências de teste.",
+          },
+          {
+            term: "chave de cache",
+            definition:
+              "Identificador derivado de arquivos que determina reaproveitamento do cache.",
+          },
         ],
         printQuestLink: "Rodar as migrações e testes de integração do CloudShop a cada PR.",
         quiz: [
@@ -616,7 +1079,11 @@ jobs:
         difficulty: "Avançado",
         tools: ["GitHub Actions", "OIDC", "AWS IAM"],
         xp: 25,
-        objectives: ["Gerenciar secrets por ambiente", "Autenticar na AWS sem chave estática", "Aplicar menor privilégio no token do workflow"],
+        objectives: [
+          "Gerenciar secrets por ambiente",
+          "Autenticar na AWS sem chave estática",
+          "Aplicar menor privilégio no token do workflow",
+        ],
         body: [
           "Secret em CI é alvo de ataque. Boas práticas: usar secrets por ambiente com regra de aprovação, nunca imprimir valores, evitar passar segredo por argumento de linha de comando e restringir quem pode disparar workflows que acessam produção.",
           "A evolução mais importante dos últimos anos é OIDC: em vez de guardar chave de acesso da AWS no GitHub, o workflow troca um token de identidade por credenciais temporárias assumindo uma role. Não há chave para vazar nem rotacionar, e a role limita exatamente o que o pipeline pode fazer, inclusive por repositório e branch.",
@@ -668,14 +1135,24 @@ jobs:
 }`,
           },
         ],
-        whyItMatters: "Vagas de nível mais alto perguntam explicitamente sobre OIDC e menor privilégio em CI.",
+        whyItMatters:
+          "Vagas de nível mais alto perguntam explicitamente sobre OIDC e menor privilégio em CI.",
         commonMistake: "Guardar AWS_ACCESS_KEY_ID no repositório e nunca rotacionar.",
         productionTip: "Use ambientes protegidos com revisor obrigatório para deploy em produção.",
-        securityAlert: "echo de secret aparece em log; o mascaramento não cobre valores transformados (base64, por exemplo).",
+        securityAlert:
+          "echo de secret aparece em log; o mascaramento não cobre valores transformados (base64, por exemplo).",
         interviewQuestion: "Explique como OIDC substitui chaves estáticas no pipeline.",
         glossary: [
-          { term: "OIDC", definition: "Protocolo de identidade que permite trocar token de confiança por credencial temporária." },
-          { term: "environment", definition: "Recurso do GitHub que agrupa secrets e regras de aprovação por destino de deploy." },
+          {
+            term: "OIDC",
+            definition:
+              "Protocolo de identidade que permite trocar token de confiança por credencial temporária.",
+          },
+          {
+            term: "environment",
+            definition:
+              "Recurso do GitHub que agrupa secrets e regras de aprovação por destino de deploy.",
+          },
         ],
         printQuestLink: "Configurar a role de deploy do CloudShop restrita a tags do repositório.",
         quiz: [
@@ -695,7 +1172,11 @@ jobs:
         difficulty: "Avançado",
         tools: ["GitHub Actions", "Buildx", "GHCR"],
         xp: 25,
-        objectives: ["Publicar no GHCR com metadados", "Gerar tags previsíveis", "Registrar o digest para deploy"],
+        objectives: [
+          "Publicar no GHCR com metadados",
+          "Gerar tags previsíveis",
+          "Registrar o digest para deploy",
+        ],
         body: [
           "A saída do CI é um artefato identificável. Publicar no GHCR com docker/build-push-action e docker/metadata-action gera automaticamente tags coerentes: a versão da tag Git, o SHA do commit e, opcionalmente, latest para conveniência de desenvolvimento — nunca para produção.",
           "O digest é a identidade real da imagem. Registre-o na saída do job e use-o no deploy: assim, a mesma imagem testada é a que roda, sem chance de alguém sobrescrever uma tag no meio do caminho.",
@@ -743,13 +1224,21 @@ jobs:
               "GITHUB_TOKEN com packages: write é suficiente para GHCR; não crie PAT de longa duração para isso.",
           },
         ],
-        whyItMatters: "Deploy por digest é o que garante que produção roda exatamente o que passou pelos testes.",
+        whyItMatters:
+          "Deploy por digest é o que garante que produção roda exatamente o que passou pelos testes.",
         commonMistake: "Deployar :latest e não conseguir dizer qual commit está rodando.",
-        productionTip: "Guarde a relação tag → digest → commit em um arquivo de release ou no repositório GitOps.",
+        productionTip:
+          "Guarde a relação tag → digest → commit em um arquivo de release ou no repositório GitOps.",
         interviewQuestion: "Por que referenciar imagem por digest em produção?",
         glossary: [
-          { term: "GHCR", definition: "GitHub Container Registry, registry de imagens integrado ao GitHub." },
-          { term: "OCI labels", definition: "Metadados padronizados que descrevem origem e versão da imagem." },
+          {
+            term: "GHCR",
+            definition: "GitHub Container Registry, registry de imagens integrado ao GitHub.",
+          },
+          {
+            term: "OCI labels",
+            definition: "Metadados padronizados que descrevem origem e versão da imagem.",
+          },
         ],
         printQuestLink: "Publicar ghcr.io/sua-org/cloudshop/api a cada tag de versão.",
         quiz: [
@@ -769,7 +1258,11 @@ jobs:
         difficulty: "Avançado",
         tools: ["GitHub Actions", "Docker", "act"],
         xp: 25,
-        objectives: ["Estruturar deploy com aprovação", "Executar rollback em minutos", "Depurar workflow com método"],
+        objectives: [
+          "Estruturar deploy com aprovação",
+          "Executar rollback em minutos",
+          "Depurar workflow com método",
+        ],
         body: [
           "Deploy sem rollback planejado é aposta. O padrão mínimo é: artefato imutável, versão anterior conhecida e um caminho de volta testado — seja um job manual que reimplanta a versão anterior, seja rollout undo no Kubernetes. Rollback precisa ser tão rotineiro que ninguém hesite em usá-lo às três da manhã.",
           "Para depurar pipeline, siga a ordem: leia o primeiro erro do log (não o último), reproduza o comando localmente com as mesmas versões, verifique diferenças de ambiente (variáveis, permissões, cache) e só então mexa no YAML. Ative debug detalhado quando necessário e use act para iterar localmente sem poluir o histórico de execuções.",
@@ -826,16 +1319,25 @@ act pull_request -j qualidade --container-architecture linux/amd64
 gh variable set ACTIONS_STEP_DEBUG --body true`,
           },
         ],
-        whyItMatters: "Métricas DORA valorizam tempo de restauração. Rollback rápido é a resposta prática.",
-        commonMistake: "Tentar corrigir para frente sob pressão em vez de reverter e investigar com calma.",
-        productionTip: "Verificação de saúde pós-deploy com rollback automático em falha é o padrão que evita madrugadas.",
-        securityAlert: "PRs de forks não recebem secrets: pipelines que dependem disso falham e tentam contornos inseguros.",
+        whyItMatters:
+          "Métricas DORA valorizam tempo de restauração. Rollback rápido é a resposta prática.",
+        commonMistake:
+          "Tentar corrigir para frente sob pressão em vez de reverter e investigar com calma.",
+        productionTip:
+          "Verificação de saúde pós-deploy com rollback automático em falha é o padrão que evita madrugadas.",
+        securityAlert:
+          "PRs de forks não recebem secrets: pipelines que dependem disso falham e tentam contornos inseguros.",
         interviewQuestion: "Descreva seu processo para depurar um workflow que falha só no runner.",
         glossary: [
-          { term: "act", definition: "Ferramenta que executa workflows do GitHub Actions localmente em containers." },
+          {
+            term: "act",
+            definition:
+              "Ferramenta que executa workflows do GitHub Actions localmente em containers.",
+          },
           { term: "MTTR", definition: "Tempo médio de restauração do serviço após um incidente." },
         ],
-        printQuestLink: "Criar o workflow de rollback do CloudShop e testá-lo com a versão anterior.",
+        printQuestLink:
+          "Criar o workflow de rollback do CloudShop e testá-lo com a versão anterior.",
         quiz: [
           {
             question: "Deploy quebrou produção. Primeira ação correta?",
@@ -846,7 +1348,336 @@ gh variable set ACTIONS_STEP_DEBUG --body true`,
               "Aumentar recursos da infraestrutura",
             ],
             answerIndex: 1,
-            explanation: "Restaurar serviço primeiro; análise de causa raiz vem depois, com evidências preservadas.",
+            explanation:
+              "Restaurar serviço primeiro; análise de causa raiz vem depois, com evidências preservadas.",
+          },
+        ],
+      },
+      {
+        id: "l-5-6",
+        moduleId: "mod-5",
+        title: "Testes como contrato: cobertura, determinismo e evidências no CI",
+        duration: 50,
+        difficulty: "Intermediário",
+        tools: ["GitHub Actions", "Vitest"],
+        xp: 25,
+        objectives: [
+          "Escolher testes conforme risco e custo",
+          "Definir limites de cobertura verificáveis",
+          "Eliminar dependências de relógio e rede nos testes unitários",
+          "Publicar evidências mesmo quando um teste falha",
+          "Vincular aprovação de PR a checks obrigatórios",
+        ],
+        body: [
+          "**Teste automatizado é um contrato executável**: para o CloudShop, calcular um total e recusar estoque insuficiente são comportamentos verificáveis. Antes de escrever YAML, descreva o resultado esperado e a regressão que cada caso deve impedir.",
+          "**Camadas têm responsabilidades diferentes**. Testes unitários isolam regras; integração verifica fronteiras reais, como persistência; testes ponta a ponta exercitam jornadas completas. Não replique toda combinação em `E2E`: reserve o custo maior para fluxos críticos.",
+          "**Determinismo dá confiança**. Um teste que depende da hora atual, da ordem de execução ou de uma API pública pode falhar sem alteração de produto. Injete relógio e cliente HTTP, controle os dados e restaure mocks após cada caso; `retry` não corrige a causa.",
+          "**Cobertura é um sinal limitado**. Executar uma linha não garante uma asserção útil; cobertura de branches mostra caminhos condicionais visitados, mas não prova correção. Use `coverage.thresholds` como limite mínimo e revise casos de erro, fronteiras e regras de negócio.",
+          "**O comando precisa ser adequado ao CI**. `vitest run` termina com um código de saída, enquanto o modo watch fica esperando alterações. O exemplo pressupõe `vitest` e `@vitest/coverage-v8` em versões compatíveis já registrados no lockfile.",
+          "**Falhar deve bloquear o caminho seguinte**. Não use `continue-on-error` no teste obrigatório. Um job de build dependente deve declarar `needs` no job de testes; o processo de merge também precisa de proteção de branch exigindo esse check.",
+          "**Evidências precisam sobreviver à falha**. Publique `coverage/` com `if: always()` para investigar regressões mesmo quando o limite de cobertura reprova. Defina retenção curta e não coloque respostas reais de clientes ou tokens dentro dos relatórios.",
+          "**Maturidade é medida ao longo do tempo**. Acompanhe duração e taxa de testes instáveis, priorize os que bloqueiam o time e inclua novos casos para bugs corrigidos. Um pipeline verde só tem valor quando o conjunto em `vitest run` representa riscos relevantes.",
+        ],
+        code: [
+          {
+            label: "vitest.config.ts: limite mínimo de cobertura",
+            language: "typescript",
+            code: 'import { defineConfig } from "vitest/config";\n\nexport default defineConfig({\n  test: {\n    environment: "node", // Regras da API não precisam de navegador.\n    clearMocks: true,\n    coverage: {\n      provider: "v8",\n      include: ["src/**/*.ts"], // Inclui também código não importado pelos testes.\n      exclude: ["src/**/*.test.ts", "src/**/*.d.ts"],\n      reporter: ["text", "html", "lcov"],\n      thresholds: { lines: 80, functions: 80, statements: 80, branches: 75 },\n    },\n  },\n});',
+          },
+          {
+            label: ".github/workflows/testes.yml: execução e evidências",
+            language: "yaml",
+            code: "name: testes\non: [pull_request, push]\npermissions:\n  contents: read # Testes não precisam escrever no repositório.\njobs:\n  unitarios:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n          cache: npm\n      - run: npm ci\n      - run: npx --no-install vitest run --coverage\n      - uses: actions/upload-artifact@v4\n        if: always() # Preserve o relatório mesmo quando o teste reprovar.\n        with:\n          name: cobertura-unitarios\n          path: coverage/\n          retention-days: 7\n          if-no-files-found: warn",
+          },
+        ],
+        whyItMatters:
+          "Testes previsíveis e evidências acessíveis reduzem regressões sem transformar cada falha de CI em investigação manual demorada.",
+        commonMistake:
+          "Confundir alta cobertura com boa qualidade ou repetir um teste instável até ele ficar verde.",
+        productionTip:
+          "Exija o check de testes nas regras de proteção de branch e revise os limites de cobertura junto com o risco do produto.",
+        securityAlert:
+          "Relatórios e fixtures também podem vazar informações: use dados sintéticos e não execute PRs não confiáveis com secrets de produção.",
+        interviewQuestion:
+          "Um projeto tem 95% de cobertura e ainda sofre regressões: o que você investigaria além da porcentagem?",
+        glossary: [
+          {
+            term: "asserção",
+            definition:
+              "Verificação explícita de que o resultado observado corresponde ao esperado.",
+          },
+          {
+            term: "teste determinístico",
+            definition: "Teste que produz o mesmo resultado sob entradas e ambiente controlados.",
+          },
+          {
+            term: "branch coverage",
+            definition: "Medida dos caminhos condicionais exercitados pelos testes.",
+          },
+          {
+            term: "flaky test",
+            definition: "Teste que alterna entre sucesso e falha sem mudança relevante no produto.",
+          },
+          {
+            term: "check obrigatório",
+            definition: "Resultado de CI que uma regra do repositório exige antes do merge.",
+          },
+        ],
+        printQuestLink:
+          "Adicionar limites de cobertura às regras de pedidos do CloudShop e publicar relatórios de testes em cada PR.",
+        quiz: [
+          {
+            question: "Por que usar vitest run no CI?",
+            options: [
+              "Para ignorar falhas",
+              "Para executar uma rodada e encerrar com código de saída",
+              "Para abrir um navegador sempre",
+              "Para dispensar dependências",
+            ],
+            answerIndex: 1,
+            explanation: "O modo run encerra a execução; o runner interpreta seu código de saída.",
+          },
+          {
+            question: "O que alta cobertura não garante?",
+            options: [
+              "Que linhas foram executadas",
+              "Que um relatório foi gerado",
+              "Que as asserções validam corretamente o negócio",
+              "Que houve instrumentação",
+            ],
+            answerIndex: 2,
+            explanation:
+              "É possível executar código com asserções fracas ou sem cobrir cenários importantes.",
+          },
+          {
+            question: "Como preservar relatórios de uma execução reprovada?",
+            options: [
+              "Usar if: always() no upload",
+              "Usar continue-on-error nos testes",
+              "Desligar as asserções",
+              "Salvar secrets no artifact",
+            ],
+            answerIndex: 0,
+            explanation:
+              "O upload pode rodar após a falha sem transformar o teste reprovado em sucesso.",
+          },
+        ],
+      },
+      {
+        id: "l-5-7",
+        moduleId: "mod-5",
+        title: "Entrega progressiva: blue/green, canary e rollback orientado por métricas",
+        duration: 50,
+        difficulty: "Intermediário",
+        tools: ["Kubernetes", "kubectl", "GitHub Actions"],
+        xp: 25,
+        objectives: [
+          "Comparar blue/green e canary segundo risco e custo",
+          "Separar disponibilidade técnica de saúde do negócio",
+          "Planejar critérios de promoção e aborto",
+          "Trocar o tráfego entre versões identificáveis",
+          "Compatibilizar migrações com retorno à versão anterior",
+        ],
+        body: [
+          "**Estratégia de deploy controla exposição ao risco**. Um container iniciar não demonstra que os pedidos continuam sendo processados. Defina critérios de aceitação, como taxa de erros e latência, antes de liberar tráfego para uma versão nova.",
+          "**Blue/green mantém dois ambientes completos**: um atende usuários e o outro recebe a release candidata. Depois de testes, o roteamento muda para o novo ambiente. A troca pode ser rápida, mas duplicar capacidade tem custo e os dois ambientes podem compartilhar o mesmo banco.",
+          "**Canary expõe uma parcela do tráfego** e amplia a exposição em etapas, por exemplo 5%, 25% e 100%. A distribuição precisa de um controlador ou proxy que suporte pesos; aumentar réplicas não garante uma divisão precisa de requisições entre versões.",
+          "**O tamanho da amostra afeta a decisão**. Cinco minutos com três requisições não demonstram segurança. Compare a candidata com a versão estável, observe um volume mínimo e defina limites de erro e latência; se faltarem dados, aguarde ou peça avaliação humana.",
+          "**No laboratório blue/green**, dois Deployments existentes usam `app: cloudshop-api` e o label `slot` com valores `blue` ou `green`. O Service seleciona um slot; mudar esse seletor altera os endpoints. O exemplo pressupõe autenticação e contexto Kubernetes já configurados.",
+          "**Readiness e smoke test são complementares**. `rollout status` só é significativo para disponibilidade quando o Deployment tem probes e limites adequados. Faça uma chamada funcional controlada antes e depois da troca, sem disparar cobranças reais no teste.",
+          "**Rollback de aplicação não desfaz dados**. Se uma migração remove uma coluna necessária pela versão anterior, trocar o tráfego de volta pode piorar o incidente. Prefira expandir o esquema, migrar o uso e remover o campo apenas em release posterior, após a janela de reversão.",
+          "**A operação precisa de trilha e exclusão mútua**. Registre digest, slot anterior, métricas e responsável pela promoção. Serialize deploys do mesmo ambiente com `concurrency`, evite desligar o slot antigo imediatamente e valide o serviço novamente após um rollback.",
+        ],
+        code: [
+          {
+            label: "Service para dois Deployments já existentes",
+            language: "yaml",
+            code: "apiVersion: v1\nkind: Service\nmetadata:\n  name: cloudshop-api\n  namespace: cloudshop\nspec:\n  selector:\n    app: cloudshop-api\n    slot: blue # Cada Deployment deve ter seu próprio slot no template do Pod.\n  ports:\n    - port: 80\n      targetPort: 3000\n# Deployments cloudshop-api-blue e cloudshop-api-green devem ter readinessProbe.",
+          },
+          {
+            label: "Promover green com possibilidade de retorno explícito",
+            language: "bash",
+            code: 'set -euo pipefail\n# Execute em contexto de staging antes de repetir o procedimento em produção.\n# Pré-requisito: green já implantado por digest e validado por smoke test direto.\nkubectl -n cloudshop rollout status deployment/cloudshop-api-green --timeout=120s\nANTERIOR=$(kubectl -n cloudshop get service cloudshop-api -o jsonpath=\'{.spec.selector.slot}\')\ntest "$ANTERIOR" = blue # Evita repetir a promoção sobre um estado inesperado.\n# A troca afeta novas conexões após a propagação dos endpoints.\nkubectl -n cloudshop patch service cloudshop-api --type=merge \\\n  -p \'{"spec":{"selector":{"slot":"green"}}}\'\n# Valide métricas e smoke test via entrada real do ambiente antes de encerrar.\n# Se os critérios de aborto forem atingidos, execute o retorno abaixo:\n# kubectl -n cloudshop patch service cloudshop-api --type=merge \\\n#   -p \'{"spec":{"selector":{"slot":"blue"}}}\'\n# Depois do retorno, confirme erros, latência e processamento de pedidos.',
+          },
+        ],
+        whyItMatters:
+          "Entregas progressivas limitam o número de usuários afetados e tornam a decisão de rollback objetiva, não baseada em intuição.",
+        commonMistake:
+          "Declarar sucesso só porque os Pods estão prontos ou supor que reverter a imagem também reverte migrações.",
+        productionTip:
+          "Defina limites por serviço e uma janela de observação; preserve capacidade do slot anterior até encerrar a validação.",
+        securityAlert:
+          "Endpoints de teste e versões inativas também precisam de autenticação e políticas de rede; não exponha o slot green publicamente para facilitar validações.",
+        interviewQuestion:
+          "Quando você escolheria canary em vez de blue/green, e quais condições fariam abortar a promoção?",
+        glossary: [
+          {
+            term: "blue/green",
+            definition: "Estratégia com dois ambientes e troca do destino de tráfego entre eles.",
+          },
+          {
+            term: "canary",
+            definition:
+              "Liberação progressiva de uma versão para uma parcela controlada do tráfego.",
+          },
+          {
+            term: "smoke test",
+            definition: "Verificação curta dos comportamentos essenciais após uma mudança.",
+          },
+          {
+            term: "readiness",
+            definition: "Sinal de que uma instância está apta a receber tráfego.",
+          },
+          {
+            term: "expand/contract",
+            definition:
+              "Evolução de esquema que adiciona compatibilidade antes de remover estruturas antigas.",
+          },
+        ],
+        printQuestLink:
+          "Planejar a entrega blue/green do CloudShop e ensaiar a troca de tráfego e o retorno com critérios documentados.",
+        quiz: [
+          {
+            question: "Qual característica define um canary?",
+            options: [
+              "Substituir tudo de uma vez",
+              "Expor progressivamente uma parcela do tráfego",
+              "Remover todos os testes",
+              "Ter sempre dois bancos independentes",
+            ],
+            answerIndex: 1,
+            explanation:
+              "A candidata recebe tráfego controlado e a exposição cresce conforme os critérios de saúde.",
+          },
+          {
+            question: "Qual mudança ameaça um rollback de aplicação?",
+            options: [
+              "Adicionar uma coluna opcional",
+              "Registrar o digest anterior",
+              "Remover uma coluna exigida pela versão anterior",
+              "Preservar o ambiente blue",
+            ],
+            answerIndex: 2,
+            explanation: "A versão anterior pode deixar de funcionar com um esquema incompatível.",
+          },
+          {
+            question: "rollout status com sucesso comprova qual aspecto?",
+            options: [
+              "Ausência de fraude",
+              "Sucesso de todas as compras",
+              "Que o banco pode ser revertido",
+              "Que o Deployment atingiu as condições de rollout",
+            ],
+            answerIndex: 3,
+            explanation:
+              "Disponibilidade do Deployment não substitui testes funcionais e métricas de negócio.",
+          },
+        ],
+      },
+      {
+        id: "l-5-8",
+        moduleId: "mod-5",
+        title: "Quality gates: SAST, dependências e tratamento de vulnerabilidades",
+        duration: 50,
+        difficulty: "Avançado",
+        tools: ["GitHub Actions", "Semgrep", "npm audit"],
+        xp: 25,
+        objectives: [
+          "Distinguir SAST de análise de dependências",
+          "Criar gates de segurança com critérios explícitos",
+          "Bloquear publicação quando um gate obrigatório falha",
+          "Tratar falsos positivos com justificativa e prazo",
+          "Manter ferramentas e regras atualizadas",
+        ],
+        body: [
+          "**Qualidade e segurança precisam de critérios executáveis**. Um pipeline que apenas imprime alertas pode continuar publicando código vulnerável. Um quality gate define quais achados reprovam a execução, quem os avalia e quais evidências permitem uma exceção.",
+          "**SAST examina o código sem executar o produto**. Regras podem identificar construção insegura de consultas, uso perigoso de funções e outros padrões. O resultado depende da linguagem e do conjunto de regras; `semgrep scan` não comprova que toda entrada do usuário está protegida.",
+          "**Análise de dependências olha outro risco**: pacotes diretos e transitivos podem ter vulnerabilidades conhecidas. `npm audit` consulta avisos do ecossistema e usa o lockfile para mapear versões. Um código próprio sem alertas SAST ainda pode importar uma biblioteca comprometida.",
+          "**Severidade não é contexto completo**. Examine se o componente está em produção, se o caminho vulnerável é alcançável e se há correção disponível. Uma política inicial pode bloquear avisos de severidade alta ou crítica; documente a evolução para evitar que alertas sejam ignorados em massa.",
+          "**Ferramentas também fazem parte da cadeia de confiança**. O exemplo pressupõe Semgrep instalado na imagem do runner pelo processo aprovado da equipe, com versão registrada. As regras `p/ci` são remotas e exigem acesso à rede; em uso controlado, revise e versione um conjunto local.",
+          "**Falha deve ser inequívoca**: `--error` faz achados Semgrep reprovarem a execução e `--strict` trata avisos de configuração como falhas. Não acrescente `|| true` para deixar o CI verde; indisponibilidade do scanner exige investigação, não aprovação silenciosa.",
+          "**Exceção é uma decisão com prazo**. Para um falso positivo, registre regra, trecho, justificativa, responsável e revisão futura. Para risco real sem correção imediata, estabeleça mitigação e vencimento; uma lista de exclusões sem dono vira dívida invisível.",
+          "**O gate precisa proteger o destino**. Exija o check de segurança antes do merge e faça o job de publicação depender dele com `needs`. Mantenha testes e scan de imagem como verificações adicionais: SAST e auditoria de pacotes não cobrem configuração de runtime nem substituem revisão humana.",
+        ],
+        code: [
+          {
+            label: ".github/workflows/seguranca.yml: gates separados por responsabilidade",
+            language: "yaml",
+            code: "name: seguranca\non: [pull_request, push]\npermissions:\n  contents: read\njobs:\n  dependencias:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n      # Primeiro verifique o lockfile sem executar scripts de instalação.\n      - run: npm ci --ignore-scripts\n      # Inclui dependências de desenvolvimento: elas também executam no CI.\n      - run: npm audit --audit-level=high\n  sast:\n    # Runner efêmero, isolado e exclusivo para código confiável interno.\n    # A imagem aprovada deve conter Semgrep com versão fixada e Python.\n    runs-on: [self-hosted, linux, semgrep-ephemeral]\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n      - run: semgrep --version\n      # Em produção, prefira regras locais revisadas e versionadas.\n      - run: semgrep scan --config p/ci --error --strict .",
+          },
+          {
+            label: "Reproduzir a triagem sem aplicar correções cegamente",
+            language: "bash",
+            code: "# Execute no ambiente aprovado, com as mesmas versões usadas no CI.\n# npm audit retorna código diferente de zero quando encontra riscos.\nnpm audit --json > audit.json\n# Consulte cadeias de dependências antes de escolher uma atualização.\nnpm explain nome-do-pacote\n# Para regras revisadas em .semgrep/, gere evidência local de SAST.\nsemgrep scan --config .semgrep/ --error --strict --json --output semgrep.json .\n# Não aplique npm audit fix --force sem revisar mudanças e rodar testes.",
+          },
+        ],
+        whyItMatters:
+          "Gates independentes encontram classes diferentes de falhas e impedem que um alerta conhecido acompanhe o artefato até produção sem avaliação.",
+        commonMistake:
+          "Usar || true em scanners obrigatórios ou executar npm audit fix --force sem avaliar mudanças incompatíveis.",
+        productionTip:
+          "Fixe actions por SHA revisado, mantenha runners efêmeros e versione regras; exija que publicação aguarde todos os gates obrigatórios.",
+        securityAlert:
+          "Nunca execute PRs públicos não confiáveis em runners self-hosted com acesso interno; use runners hospedados isolados ou uma infraestrutura efêmera sem secrets e sem acesso à rede corporativa.",
+        interviewQuestion:
+          "Qual a diferença entre um alerta SAST e uma vulnerabilidade de dependência, e como você trataria uma exceção em cada caso?",
+        glossary: [
+          {
+            term: "SAST",
+            definition:
+              "Análise estática de código para identificar padrões potencialmente inseguros.",
+          },
+          {
+            term: "SCA",
+            definition:
+              "Análise de componentes e dependências, incluindo vulnerabilidades conhecidas.",
+          },
+          {
+            term: "quality gate",
+            definition: "Critério automatizado que permite ou impede avançar no fluxo de entrega.",
+          },
+          {
+            term: "falso positivo",
+            definition:
+              "Alerta que, após avaliação, não representa a falha indicada naquele contexto.",
+          },
+          {
+            term: "dependência transitiva",
+            definition: "Pacote incluído indiretamente por outra dependência do projeto.",
+          },
+        ],
+        printQuestLink:
+          "Bloquear o merge e a publicação do CloudShop quando SAST ou auditoria de dependências violarem a política definida.",
+        quiz: [
+          {
+            question: "Qual análise procura padrões inseguros no código próprio?",
+            options: ["SAST", "Backup", "Teste de carga", "Roteamento canary"],
+            answerIndex: 0,
+            explanation:
+              "SAST examina o código; auditoria de dependências verifica riscos em componentes importados.",
+          },
+          {
+            question: "Qual é o problema de scanner || true em um gate obrigatório?",
+            options: [
+              "Cria mais vulnerabilidades automaticamente",
+              "Converte uma reprovação em sucesso do comando",
+              "Remove todas as regras",
+              "Atualiza todas as dependências",
+            ],
+            answerIndex: 1,
+            explanation: "O shell passa a reportar sucesso mesmo quando o scanner falhou.",
+          },
+          {
+            question: "Como tratar um falso positivo de forma responsável?",
+            options: [
+              "Excluir toda a pasta permanentemente",
+              "Desativar o scanner globalmente",
+              "Registrar justificativa, responsável e prazo de revisão",
+              "Ocultar o relatório",
+            ],
+            answerIndex: 2,
+            explanation:
+              "Uma exceção rastreável e limitada evita exclusões silenciosas e permanentes.",
           },
         ],
       },
