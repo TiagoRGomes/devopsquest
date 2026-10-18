@@ -8,7 +8,7 @@ export const SRE_FINAL_MODULES: Module[] = [
     title: "Observabilidade e SRE",
     tagline: "Saber o que acontece antes do cliente contar.",
     weeks: 3,
-    xp: 2500,
+    xp: 2575,
     badge: "sre-guardian",
     regionId: "torre-confiabilidade",
     bossId: "boss-queda-producao",
@@ -451,6 +451,321 @@ politica:
           },
         ],
       },
+      {
+        "id": "l-10-6",
+        "moduleId": "mod-10",
+        "title": "Investigação ponta a ponta: do log ao span que explica a falha",
+        "duration": 55,
+        "difficulty": "Intermediário",
+        "tools": [
+          "OpenTelemetry",
+          "Node.js",
+          "LogQL"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Padronizar campos de eventos sem registrar dados sensíveis",
+          "Correlacionar logs com o contexto ativo do OpenTelemetry",
+          "Diagnosticar quebras de propagação entre serviços",
+          "Distinguir ausência de evento de ausência de amostra",
+          "Validar uma hipótese com evidências de múltiplos sinais"
+        ],
+        "body": [
+          "Você já conhece logs e traces; agora vamos usá-los como uma **cadeia de evidências**. Imagine um pedido que falha somente ao calcular o frete: a métrica aponta o horário, o log descreve o evento e o `trace_id` permite procurar a execução correspondente.",
+          "Um **contrato de log** define campos estáveis para toda a equipe. Comece com `timestamp`, `level`, `service`, `event`, `trace_id` e `span_id`; acrescente apenas atributos necessários ao diagnóstico. Um evento como `shipping.failed` é mais fácil de consultar que dezenas de mensagens livres.",
+          "O **contexto ativo** pertence à execução atual, não a uma variável global. Com a instrumentação OTel inicializada antes da aplicação, `trace.getSpan(context.active())` recupera o span daquela operação. Guardar o último identificador em uma variável compartilhada mistura requisições concorrentes e produz correlações falsas.",
+          "No exemplo, a função `logEvent` usa uma **lista permitida de campos** e consulta o contexto no momento da emissão. Execute-a dentro de um handler instrumentado; fora de um span, os identificadores ficam ausentes. Isso é esperado em tarefas ainda não instrumentadas e não deve ser preenchido com um identificador inventado.",
+          "Para cruzar processos, a **propagação** precisa transportar contexto: em HTTP, normalmente `traceparent`; em filas, propriedades da mensagem. Se o consumidor iniciar outro trace, confira injeção no produtor e extração no consumidor antes de concluir que o backend perdeu dados. Instrumentação automática não cobre necessariamente todo cliente de mensageria.",
+          "No Loki, mantenha `trace_id` no **conteúdo JSON**, não como label indexado do stream. Filtre primeiro pelo serviço e pelo intervalo, depois extraia o JSON e busque o identificador. Configure no Grafana um campo derivado apontando para o backend de traces para reduzir o trabalho manual.",
+          "A **amostragem** muda o que você consegue provar. Um log com `trace_id` não garante que o trace foi armazenado: uma decisão de head sampling pode descartá-lo antes do Collector. Tail sampling só avalia spans que chegaram até ele; não recupera dados descartados na origem.",
+          "Feche o exercício com uma **falha controlada** no laboratório: provoque timeout no frete, encontre o evento `shipping.failed` e confira a duração do span correspondente. Registre também o caso sem trace retido e a limitação observada. Investigar bem inclui dizer o que a evidência disponível não permite concluir."
+        ],
+        "code": [
+          {
+            "label": "Logger com correlação ao contexto ativo",
+            "language": "javascript",
+            "code": "import { context, trace } from \"@opentelemetry/api\";\n\n// Pré-requisito: SDK OTel inicializado antes da aplicação.\nfunction logEvent(event, { status, dependency } = {}) {\n  const span = trace.getSpan(context.active());\n  const ids = span?.spanContext();\n  // Lista permitida: não aceite corpo, headers ou atributos arbitrários.\n  process.stdout.write(JSON.stringify({\n    timestamp: new Date().toISOString(),\n    level: \"error\",\n    service: \"cloudshop-api\",\n    event,\n    trace_id: ids?.traceId,\n    span_id: ids?.spanId,\n    status,\n    dependency,\n  }) + \"\\n\");\n}\n\n// Chame dentro do handler instrumentado ao detectar a falha real.\nlogEvent(\"shipping.failed\", { status: 504, dependency: \"shipping\" });"
+          },
+          {
+            "label": "Localizar o evento correlacionado no Loki",
+            "language": "logql",
+            "code": "# Selecione o intervalo do incidente e substitua pelo trace_id observado.\n{app=\"cloudshop\", component=\"api\"}\n  | json\n  | event = \"shipping.failed\"\n  | trace_id = \"4bf92f3577b34da6a3ce929d0e0e4736\""
+          }
+        ],
+        "whyItMatters": "Correlação confiável reduz tentativas aleatórias e permite explicar qual dependência afetou uma jornada.",
+        "commonMistake": "Presumir que todo trace_id encontrado em log terá um trace armazenado, ignorando a amostragem.",
+        "productionTip": "Teste a correlação em duas requisições simultâneas e após atravessar uma fila; isso revela contexto perdido ou compartilhado.",
+        "securityAlert": "Não registre Authorization, cookies, payloads de pagamento nem baggage indiscriminadamente; aplique retenção e acesso mínimo aos backends.",
+        "interviewQuestion": "Como você investigaria logs com trace_id válido quando o backend não encontra o trace?",
+        "glossary": [
+          {
+            "term": "Contexto ativo",
+            "definition": "Estado da execução atual usado para associar eventos ao span correto."
+          },
+          {
+            "term": "trace_id",
+            "definition": "Identificador compartilhado pelos spans de um trace distribuído."
+          },
+          {
+            "term": "span_id",
+            "definition": "Identificador de uma operação específica dentro do trace."
+          },
+          {
+            "term": "Head sampling",
+            "definition": "Decisão de amostragem feita no início do trace."
+          },
+          {
+            "term": "Propagação",
+            "definition": "Transporte de contexto entre processos para manter a correlação."
+          }
+        ],
+        "printQuestLink": "Entregar uma investigação do timeout de frete do CloudShop com log sanitizado, trace correlacionado e teste de propagação.",
+        "quiz": [
+          {
+            "question": "Onde recuperar o identificador de trace ao emitir um log?",
+            "options": [
+              "Em uma variável global com o último ID",
+              "No contexto ativo da execução",
+              "No nome do pod",
+              "No status HTTP"
+            ],
+            "answerIndex": 1,
+            "explanation": "O contexto ativo evita misturar identificadores de requisições concorrentes."
+          },
+          {
+            "question": "Por que um trace_id pode não ter trace no backend?",
+            "options": [
+              "Todo log está corrompido",
+              "JSON impede tracing",
+              "O trace pode ter sido descartado pela amostragem",
+              "O span_id substitui o trace"
+            ],
+            "answerIndex": 2,
+            "explanation": "A existência do identificador não garante retenção ou exportação do trace."
+          },
+          {
+            "question": "Como armazenar trace_id no Loki neste exercício?",
+            "options": [
+              "Como label único de cada stream",
+              "No nome do serviço",
+              "Como campo JSON consultável",
+              "Como senha do coletor"
+            ],
+            "answerIndex": 2,
+            "explanation": "Campos no conteúdo permitem busca sem criar um stream por identificador."
+          }
+        ]
+      },
+      {
+        "id": "l-10-7",
+        "moduleId": "mod-10",
+        "title": "Engenharia de alertas: burn rate multijanela e revisão do plantão",
+        "duration": 55,
+        "difficulty": "Intermediário",
+        "tools": [
+          "Prometheus",
+          "promtool",
+          "Alertmanager"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Calcular burn rate a partir de um SLO baseado em requisições",
+          "Combinar janelas longa e curta em uma regra",
+          "Separar paginação urgente de trabalho planejável",
+          "Tratar ausência de tráfego como condição distinta",
+          "Revisar a qualidade dos alertas com o plantão"
+        ],
+        "body": [
+          "Esta aula transforma a ideia de alerta acionável em uma **política verificável**. O objetivo não é silenciar sintomas, mas chamar alguém apenas quando há uma decisão urgente. Para cada regra, escreva impacto, responsável, ação inicial e canal; sem esses itens, `severity: critical` é apenas um rótulo.",
+          "Considere **SLO de disponibilidade de 99,9%** em 30 dias, medido por requisições. A fração de falha permitida é `0.001`; o burn rate é a proporção observada de erros dividida por esse valor. Assim, 1,44% de erros corresponde a `14.4` vezes a taxa permitida.",
+          "A **janela longa** acumula evidência de impacto; a curta confirma que o problema continua acontecendo. Exigir burn rate acima de `14.4` tanto em uma hora quanto em cinco minutos reduz páginas causadas por uma falha antiga que já cessou. O operador `and on(service)` combina séries da mesma dimensão.",
+          "O limiar tem uma **interpretação de orçamento**: mantendo o mesmo perfil de tráfego, `14.4 × 1h / 720h` representa aproximadamente 2% do orçamento de 30 dias. Para SLO por requisições, o consumo real depende da distribuição do tráfego; valide também contagens acumuladas, em vez de converter tudo automaticamente em minutos.",
+          "O bloco usa o contador de histograma já instrumentado, `http_request_duration_seconds_count`, e pressupõe a label `service`. As regras de gravação calculam proporções por serviço. Se a sua instrumentação não expõe essa label, adicione-a de forma consistente ou adapte a agregação antes de copiar a regra.",
+          "**Sem tráfego não significa 100% de disponibilidade**. A divisão pode gerar `NaN`, e ausência de coleta pode eliminar séries; não force zero com um preenchimento que esconda falhas. Monitore scrape e disponibilidade do pipeline separadamente e use uma sonda sintética quando a jornada precisar de validação mesmo sem usuários.",
+          "**Paginação e ticket têm urgências diferentes**. A queima rápida pode chamar o plantão; uma degradação lenta e persistente pode gerar trabalho para o horário útil, conforme a política acordada. `for: 2m` adiciona persistência, mas também atraso: avalie esse custo no tempo de detecção.",
+          "Por fim, faça uma **revisão semanal de ruído**: quantas notificações exigiram ação, quais duplicaram outras e quais chegaram tarde? Teste regras com `promtool`, simule recuperação e confira roteamento no Alertmanager. Só ajuste limites após comparar impacto e evidência; reduzir páginas às cegas pode ocultar incidentes."
+        ],
+        "code": [
+          {
+            "label": "Regras multijanela por serviço",
+            "language": "yaml",
+            "code": "# Pré-requisito: contador com labels service e status.\ngroups:\n  - name: cloudshop-slo\n    rules:\n      - record: service:http_errors:ratio1h\n        expr: |\n          sum by (service) (rate(http_request_duration_seconds_count{status=~\"5..\"}[1h]))\n          / sum by (service) (rate(http_request_duration_seconds_count[1h]))\n      - record: service:http_errors:ratio5m\n        expr: |\n          sum by (service) (rate(http_request_duration_seconds_count{status=~\"5..\"}[5m]))\n          / sum by (service) (rate(http_request_duration_seconds_count[5m]))\n      - alert: CloudShopBudgetQueimaRapida\n        expr: |\n          (service:http_errors:ratio1h{service=\"cloudshop-api\"} / 0.001 > 14.4)\n          and on (service)\n          (service:http_errors:ratio5m{service=\"cloudshop-api\"} / 0.001 > 14.4)\n        for: 2m\n        labels:\n          severity: critical\n          team: platform\n        annotations:\n          summary: \"Falhas da API consomem o orçamento rapidamente\"\n          description: \"Verificar impacto e seguir docs/runbooks/api-5xx.md\""
+          },
+          {
+            "label": "Validar o arquivo antes de recarregar o Prometheus",
+            "language": "bash",
+            "code": "# Salve o YAML anterior como cloudshop-slo.rules.yml.\n# Verifica sintaxe; não substitui testes de comportamento com séries simuladas.\npromtool check rules cloudshop-slo.rules.yml"
+          }
+        ],
+        "whyItMatters": "Alertas sustentáveis preservam atenção humana para situações que realmente ameaçam a experiência do usuário.",
+        "commonMistake": "Usar apenas a janela longa e continuar notificando depois que o serviço já se recuperou.",
+        "productionTip": "Adicione testes de regra para erro sustentado, recuperação, baixo tráfego e série ausente antes de ativar paginação.",
+        "securityAlert": "Notificações devem trazer links e agregados, nunca credenciais ou amostras de dados pessoais; restrinja quem pode criar silêncios.",
+        "interviewQuestion": "Por que combinar duas janelas e como validar que o alerta não mascara ausência de telemetria?",
+        "glossary": [
+          {
+            "term": "Burn rate",
+            "definition": "Razão entre a taxa de falhas observada e a taxa permitida pelo SLO."
+          },
+          {
+            "term": "Regra de gravação",
+            "definition": "Expressão PromQL cujo resultado é armazenado como nova série."
+          },
+          {
+            "term": "Multijanela",
+            "definition": "Uso combinado de intervalos diferentes para avaliar um sintoma."
+          },
+          {
+            "term": "Paginação",
+            "definition": "Notificação urgente que exige resposta do plantão."
+          },
+          {
+            "term": "Fadiga de alertas",
+            "definition": "Perda de atenção causada por notificações frequentes e pouco úteis."
+          }
+        ],
+        "printQuestLink": "Entregar regra multijanela do CloudShop validada, política de canais e registro de revisão de ruído.",
+        "quiz": [
+          {
+            "question": "Com SLO de 99,9%, qual o burn rate para 1,44% de erros?",
+            "options": [
+              "0,144",
+              "1,44",
+              "14,4",
+              "1440"
+            ],
+            "answerIndex": 2,
+            "explanation": "0,0144 dividido por 0,001 resulta em 14,4."
+          },
+          {
+            "question": "Qual o papel da janela curta?",
+            "options": [
+              "Confirmar que a degradação continua",
+              "Substituir o SLO",
+              "Eliminar toda notificação",
+              "Medir custo mensal"
+            ],
+            "answerIndex": 0,
+            "explanation": "Ela evita tratar um impacto passado como falha necessariamente ainda ativa."
+          },
+          {
+            "question": "Uma série sem dados prova disponibilidade total?",
+            "options": [
+              "Sim, não há erros",
+              "Somente à noite",
+              "Sim, com for",
+              "Não; pode haver falha de coleta"
+            ],
+            "answerIndex": 3,
+            "explanation": "Ausência de evidência exige verificar a saúde da telemetria e outras sondas."
+          }
+        ]
+      },
+      {
+        "id": "l-10-8",
+        "moduleId": "mod-10",
+        "title": "Game day: resposta coordenada e ações de postmortem verificáveis",
+        "duration": 55,
+        "difficulty": "Intermediário",
+        "tools": [
+          "kubectl",
+          "Runbooks",
+          "Markdown"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Executar um exercício de incidente com limites claros",
+          "Separar comando, investigação e comunicação",
+          "Escolher mitigação reversível com critério de sucesso",
+          "Registrar uma linha do tempo com evidências",
+          "Transformar aprendizados em ações testáveis"
+        ],
+        "body": [
+          "Em vez de repetir o conceito de postmortem, vamos **ensaiar o ciclo completo**. Um game day é uma simulação planejada para testar pessoas, processos e ferramentas. Use o CloudShop de laboratório; defina previamente cenário, duração, responsáveis e condição de parada em `docs/game-day.md`.",
+          "Comece estabelecendo **limites de segurança**: ambiente isolado, dados sintéticos, autorização e um observador com poder de abortar. Uma simulação que toca produção por engano já é um incidente real. Confirme o contexto com `kubectl config current-context` antes de qualquer operação.",
+          "Ao detectar a degradação, nomeie um **coordenador do incidente**. Ele mantém prioridades e evita intervenções conflitantes; outra pessoa investiga e outra comunica. Em uma equipe pequena, uma pessoa pode acumular papéis, mas precisa anunciar essa limitação e registrar decisões no canal `inc-cloudshop`.",
+          "Escreva a primeira atualização com **impacto, horário e próximo retorno**, mesmo sem causa conhecida. Diga o que foi observado e o que ainda é hipótese: “checkout apresenta erros desde 14:02 UTC; próxima atualização às 14:12”. Não prometa uma restauração em `5m` sem evidência.",
+          "A **mitigação vem antes da explicação definitiva**. Se o início coincide com um deploy, compare a revisão atual e a anterior e avalie rollback; uma migração incompatível pode impedir essa opção. Registre alternativa, risco, autorização e sinal que comprovará melhora antes de executar a mudança.",
+          "O exemplo usa uma **revisão explícita** para reduzir ambiguidades, mas só deve ser executado após a avaliação de compatibilidade. `rollout status` informa progresso do Deployment, não a recuperação da experiência. Confira também a jornada sintética de compra, a taxa de erros e o tempo de resposta.",
+          "Após estabilizar, preserve a **linha do tempo factual**: detecção, decisões, mudanças e recuperação, com horários em UTC. No postmortem, diferencie gatilho de condições contribuintes. “Deploy iniciou a falha” não explica por que testes, revisão e mecanismos de recuperação não a impediram.",
+          "Termine com **ações verificáveis**, não promessas vagas. Troque “melhorar testes” por “adicionar teste de exaustão do pool que falha na versão defeituosa”, com responsável, prazo e evidência. Agende novo exercício para comprovar a mudança e só encerre o item quando o critério de aceite estiver cumprido."
+        ],
+        "code": [
+          {
+            "label": "Inspeção e mitigação em laboratório autorizado",
+            "language": "bash",
+            "code": "# Leia o contexto e confirme manualmente que é o laboratório autorizado.\nkubectl config current-context\nkubectl -n cloudshop-lab rollout history deployment/cloudshop-api\nkubectl -n cloudshop-lab get deployment cloudshop-api -o wide\n\n# Somente após validar compatibilidade e autorizar a revisão 3 deste laboratório.\nkubectl -n cloudshop-lab rollout undo deployment/cloudshop-api --to-revision=3\nkubectl -n cloudshop-lab rollout status deployment/cloudshop-api --timeout=120s\n# Depois, valide checkout sintético e métricas; rollout saudável não basta."
+          },
+          {
+            "label": "Registro de decisão e ação com aceite",
+            "language": "yaml",
+            "code": "# Exemplo didático: substitua horários e evidências pelos dados do exercício.\nincidente: GD-001\nambiente: cloudshop-lab\ndecisao:\n  horario_utc: \"2026-09-14T14:08:00Z\"\n  hipotese: \"Nova versão não devolve conexões ao pool\"\n  mitigacao: \"Retornar à revisão 3 compatível com o esquema atual\"\n  sucesso: \"Checkout sintético funciona e erros retornam à linha de base por 10 minutos\"\nacao:\n  responsavel: \"Equipe da API\"\n  prazo: \"2026-09-21\"\n  aceite: \"Teste de carga falha na versão defeituosa e passa na corrigida\"\n  evidencia: \"Anexar execução do CI ao ticket antes de encerrá-lo\""
+          }
+        ],
+        "whyItMatters": "Uma equipe que ensaia decisões e comunicação reduz improviso e consegue comprovar se aprendeu com falhas.",
+        "commonMistake": "Encerrar o incidente quando os pods ficam Ready, sem confirmar a jornada do usuário.",
+        "productionTip": "Mantenha o runbook acessível mesmo se o cluster ou o provedor principal estiver indisponível.",
+        "securityAlert": "Não faça injeção de falhas fora do escopo autorizado; sanitize evidências e envolva resposta de segurança se houver suspeita de comprometimento.",
+        "interviewQuestion": "Como decidir entre rollback e investigação adicional, e que evidência permite declarar recuperação?",
+        "glossary": [
+          {
+            "term": "Game day",
+            "definition": "Exercício controlado para testar resposta e resiliência."
+          },
+          {
+            "term": "Mitigação",
+            "definition": "Ação para reduzir impacto antes da correção definitiva."
+          },
+          {
+            "term": "Coordenador do incidente",
+            "definition": "Pessoa que organiza prioridades e decisões durante a resposta."
+          },
+          {
+            "term": "Gatilho",
+            "definition": "Evento que inicia a manifestação de uma falha."
+          },
+          {
+            "term": "Critério de aceite",
+            "definition": "Condição objetiva necessária para considerar uma ação concluída."
+          }
+        ],
+        "printQuestLink": "Executar um game day no CloudShop de laboratório e entregar linha do tempo, comunicação e postmortem com ações testáveis.",
+        "quiz": [
+          {
+            "question": "Qual evidência basta para declarar recuperação?",
+            "options": [
+              "Deployment atualizado apenas",
+              "Fim do expediente",
+              "Jornada validada e indicadores estabilizados",
+              "Hipótese plausível"
+            ],
+            "answerIndex": 2,
+            "explanation": "A recuperação deve refletir a experiência, não somente o estado do orquestrador."
+          },
+          {
+            "question": "Qual ação de postmortem é verificável?",
+            "options": [
+              "Ter mais cuidado",
+              "Teste do pool com responsável, prazo e execução anexada",
+              "Nunca mais falhar",
+              "Melhorar tudo"
+            ],
+            "answerIndex": 1,
+            "explanation": "Um aceite observável permite comprovar conclusão e eficácia."
+          },
+          {
+            "question": "Quando executar rollback?",
+            "options": [
+              "Sempre que alguém sugerir",
+              "Sem consultar o esquema do banco",
+              "Só depois de descobrir toda a causa",
+              "Após avaliar compatibilidade, risco e critério de sucesso"
+            ],
+            "answerIndex": 3,
+            "explanation": "Mitigar rapidamente não significa ignorar riscos de incompatibilidade."
+          }
+        ]
+      },
     ],
   },
   {
@@ -460,7 +775,7 @@ politica:
     title: "DevSecOps, FinOps e Projeto Final",
     tagline: "Seguro, com custo sob controle e pronto para portfólio.",
     weeks: 2,
-    xp: 3000,
+    xp: 3075,
     badge: "devops-professional",
     regionId: "torre-confiabilidade",
     overview:
@@ -848,6 +1163,323 @@ right-sizing do RDS, VPC endpoint para S3 (reduziu NAT).
             explanation: "Resultado medido demonstra competência aplicada.",
           },
         ],
+      },
+      {
+        "id": "l-11-6",
+        "moduleId": "mod-11",
+        "title": "Portfólio auditável: provas reproduzíveis em vez de promessas",
+        "duration": 55,
+        "difficulty": "Intermediário",
+        "tools": [
+          "GitHub Actions",
+          "Docker Compose",
+          "Markdown"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Construir uma matriz de competências e evidências",
+          "Separar resultados medidos de estimativas",
+          "Criar uma validação reproduzível do projeto",
+          "Preparar demonstração curta com plano alternativo",
+          "Publicar evidências sem expor dados privados"
+        ],
+        "body": [
+          "Você já organizou currículo e README; agora precisa demonstrar **reprodutibilidade**. Um portfólio forte permite a outra pessoa verificar uma afirmação sem depender da sua apresentação. Para cada competência, conecte `afirmação → artefato → procedimento de validação → limitação`.",
+          "Escolha **três provas relevantes** em vez de multiplicar repositórios. No CloudShop, use uma implantação automatizada, uma recuperação de falha e uma otimização medida. Cada prova deve apontar para um commit ou uma execução específica, e não apenas para um badge `passing` que muda com o tempo.",
+          "Uma comparação exige **condições explícitas**: versão, tamanho da amostra, máquina, carga e intervalo. Se o build passou de 12 para 5 minutos, informe se o cache estava frio ou quente em cada teste. Registre também a dispersão; `n=1` é uma observação, não uma garantia de desempenho.",
+          "Separe **laboratório e produção** sem diminuir a prática. Diga que o projeto usa dados sintéticos e uma carga de `20 req/s`, se isso for verdade. Operar um exercício bem documentado demonstra raciocínio; apresentá-lo como operação comercial real compromete sua credibilidade.",
+          "A **demonstração local** deve ter pré-requisitos e uma saída esperada. O script pressupõe um arquivo Compose já existente, aguarda o healthcheck e consulta `/health`. Adapte o endpoint ao contrato da sua API e documente consumo de memória e portas antes de pedir que alguém execute.",
+          "Prepare uma **narrativa de cinco minutos**: problema, decisão, prova, resultado e limite. Mostre uma execução e uma evidência de recuperação, não todas as telas. Tenha uma gravação curta e resultados sanitizados como plano alternativo se a rede falhar durante a entrevista.",
+          "A **curadoria pública** é uma atividade de segurança. Faça revisão do histórico, capturas e artefatos; um terminal gravado pode revelar tokens ou nomes internos. O arquivo `.env.example` precisa conter placeholders, nunca credenciais funcionais, mesmo que sejam de laboratório.",
+          "Conclua pedindo uma **avaliação externa**: outra pessoa consegue rodar o projeto com as instruções e explicar o trade-off sem sua ajuda? Registre dificuldades como issues, corrija as mais importantes e marque a versão demonstrada com uma referência como `portfolio-v1`. Essa validação vale mais que ampliar a lista de ferramentas."
+        ],
+        "code": [
+          {
+            "label": "Smoke test reproduzível do ambiente local",
+            "language": "bash",
+            "code": "#!/usr/bin/env bash\nset -euo pipefail\n# Pré-requisitos: Docker Compose v2, compose.yaml com healthcheck e API em 8080.\n# Execute apenas em ambiente local de estudo; remove containers ao terminar.\ntrap 'docker compose down' EXIT\ndocker compose up -d --build --wait --wait-timeout 120\n# -f faz o teste falhar em respostas HTTP de erro.\ncurl --fail --silent --show-error --max-time 10 http://localhost:8080/health\nprintf '\\nSmoke test concluído.\\n'\n# O healthcheck não substitui um teste completo de criação de pedido."
+          },
+          {
+            "label": "Índice de evidências do portfólio",
+            "language": "yaml",
+            "code": "# Metadados do laboratório: preencha resultados somente após medir.\nprojeto: CloudShop\ncontexto: \"Laboratório com dados sintéticos, não operação comercial\"\nevidencias:\n  - competencia: \"Recuperação de falhas\"\n    artefato: \"docs/game-day.md\"\n    reproducao: \"Seguir cenário autorizado e registrar tempos em UTC\"\n    criterio: \"Checkout validado após mitigação\"\n    limite: \"Resultado válido para a carga e infraestrutura descritas\"\n  - competencia: \"Entrega automatizada\"\n    artefato: \".github/workflows/ci.yml\"\n    reproducao: \"Consultar execução vinculada ao commit demonstrado\"\n    criterio: \"Build e testes aprovados sem credenciais no log\""
+          }
+        ],
+        "whyItMatters": "Evidências reproduzíveis permitem avaliar competência aplicada, mesmo quando sua experiência é de laboratório.",
+        "commonMistake": "Copiar números de exemplos para o currículo sem executar a medição correspondente.",
+        "productionTip": "Mantenha uma versão de demonstração estável e valide as instruções em ambiente limpo antes de cada apresentação.",
+        "securityAlert": "Nunca publique ativos ou incidentes do empregador sem autorização; remova dados pessoais e revogue qualquer credencial exposta.",
+        "interviewQuestion": "Como outra pessoa verificaria um resultado que você apresenta no portfólio e quais são os limites dessa medição?",
+        "glossary": [
+          {
+            "term": "Reprodutibilidade",
+            "definition": "Possibilidade de repetir um procedimento sob condições documentadas."
+          },
+          {
+            "term": "Artefato",
+            "definition": "Arquivo ou resultado concreto que sustenta uma afirmação."
+          },
+          {
+            "term": "Linha de base",
+            "definition": "Medição inicial usada como referência de comparação."
+          },
+          {
+            "term": "Smoke test",
+            "definition": "Verificação curta de funcionamento essencial."
+          },
+          {
+            "term": "Curadoria",
+            "definition": "Seleção e revisão de evidências relevantes para um público."
+          }
+        ],
+        "printQuestLink": "Publicar uma versão auditável do CloudShop com matriz de evidências, smoke test local e demonstração curta sanitizada.",
+        "quiz": [
+          {
+            "question": "Qual evidência sustenta melhor uma melhoria de build?",
+            "options": [
+              "Um número sem contexto",
+              "Medições com versões, cache e ambiente documentados",
+              "Uma lista de ferramentas",
+              "Um certificado isolado"
+            ],
+            "answerIndex": 1,
+            "explanation": "Condições documentadas tornam a comparação verificável."
+          },
+          {
+            "question": "Como descrever uma recuperação feita em laboratório?",
+            "options": [
+              "Como incidente comercial real",
+              "Sem mencionar o ambiente",
+              "Como exercício com carga, método e limites explícitos",
+              "Como garantia de disponibilidade futura"
+            ],
+            "answerIndex": 2,
+            "explanation": "Transparência preserva credibilidade e permite avaliar a prática."
+          },
+          {
+            "question": "Qual o objetivo principal do smoke test?",
+            "options": [
+              "Comprovar toda a segurança",
+              "Substituir testes de carga",
+              "Prometer SLO de produção",
+              "Verificar rapidamente o funcionamento essencial"
+            ],
+            "answerIndex": 3,
+            "explanation": "É uma checagem inicial e limitada, não uma prova completa de qualidade."
+          }
+        ]
+      },
+      {
+        "id": "l-11-7",
+        "moduleId": "mod-11",
+        "title": "Entrevista prática: diagnóstico em voz alta e simulações com rubrica",
+        "duration": 55,
+        "difficulty": "Intermediário",
+        "tools": [
+          "Linux",
+          "curl",
+          "kubectl",
+          "GitHub Actions"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Organizar prática técnica por cenários e fundamentos",
+          "Explicitar hipóteses e critérios de confirmação",
+          "Diagnosticar conectividade em camadas",
+          "Explicar riscos e alternativas de uma intervenção",
+          "Avaliar simulações com uma rubrica objetiva"
+        ],
+        "body": [
+          "Aqui o foco não é repetir histórias de currículo: é **resolver problemas sob observação**. Em uma entrevista prática, o avaliador quer acompanhar seu modelo mental. Comece perguntando impacto, escopo, ambiente e mudanças recentes antes de executar `kubectl` ou sugerir trocar toda a arquitetura.",
+          "Monte uma **matriz de treino por fundamentos**: processos e permissões em Linux; DNS, TCP e HTTP em redes; imagem e runtime em containers; recursos e eventos em Kubernetes; fluxo de artefatos e permissões no CI. Alterne cenários pequenos, como “pipeline não publica imagem”, com sessões de `30m`.",
+          "Use um ciclo de **hipótese, teste e interpretação**. Diante de erro no checkout, diga: “vou separar resolução DNS de resposta HTTP; se DNS falhar, não concluo que a API caiu”. Execute uma consulta pequena e explique como o resultado muda a próxima decisão. Uma lista de comandos sem interpretação não demonstra diagnóstico.",
+          "Comece por **inspeções não destrutivas**. O bloco de rede separa nome, conexão e status HTTP e registra tempos observados pelo cliente. Um `curl` bem-sucedido da sua máquina não prova que um pod alcança a dependência; origem, proxy e políticas podem mudar o caminho.",
+          "Em Kubernetes, distinga **estado desejado e execução**: Deployment existe, mas há pods agendados? Eventos indicam imagem inválida, falta de recursos ou falha de probe? `describe` e logs ajudam a escolher a camada; reiniciar tudo pode apagar pistas e esconder o problema temporariamente.",
+          "Treine também **leitura de pipeline**: descubra qual etapa falhou, que identidade a executa e qual artefato a etapa seguinte espera. Se a autenticação no registry falhar, não aumente permissões para administrador automaticamente. Explique como verificar escopo e corrigir apenas o acesso necessário.",
+          "Quando não souber algo, pratique **incerteza responsável**: declare o limite e diga onde confirmaria o comportamento. “Não lembro essa flag; consultaria `--help` e testaria no laboratório” é melhor que inventar. Antes de uma mudança, anuncie risco, rollback e sinal de sucesso.",
+          "Faça uma **simulação com rubrica**: de zero a dois pontos para delimitação, hipóteses, evidências, segurança e comunicação. Grave a sessão com dados fictícios, escolha um ponto fraco e repita o cenário com outra causa. O objetivo não é decorar respostas, mas melhorar decisões transferíveis entre ferramentas."
+        ],
+        "code": [
+          {
+            "label": "Diagnóstico HTTP a partir da máquina do candidato",
+            "language": "bash",
+            "code": "# Pré-requisitos: getent e curl; adapte ao endpoint autorizado do exercício.\ngetent hosts example.com\n# Tempos cumulativos em segundos; não confunda HTTP 500 com falha de DNS.\ncurl --silent --show-error --output /dev/null   --connect-timeout 3 --max-time 10   --write-out 'http=%{http_code} dns=%{time_namelookup} connect=%{time_connect} total=%{time_total}\\n'   https://example.com/\n# Sem --fail, HTTP 4xx/5xx exige interpretação explícita do código retornado."
+          },
+          {
+            "label": "Inspeção inicial sem alterar o cluster",
+            "language": "bash",
+            "code": "# Use somente o contexto e namespace autorizados pelo entrevistador.\nkubectl config current-context\nkubectl -n cloudshop-lab get deployments,pods,services\nkubectl -n cloudshop-lab describe deployment cloudshop-api\nkubectl -n cloudshop-lab get events --sort-by=.metadata.creationTimestamp\n# Logs podem conter dados sensíveis; não copie a saída para serviços públicos.\nkubectl -n cloudshop-lab logs deployment/cloudshop-api --tail=50 --timestamps"
+          }
+        ],
+        "whyItMatters": "Praticar diagnóstico explicável prepara tanto para entrevistas quanto para incidentes em ambientes desconhecidos.",
+        "commonMistake": "Executar comandos de alteração para parecer rápido antes de entender escopo e risco.",
+        "productionTip": "Repita o mesmo sintoma com causas diferentes: DNS inválido, timeout e HTTP 500 exigem raciocínios distintos.",
+        "securityAlert": "Não cole tokens ou logs de empresas em plataformas de entrevista; peça autorização antes de qualquer alteração e use privilégios mínimos.",
+        "interviewQuestion": "A aplicação não responde a um cliente, mas o pod está Running: quais hipóteses você testaria e em qual ordem?",
+        "glossary": [
+          {
+            "term": "Hipótese",
+            "definition": "Explicação provisória que pode ser confirmada ou refutada por evidência."
+          },
+          {
+            "term": "Rubrica",
+            "definition": "Critérios explícitos usados para avaliar uma prática."
+          },
+          {
+            "term": "Timeout",
+            "definition": "Limite de espera excedido antes de uma operação terminar."
+          },
+          {
+            "term": "Estado desejado",
+            "definition": "Configuração que o controlador busca manter no sistema."
+          },
+          {
+            "term": "Escopo de permissão",
+            "definition": "Conjunto de recursos e ações autorizados para uma identidade."
+          }
+        ],
+        "printQuestLink": "Realizar duas entrevistas simuladas com o CloudShop, entregando hipóteses, evidências sanitizadas e autoavaliação por rubrica.",
+        "quiz": [
+          {
+            "question": "Antes de mudar o ambiente durante o diagnóstico, você deve:",
+            "options": [
+              "Delimitar escopo, risco e autorização",
+              "Reiniciar todos os pods",
+              "Desligar os alertas",
+              "Solicitar acesso de administrador sempre"
+            ],
+            "answerIndex": 0,
+            "explanation": "A segurança da investigação começa antes da primeira alteração."
+          },
+          {
+            "question": "HTTP 500 recebido pelo curl demonstra necessariamente falha de DNS?",
+            "options": [
+              "Sim",
+              "Não; houve resposta HTTP de um servidor no caminho",
+              "Sim, se o pod está Running",
+              "Apenas em HTTPS"
+            ],
+            "answerIndex": 1,
+            "explanation": "Receber resposta HTTP é diferente de não resolver o nome; é preciso investigar a camada que respondeu."
+          },
+          {
+            "question": "Se não lembra uma flag durante a entrevista, qual conduta é melhor?",
+            "options": [
+              "Inventar e executar",
+              "Encerrar o diagnóstico",
+              "Declarar a dúvida e consultar documentação ou ajuda",
+              "Mudar de assunto"
+            ],
+            "answerIndex": 2,
+            "explanation": "Comunicar limites e validar comportamento demonstra responsabilidade técnica."
+          }
+        ]
+      },
+      {
+        "id": "l-11-8",
+        "moduleId": "mod-11",
+        "title": "Primeiros 90 dias: aprender o sistema, entregar com segurança e ganhar autonomia",
+        "duration": 55,
+        "difficulty": "Intermediário",
+        "tools": [
+          "Markdown",
+          "Git",
+          "SLO",
+          "Runbooks"
+        ],
+        "xp": 25,
+        "objectives": [
+          "Mapear serviços, responsáveis e fluxos de entrega",
+          "Planejar resultados para 30, 60 e 90 dias",
+          "Escolher uma primeira melhoria de baixo risco",
+          "Negociar autonomia e critérios de escalonamento",
+          "Demonstrar impacto sem otimizar métricas isoladas"
+        ],
+        "body": [
+          "Entrar em uma equipe exige **entender antes de transformar**. O plano de `90 dias` é um acordo de aprendizagem e entregas, não uma promessa de dominar toda a plataforma. Ajuste marcos com sua liderança conforme senioridade, contexto e prioridade do negócio.",
+          "Nos **primeiros 30 dias**, descubra quem opera cada serviço, quem decide mudanças e como um pedido chega à produção. Siga uma alteração do commit ao deploy, leia um incidente recente e observe o atendimento de um alerta. Registre dúvidas em `docs/onboarding.md`, com responsáveis para respondê-las.",
+          "O **acesso inicial** deve ser suficiente para aprender sem criar risco desnecessário. Comece com leitura, MFA e sessões auditáveis; solicite elevação temporária para tarefas aprovadas. Não compartilhe credenciais de colegas para acelerar o onboarding e não exporte inventários internos para contas pessoais.",
+          "Construa um **mapa de dependências operacionais**: serviço, dono, dashboard, runbook, repositório e escalonamento. Um catálogo simples já revela serviços órfãos e documentação quebrada. Confirme as informações com quem atende o plantão, pois um documento antigo pode não refletir a operação real.",
+          "Entre os **dias 31 e 60**, entregue uma melhoria pequena acompanhada por alguém experiente. Pode ser corrigir um runbook ou tornar um teste de pipeline determinístico. Defina linha de base, risco, revisão e rollback; em vez de “reduzir tempo de CI”, combine medir `p50` e taxa de falha em uma amostra acordada.",
+          "Evite o impulso de **substituir ferramentas cedo demais**. Uma configuração aparentemente estranha pode existir por contrato, custo ou incidente anterior. Registre alternativas e procure contexto antes de propor migração; automatizar um processo ainda não compreendido pode apenas acelerar erros.",
+          "Entre os **dias 61 e 90**, busque autonomia em um escopo explícito. Execute uma mudança revisada, participe de um exercício e apresente resultados com limites. Entrar sozinho no plantão não é rito obrigatório: combine treinamento, acesso, runbooks e critérios de escalonamento antes de assumir responsabilidade.",
+          "Feche o período com uma **retrospectiva orientada a impacto**: o que aprendeu, que risco diminuiu, que resultado foi medido e o que ainda depende de apoio. Não use quantidade de commits como medida de valor. Atualize o plano para o próximo trimestre e confirme com a equipe se o benefício observado justifica manter a mudança."
+        ],
+        "code": [
+          {
+            "label": "Plano negociável com entregas e critérios de aceite",
+            "language": "yaml",
+            "code": "# Exemplo para adaptar com a liderança; não é uma meta universal.\nplano:\n  dias_1_30:\n    objetivo: \"Entender a operação\"\n    entrega: \"Mapa de serviços e acompanhamento de um deploy\"\n    aceite: \"Mapa revisado por responsáveis e dúvidas prioritárias respondidas\"\n  dias_31_60:\n    objetivo: \"Entregar melhoria de baixo risco\"\n    entrega: \"Correção de runbook validada em laboratório\"\n    aceite: \"Outra pessoa executa o procedimento sem instrução oral adicional\"\n  dias_61_90:\n    objetivo: \"Ampliar autonomia em escopo acordado\"\n    entrega: \"Mudança revisada com resultado observado\"\n    aceite: \"Revisão, rollback e critério de escalonamento documentados\"\nacompanhamento:\n  frequencia: \"Semanal\"\n  responsaveis: [\"Profissional\", \"Mentor\", \"Liderança\"]"
+          },
+          {
+            "label": "Modelo de catálogo operacional mínimo",
+            "language": "yaml",
+            "code": "# Mantenha apenas links internos autorizados, sem credenciais.\nservicos:\n  - nome: cloudshop-api\n    responsavel: \"Equipe de pedidos\"\n    repositorio: \"Link interno a preencher\"\n    dashboard: \"Link interno a preencher\"\n    runbook: \"docs/runbooks/api-5xx.md\"\n    escalonamento: \"Consultar escala vigente do time\"\n    ultima_validacao: \"Preencher após revisão com o responsável\"\n# Não publique o catálogo da empresa no portfólio pessoal."
+          }
+        ],
+        "whyItMatters": "Autonomia construída com contexto e confiança permite entregar valor sem criar incidentes evitáveis na adaptação.",
+        "commonMistake": "Prometer uma migração grande na primeira semana antes de entender dependências e restrições.",
+        "productionTip": "Combine checkpoints semanais com mentor e liderança e revise prioridades sempre que o contexto mudar.",
+        "securityAlert": "Use MFA, identidades individuais e elevação temporária; inventários, runbooks e indicadores internos também precisam de controle de acesso.",
+        "interviewQuestion": "Que primeira melhoria você escolheria em uma plataforma desconhecida e como demonstraria valor com baixo risco?",
+        "glossary": [
+          {
+            "term": "Onboarding",
+            "definition": "Processo de integração ao contexto técnico e organizacional da equipe."
+          },
+          {
+            "term": "Mentoria",
+            "definition": "Acompanhamento para desenvolver contexto e autonomia com apoio."
+          },
+          {
+            "term": "Escalonamento",
+            "definition": "Acionamento de pessoas ou níveis de suporte conforme critérios definidos."
+          },
+          {
+            "term": "Catálogo de serviços",
+            "definition": "Registro dos serviços e de suas informações operacionais essenciais."
+          },
+          {
+            "term": "Autonomia",
+            "definition": "Capacidade de atuar com responsabilidade dentro de um escopo acordado."
+          }
+        ],
+        "printQuestLink": "Criar um plano de 90 dias para assumir a operação do CloudShop, com catálogo, melhoria de baixo risco e critérios de autonomia.",
+        "quiz": [
+          {
+            "question": "Qual deve ser a prioridade inicial em uma equipe nova?",
+            "options": [
+              "Migrar tudo para sua ferramenta preferida",
+              "Entender serviços, responsáveis e processo de entrega",
+              "Assumir plantão sozinho imediatamente",
+              "Receber todas as permissões disponíveis"
+            ],
+            "answerIndex": 1,
+            "explanation": "Contexto e responsabilidades vêm antes de mudanças amplas."
+          },
+          {
+            "question": "Qual é uma boa primeira entrega?",
+            "options": [
+              "Mudança irreversível sem revisão",
+              "Refatorar toda a infraestrutura",
+              "Runbook corrigido e validado por outra pessoa",
+              "Aumentar o número de commits"
+            ],
+            "answerIndex": 2,
+            "explanation": "Uma melhoria pequena e verificável reduz risco e constrói confiança."
+          },
+          {
+            "question": "Quando assumir autonomia no plantão?",
+            "options": [
+              "Assim que receber o notebook",
+              "Sempre no dia 30",
+              "Sem acesso aos dashboards",
+              "Após alinhar treinamento, escopo, recursos e escalonamento"
+            ],
+            "answerIndex": 3,
+            "explanation": "Responsabilidade operacional exige preparação e suporte explícitos."
+          }
+        ]
       },
     ],
   },
