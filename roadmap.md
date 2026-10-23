@@ -18,3 +18,4 @@
 - [ ] Adicionar 3 aulas novas por módulo (36 no total), mais didáticas e explicadas, nos 6 arquivos de módulos (6 agentes em paralelo).
 - [ ] Traduzir as novas aulas para espanhol e inglês.
 - [ ] Typecheck/build OK e verificação de uma aula nova na interface.
+- [x] 36 aulas novas adicionadas (3 por módulo) e RichText passou a renderizar **negrito** e `código` inline; verificado l-0-6 e l-8-8 na interface.
