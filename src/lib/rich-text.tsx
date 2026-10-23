@@ -91,7 +91,10 @@ function escapeText(value: string): string {
 
 export function toHtml(value: string): string {
   if (looksLikeHtml(value)) return sanitizeHtml(value);
-  return `<p>${escapeText(value).replace(/\n/g, "<br />")}</p>`;
+  const escaped = escapeText(value)
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>");
+  return `<p>${escaped.replace(/\n/g, "<br />")}</p>`;
 }
 
 const PROSE = [
