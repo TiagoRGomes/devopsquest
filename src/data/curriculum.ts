@@ -18,9 +18,11 @@ const EXTRA: Record<string, Lesson[]> = { ...EXTRA_LESSONS_A, ...EXTRA_LESSONS_B
 const DEEP: Record<string, LessonDeep> = { ...DEEP_REDES_GIT, ...DEEP_CONTAINERS_CICD, ...DEEP_CLOUD_IAC, ...DEEP_K8S_GITOPS, ...DEEP_SRE_FINAL };
 
 function enrich(m: Module): Module {
+  const extra = EXTRA[m.id] ?? [];
   return {
     ...m,
-    lessons: m.lessons.map((l) => {
+    xp: m.xp + extra.reduce((acc, l) => acc + l.xp, 0),
+    lessons: [...m.lessons, ...extra].map((l) => {
       const d = DEEP[l.id];
       if (!d) return l;
       return {
