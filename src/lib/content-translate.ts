@@ -35,7 +35,9 @@ export function tLesson(lang: Lang, l: Lesson): Lesson {
   const defs = contentList(lang, l.id, "glossaryDefs", glossary.map((g) => g.definition));
   const code = contentObjects<CodeBlock>(lang, l.id, "codeJson", l.code);
   const labels = contentList(lang, l.id, "codeLabels", code.map((c) => c.label));
-  const securityAlert = overrideText(lang, l.id, "securityAlert") ?? l.securityAlert;
+  const securityAlert = l.securityAlert
+    ? contentText(lang, l.id, "securityAlert", l.securityAlert)
+    : undefined;
   const { securityAlert: _drop, ...base } = l;
   void _drop;
   return {
