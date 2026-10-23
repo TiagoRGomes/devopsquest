@@ -80,9 +80,9 @@ export function sanitizeHtml(html: string): string {
     });
 }
 
-/** Detecta se o texto já é HTML vindo do editor. */
+/** Detecta se o texto já é HTML vindo do editor (só tags conhecidas; `<pod>` etc. não contam). */
 export function looksLikeHtml(value: string): boolean {
-  return /<\/?[a-zA-Z][^>]*>/.test(value);
+  return /<\/?(p|br|hr|strong|b|em|i|u|s|h[1-6]|ul|ol|li|blockquote|code|pre|span|div|figure|figcaption|table|thead|tbody|tr|th|td|a|img|video|source|iframe)\b[^>]*>/i.test(value);
 }
 
 function escapeText(value: string): string {
