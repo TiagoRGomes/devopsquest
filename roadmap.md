@@ -19,3 +19,4 @@
 - [ ] Traduzir as novas aulas para espanhol e inglês.
 - [ ] Typecheck/build OK e verificação de uma aula nova na interface.
 - [x] 36 aulas novas adicionadas (3 por módulo) e RichText passou a renderizar **negrito** e `código` inline; verificado l-0-6 e l-8-8 na interface.
+- [x] Traduções ES/EN das 36 aulas novas geradas via IA (3458 chaves) e securityAlert passou a usar o dicionário de tradução; RichText corrigido para não confundir `<pod>` com HTML.
