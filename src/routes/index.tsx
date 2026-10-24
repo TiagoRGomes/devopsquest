@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { ArrowRight, BookOpen, Castle, Crown, FlaskConical, MessagesSquare, Skull, Swords, Compass } from 'lucide-react';
-import heroImage from '@/assets/night-kingdom.jpg';
+import heroImage from '@/assets/hero-banner.png.asset.json';
 import libraryImage from '@/assets/quest-library.jpg';
 import forgeImage from '@/assets/quest-forge.jpg';
 import dragonImage from '@/assets/quest-dragon.jpg';
