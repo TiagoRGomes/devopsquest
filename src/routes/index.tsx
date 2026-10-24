@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { ArrowRight, BookOpen, Castle, Crown, FlaskConical, MessagesSquare, Skull, Swords, Compass } from 'lucide-react';
-import heroImage from '@/assets/night-kingdom.jpg';
+import heroImage from '@/assets/hero-banner.png.asset.json';
 import libraryImage from '@/assets/quest-library.jpg';
 import forgeImage from '@/assets/quest-forge.jpg';
 import dragonImage from '@/assets/quest-dragon.jpg';
@@ -31,7 +31,7 @@ function Landing() {
   </div></header>
   <main>
    <section className="adventure-hero">
-    <img src={heroImage} width={1920} height={1024} alt="" className="hero-art" />
+    <img src={heroImage.url} width={1920} height={1080} alt="" className="hero-art" />
     <div className="hero-shade" />
     <div className="hero-copy mx-auto w-full max-w-7xl px-5 lg:px-8"><p className="hero-kicker"><span />{c.kicker}</p><h1>DevOps<span>Quest</span></h1><h2>{c.title}</h2><p className="hero-lead">{c.lead}</p><div className="mt-7 flex flex-wrap gap-3"><Button asChild size="lg" className="adventure-cta"><Link to={session ? '/dashboard' : '/auth'} search={session ? {} : {mode:'signup'}}><Swords />{session ? t('rpg.ctaContinue') : t('rpg.ctaCreate')}</Link></Button><Button asChild variant="outline" size="lg" className="adventure-secondary"><Link to="/mapa"><Compass />{c.explore}</Link></Button></div><p className="mt-5 text-xs text-hero-muted">{t('rpg.badgeLangs')}</p></div>
     <div className="hero-corner hero-corner-left" aria-hidden /><div className="hero-corner hero-corner-right" aria-hidden />
