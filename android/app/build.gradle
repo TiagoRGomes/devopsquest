@@ -7,8 +7,8 @@ android {
         applicationId "com.devopsquest.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.0.1"
+        versionCode 3
+        versionName "1.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,10 +16,35 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            def uploadStore = System.getenv('DEVOPSQUEST_UPLOAD_STORE')
+            if (uploadStore) {
+                storeFile file(uploadStore)
+                storePassword System.getenv('DEVOPSQUEST_UPLOAD_STORE_PASSWORD')
+                keyAlias System.getenv('DEVOPSQUEST_UPLOAD_KEY_ALIAS')
+                keyPassword System.getenv('DEVOPSQUEST_UPLOAD_KEY_PASSWORD')
+            }
+        }
+    }
     buildTypes {
         release {
+            if (System.getenv('DEVOPSQUEST_UPLOAD_STORE')) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.name in ['bundleRelease', 'assembleRelease'] }) {
+        ['DEVOPSQUEST_UPLOAD_STORE', 'DEVOPSQUEST_UPLOAD_STORE_PASSWORD',
+         'DEVOPSQUEST_UPLOAD_KEY_ALIAS', 'DEVOPSQUEST_UPLOAD_KEY_PASSWORD'].each { name ->
+            if (!System.getenv(name)) {
+                throw new GradleException("Missing release signing environment variable: ${name}")
+            }
         }
     }
 }
