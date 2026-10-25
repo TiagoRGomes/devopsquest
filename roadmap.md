@@ -10,8 +10,8 @@
 - [x] Match the supplied reference with a moonlit castle, metallic frames, ornamental gold buttons and RPG status tiles; verify mobile sizing, languages and signup navigation.
 
 # Android native package
-- [ ] Generate first Google Play release AAB and companion APK, verify signing and packaged host, deliver signing backup and submission instructions.
-- [ ] Check current hosted design and identify store-readiness blockers without changing account or learning logic.
+- [x] Generate first Google Play release AAB and companion APK, verify signing and packaged host, deliver signing backup and submission instructions.
+- [x] Check current hosted design and identify store-readiness blockers without changing account or learning logic; hosted banner missing, deletion unavailable and native OAuth/device flows unverified, documented for release owner.
 - [x] Correct the Android hosted URL to the verified current medieval Cloudflare site, rebuild the test APK and verify its packaged URL; mobile web images render without horizontal overflow. Physical Android verification remains unavailable.
 - [x] Prepare Android native project using the public hosted app and existing brand icon.
 - [x] Generate and verify an installable test APK (compiled and signature verified; no physical-device test available).
